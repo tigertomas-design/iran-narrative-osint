@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>רשות נרטיב — בית</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #21262d; --border2: #30363d;
+  --text: #e6edf3; --muted: #7d8590;
+  --T1: #f85149; --T2: #fb8500; --T3: #388bfd; --T4: #bc8cff; --T5: #3fb950; --T6: #6e7681;
+  --gold: #e3b341;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  font-weight: 300;
+  direction: rtl;
+}
+
+/* ── CANVAS BACKGROUND ── */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(1px);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── DATA BADGE ── */
+#data-badge {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(22,27,34,0.85);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 15px;
+  color: var(--muted);
+  backdrop-filter: blur(8px);
+  font-weight: 400;
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-green  { background: #3fb950; box-shadow: 0 0 6px #3fb95088; }
+.dot-yellow { background: #e3b341; box-shadow: 0 0 6px #e3b34188; }
+.dot-red    { background: #f85149; box-shadow: 0 0 6px #f8514988; }
+
+/* ── MAIN CONTAINER ── */
+.hero {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 20px;
+}
+
+/* ── OSINT BADGE ── */
+.osint-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(56,139,253,0.1);
+  border: 1px solid rgba(56,139,253,0.3);
+  border-radius: 20px;
+  padding: 5px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #58a6ff;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.osint-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #3fb950;
+  box-shadow: 0 0 6px #3fb95088;
+  animation: blink 1.6s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── TITLE ── */
+.hero-title {
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, #ffffff 0%, #88c0fd 40%, #bc8cff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 14px;
+  text-align: center;
+  letter-spacing: -2px;
+}
+
+/* ── SUBTITLE ── */
+.hero-sub {
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-bottom: 28px;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+/* ── STAT ROW ── */
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 44px;
+  background: rgba(22,27,34,0.7);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+.stat-item {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--muted);
+  white-space: nowrap;
+  border-left: 1px solid var(--border);
+}
+.stat-item:first-child { border-left: none; }
+.stat-item strong {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 28px;
+  margin-left: 5px;
+}
+
+/* ── NAV CARDS GRID ── */
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 960px;
+}
+
+@media (max-width: 900px) {
+  .nav-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .hero-title { font-size: 48px; }
+  .hero-sub { font-size: 20px; }
+}
+
+/* ── NAV CARD ── */
+.nav-card {
+  background: rgba(22,27,34,0.8);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 32px 24px;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  backdrop-filter: blur(8px);
+  transition: transform 0.18s cubic-bezier(.4,0,.2,1), box-shadow 0.18s, border-color 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+.nav-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, currentColor 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+.nav-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--card-color, var(--border2));
+}
+.nav-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 20px color-mix(in srgb, var(--card-color, #fff) 20%, transparent); }
+
+.card-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.card-desc {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.card-arrow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 22px;
+  font-weight: 600;
+  opacity: 0.6;
+  margin-top: 2px;
+  transition: opacity 0.15s, gap 0.15s;
+}
+.nav-card:hover .card-arrow { opacity: 1; gap: 8px; }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- Data completeness badge -->
+<div id="data-badge">
+  <div class="status-dot" id="status-dot"></div>
+  <span id="status-text">בדיקת כיסוי...</span>
+</div>
+
+<!-- Hero section -->
+<div class="hero">
+  <div class="osint-badge">OSINT · LIVE ANALYSIS</div>
+
+  <h1 class="hero-title">רשות נרטיב</h1>
+  <p class="hero-sub">מקרה בוחן: שאגת הארי 2026</p>
+
+  <!-- Stats row -->
+  <div class="stat-row">
+    <div class="stat-item"><strong>104</strong> חשבונות</div>
+    <div class="stat-item"><strong>46</strong> פרסומים</div>
+    <div class="stat-item"><strong>7</strong> נרטיבים</div>
+    <div class="stat-item"><strong>56</strong> ימים</div>
+  </div>
+
+  <!-- Navigation cards -->
+  <div class="nav-grid">
+
+    <!-- Card 1: Trump tweets -->
+    <a href="trump.html" class="nav-card" style="--card-color: #e3b341; color: #e3b341;">
+      <div class="card-icon" style="background: rgba(227,179,65,0.15); border: 1px solid rgba(227,179,65,0.3);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#e3b341"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </div>
+      <div class="card-title" style="color:#e3b341;">ציוצי טראמפ</div>
+      <div class="card-desc">ניתוח 20 תאריכים מ-Truth Social — מאיומים גרעיניים להפסקת אש</div>
+      <div class="card-arrow" style="color:#e3b341;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        פתח ניתוח
+      </div>
+    </a>
+
+    <!-- Card 2: Iranian network -->
+    <a href="index.html" class="nav-card" style="--card-color: #f85149; color: #f85149;">
+      <div class="card-icon" style="background: rgba(248,81,73,0.15); border: 1px solid rgba(248,81,73,0.3);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f85149" stroke-width="1.8"><circle cx="12" cy="5" r="2.5"/><circle cx="4" cy="19" r="2.5"/><circle cx="20" cy="19" r="2.5"/><line x1="12" y1="7.5" x2="4" y2="16.5"/><line x1="12" y1="7.5" x2="20" y2="16.5"/><line x1="6.5" y1="19" x2="17.5" y2="19"/></svg>
+      </div>
+      <div class="card-title" style="color:#f85149;">רשת איראנית</div>
+      <div class="card-desc">104 חשבונות בשש שכבות — גרף אינטראקטיבי עם תיקוף נרטיב</div>
+      <div class="card-arrow" style="color:#f85149;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        פתח רשת
+      </div>
+    </a>
+
+    <!-- Card 3: Timeline (uses localStorage) -->
+    <div class="nav-card" style="--card-color: #388bfd; color: #388bfd; cursor:pointer;"
+         onclick="localStorage.setItem('startView','timeline'); location.href='index.html';">
+      <div class="card-icon" style="background: rgba(56,139,253,0.15); border: 1px solid rgba(56,139,253,0.3);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#388bfd" stroke-width="1.8"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="8 8 3 12 8 16"/><line x1="9" y1="12" x2="21" y2="12"/><circle cx="21" cy="12" r="2"/><line x1="12" y1="6" x2="12" y2="3"/><line x1="17" y1="7" x2="19" y2="5"/><line x1="7" y1="7" x2="5" y2="5"/></svg>
+      </div>
+      <div class="card-title" style="color:#388bfd;">ציר זמן</div>
+      <div class="card-desc">ציר רב-שכבתי: פרסומי שגרירויות, ציוצי טראמפ ואירועי מפתח</div>
+      <div class="card-arrow" style="color:#388bfd;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        פתח ציר
+      </div>
+    </div>
+
+    <!-- Card 4: Language groups -->
+    <a href="groups.html" class="nav-card" style="--card-color: #bc8cff; color: #bc8cff;">
+      <div class="card-icon" style="background: rgba(188,140,255,0.15); border: 1px solid rgba(188,140,255,0.3);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#bc8cff" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <div class="card-title" style="color:#bc8cff;">קבוצות שפה</div>
+      <div class="card-desc">פירוק לפי שפת פנייה — אנגלית, פרסית, ערבית ורב-לשוני</div>
+      <div class="card-arrow" style="color:#bc8cff;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        פתח קבוצות
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<script>
+// ── CANVAS ANIMATION ──────────────────────────────────────────────────────────
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+
+let particles = [];
+let animId;
+
+function initCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  particles = [];
+  const count = Math.floor((canvas.width * canvas.height) / 9000);
+  const clampedCount = Math.min(Math.max(count, 80), 150);
+
+  for (let i = 0; i < clampedCount; i++) {
+    const useBlue = Math.random() > 0.4;
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      r: Math.random() * 2.5 + 1,
+      color: useBlue ? 'rgba(88,166,255,0.6)' : 'rgba(188,140,255,0.4)'
+    });
+  }
+}
+
+function drawCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw links
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 130) {
+        const alpha = (1 - dist / 130) * 0.35;
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(88,166,255,${alpha})`;
+        ctx.lineWidth = 0.6;
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Draw nodes
+  for (const p of particles) {
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  }
+
+  animId = requestAnimationFrame(drawCanvas);
+}
+
+initCanvas();
+drawCanvas();
+
+window.addEventListener('resize', () => {
+  cancelAnimationFrame(animId);
+  initCanvas();
+  drawCanvas();
+});
+
+// ── DATA COMPLETENESS BADGE ───────────────────────────────────────────────────
+(function() {
+  // POSTS keys represent accounts with documented posts
+  const NODES_COUNT = 104;
+  const DOCUMENTED = 17; // from POSTS object in index.html
+
+  const pct = Math.round((DOCUMENTED / NODES_COUNT) * 100);
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+
+  let dotClass = 'dot-red';
+  if (pct >= 85) dotClass = 'dot-green';
+  else if (pct >= 50) dotClass = 'dot-yellow';
+
+  dot.className = 'status-dot ' + dotClass;
+  text.textContent = `כיסוי נתונים: ${pct}% (${DOCUMENTED}/${NODES_COUNT} חשבונות)`;
+})();
+</script>
+
+</body>
+</html>

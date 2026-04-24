@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>קבוצות שפה — מיקוד קהלים</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #21262d; --border2: #30363d;
+  --text: #e6edf3; --muted: #7d8590;
+  --T1: #f85149; --T2: #fb8500; --T3: #388bfd; --T4: #bc8cff; --T5: #3fb950; --T6: #6e7681;
+  --gold: #e3b341;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  font-weight: 300;
+  direction: rtl;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(180deg, #040c18 0%, #05101f 100%);
+  border-bottom: 1px solid rgba(188,140,255,0.15);
+  padding: 0 20px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.back-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 7px; padding: 5px 12px; font-size: 15px; font-weight: 600;
+  color: var(--muted); text-decoration: none; transition: all .18s;
+  flex-shrink: 0; font-family: 'Heebo', sans-serif;
+}
+.back-btn:hover { background: rgba(255,255,255,.08); color: var(--text); }
+
+.header-title {
+  font-size: 22px;
+  font-weight: 900;
+  background: linear-gradient(90deg, #bc8cff 0%, #7ec8ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-total {
+  font-size: 15px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-right: auto;
+}
+
+/* ── COMPLETENESS BADGE ── */
+#completeness-badge {
+  position: fixed;
+  top: 60px;
+  left: 12px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(22,27,34,0.9);
+  border: 1px solid rgba(251,133,0,0.3);
+  border-radius: 7px;
+  padding: 5px 10px;
+  font-size: 15px;
+  color: var(--T2);
+  backdrop-filter: blur(8px);
+  max-width: 340px;
+  line-height: 1.4;
+}
+.badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  background: #fb8500; box-shadow: 0 0 6px #fb850088;
+}
+
+/* ── MAIN LAYOUT ── */
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── LEFT PANEL (group list) ── */
+#groups-panel {
+  width: 340px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: rgba(4,8,24,0.5);
+}
+
+.groups-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+}
+
+#groups-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#groups-list::-webkit-scrollbar { width: 4px; }
+#groups-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* ── GROUP CARD ── */
+.group-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  border-right: 3px solid var(--lang-color, var(--border2));
+}
+.group-card:hover { border-color: var(--lang-color, var(--border2)); transform: translateX(-2px); }
+.group-card.selected {
+  border-color: var(--lang-color, var(--border2));
+  background: rgba(255,255,255,0.025);
+}
+
+.group-card-top {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.lang-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+  direction: ltr;
+  flex-shrink: 0;
+}
+
+.group-name {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.group-count {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.acc-chip {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  border: 1px solid;
+  direction: ltr;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.acc-chip:hover { opacity: 0.65; }
+.chip-more {
+  font-size: 14px;
+  color: var(--muted);
+  padding: 3px 4px;
+  align-self: center;
+}
+
+/* ── RIGHT PANEL (insights) ── */
+#insight-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.insight-placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 18px;
+  text-align: center;
+  padding: 40px;
+  line-height: 1.7;
+}
+
+#insight-content {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+}
+#insight-content::-webkit-scrollbar { width: 5px; }
+#insight-content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* ── INSIGHT CONTENT ── */
+.ic-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ic-lang-big {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 900;
+  border: 2px solid;
+  flex-shrink: 0;
+  direction: ltr;
+}
+
+.ic-title {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.ic-subtitle {
+  font-size: 17px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-top: 3px;
+}
+
+.ic-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+.ic-section {
+  margin-bottom: 18px;
+}
+
+.ic-section-title {
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.ic-value {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.ic-insight-box {
+  background: rgba(56,139,253,0.05);
+  border: 1px solid rgba(56,139,253,0.2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.ic-insight-box strong { color: #7ec8ff; font-weight: 600; }
+
+.t1-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(248,81,73,0.12);
+  border: 1px solid rgba(248,81,73,0.3);
+  border-radius: 5px;
+  padding: 5px 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--T1);
+  margin-top: 6px;
+}
+
+/* ── FULL ACCOUNTS LIST ── */
+.accounts-sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+
+.accounts-title {
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.accounts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.acc-full-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid;
+  direction: ltr;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.acc-full-chip:hover { opacity: 0.75; transform: translateY(-1px); }
+
+.tier-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="home.html" class="back-btn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    חזרה
+  </a>
+  <span class="header-title">קבוצות שפה — מיקוד קהלים</span>
+  <span class="header-total">104 חשבונות · 6+ שפות</span>
+</header>
+
+<!-- Completeness badge -->
+<div id="completeness-badge">
+  <div class="badge-dot"></div>
+  <span>כיסוי רשתות: 45% — Twitter/X ✓ · Telegram חלקי · Instagram לא נסרק</span>
+</div>
+
+<div class="main-layout">
+
+  <!-- Left: Group list -->
+  <div id="groups-panel">
+    <div class="groups-header">קבוצות שפה (לחץ לפרטים)</div>
+    <div id="groups-list"></div>
+  </div>
+
+  <!-- Right: Insight panel -->
+  <div id="insight-panel">
+    <div class="insight-placeholder" id="insight-placeholder">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border2)" stroke-width="1.4" style="margin-bottom:12px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      בחר קבוצת שפה<br>לצפייה בניתוח מפורט
+    </div>
+    <div id="insight-content"></div>
+  </div>
+
+</div>
+
+<script>
+// ── NODES DATA ────────────────────────────────────────────────────────────────
+const NODES = [
+  // T1
+  {id:"@khamenei_ir",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"חשבון אנגלי ראשי; khamenei.ir"},
+  {id:"@Khamenei_fa",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"FA",conf:"H",notes:"חשבון פרסי"},
+  {id:"@ar_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"AR",conf:"H",notes:"חשבון ערבי"},
+  {id:"@Khamenei_es",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"ES",conf:"M",notes:"ספרדית"},
+  {id:"@fr_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"FR",conf:"H",notes:"צרפתית"},
+  {id:"@Khamenei_fra",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"FR",conf:"H",notes:"צרפתית — משני"},
+  {id:"@de_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"DE",conf:"M",notes:"גרמנית"},
+  {id:"@it_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"IT",conf:"M",notes:"איטלקית"},
+  {id:"@tr_Khamenei_ir",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"TR",conf:"M",notes:"טורקית"},
+  {id:"@ur_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"UR",conf:"M",notes:"אורדו"},
+  {id:"@in_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"HI",conf:"H",notes:"הינדי — הושק 2020"},
+  {id:"@ru_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"RU",conf:"L",notes:"רוסית"},
+  {id:"@Khamenei_m",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"multi",conf:"H",notes:"Khamenei Media"},
+  {id:"@drpezeshkian",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN/FA",conf:"H",notes:"נשיא פזשכיאן — חשבון אישי"},
+  {id:"@araghchi",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN/FA",conf:"H",notes:"שר החוץ ארגצ'י — ממסגר הנרטיב"},
+  {id:"@Iran_GOV",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"ממשלת הרפובליקה האסלאמית"},
+  {id:"@IRIMFA_SPOX",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"דובר משרד החוץ בקאי"},
+  {id:"@IRIran_Military",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"L",notes:"לא מאומת כחשבון IRGC רשמי"},
+  // T2
+  {id:"@IRIMFA_EN",tier:"T2",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"משרד החוץ — אנגלית"},
+  {id:"@Iran_UN",tier:"T2",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"נציגות קבועה לאו\"ם — ניו יורק"},
+  {id:"@PMIRAN_GENEVA",tier:"T2",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"נציגות לאו\"ם — ז'נבה"},
+  {id:"@IranmissionEU",tier:"T2",platform:"X",country:"בלגיה",region:"Europe West",lang:"EN/FR",conf:"H",notes:"שגרירות + נציגות לאיחוד האירופי"},
+  // T3 Middle East
+  {id:"@IranEmbassyLB",tier:"T3",platform:"X",country:"לבנון",region:"Middle East",lang:"AR",conf:"H",notes:"ביירות"},
+  {id:"@IRANinQATAR",tier:"T3",platform:"X",country:"קטר",region:"Middle East",lang:"AR/EN",conf:"H",notes:"דוחא"},
+  {id:"@IranembassyDam",tier:"T3",platform:"X",country:"סוריה",region:"Middle East",lang:"AR",conf:"M",notes:"דמשק — מצב תפעולי תנודתי"},
+  // T3 Europe West
+  {id:"@Iran_in_UK",tier:"T3",platform:"X",country:"בריטניה",region:"Europe West",lang:"EN",conf:"H",notes:"לונדון"},
+  {id:"@IRANinFRANCE",tier:"T3",platform:"X",country:"צרפת",region:"Europe West",lang:"FR",conf:"H",notes:"פריז"},
+  {id:"@IraninBerlin",tier:"T3",platform:"X",country:"גרמניה",region:"Europe West",lang:"DE/EN",conf:"H",notes:"Iran In Deutschland"},
+  {id:"@IraninSpain",tier:"T3",platform:"X",country:"ספרד",region:"Europe West",lang:"ES",conf:"M",notes:"מדריד"},
+  {id:"@IRANinBELGIQUE",tier:"T3",platform:"X",country:"בלגיה",region:"Europe West",lang:"FR",conf:"M",notes:"בריסל — דו-צדדי"},
+  {id:"@IRAN_in_NL",tier:"T3",platform:"X",country:"הולנד",region:"Europe West",lang:"EN",conf:"H",notes:"האג"},
+  {id:"@IraninAustria",tier:"T3",platform:"X",country:"אוסטריה",region:"Europe West",lang:"DE/EN",conf:"H",notes:"וינה"},
+  {id:"@IRANinNorway",tier:"T3",platform:"X",country:"נורווגיה",region:"Europe West",lang:"NO/EN",conf:"H",notes:"אוסלו"},
+  {id:"@IRANinFINLAND",tier:"T3",platform:"X",country:"פינלנד",region:"Europe West",lang:"EN",conf:"M",notes:"הלסינקי"},
+  {id:"@IRANinGREECE",tier:"T3",platform:"X",country:"יוון",region:"Europe West",lang:"EN/EL",conf:"H",notes:"אתונה"},
+  // T3 Europe East
+  {id:"@IRANinHUNGARY",tier:"T3",platform:"X",country:"הונגריה",region:"Europe East",lang:"EN/HU",conf:"H",notes:"בודפשט"},
+  {id:"@IRANinCZECH",tier:"T3",platform:"X",country:"צ'כיה",region:"Europe East",lang:"EN/CZ",conf:"H",notes:"פראג"},
+  {id:"@IRANinBULGARIA",tier:"T3",platform:"X",country:"בולגריה",region:"Europe East",lang:"EN/BG",conf:"H",notes:"פרסום 'Epstein's friends'"},
+  {id:"@IRANinROMANIA",tier:"T3",platform:"X",country:"רומניה",region:"Europe East",lang:"EN/RO",conf:"H",notes:"בוקרשט"},
+  {id:"@IraninSerbia",tier:"T3",platform:"X",country:"סרביה",region:"Europe East",lang:"EN/SR",conf:"H",notes:"בלגרד"},
+  {id:"@IRANinBiH",tier:"T3",platform:"X",country:"בוסניה",region:"Europe East",lang:"EN/BS",conf:"H",notes:"סרייבו"},
+  // T3 Post-Soviet
+  {id:"@EmbassyofIrtoRF",tier:"T3",platform:"X",country:"רוסיה",region:"Post-Soviet",lang:"RU/EN",conf:"M",notes:"ידית תנודתית — Al Jazeera מצטטת גרסה זו"},
+  {id:"@IRANINBAKU",tier:"T3",platform:"X",country:"אזרבייג'ן",region:"Post-Soviet",lang:"AZ/EN",conf:"H",notes:"באקו"},
+  {id:"@iraninyerevan",tier:"T3",platform:"X",country:"ארמניה",region:"Post-Soviet",lang:"EN/HY",conf:"H",notes:"ירוואן"},
+  {id:"@IraninGeorgia",tier:"T3",platform:"X",country:"גאורגיה",region:"Post-Soviet",lang:"EN/KA",conf:"H",notes:"טביליסי"},
+  {id:"@IRANinTJ",tier:"T3",platform:"X",country:"טג'יקיסטן",region:"Post-Soviet",lang:"EN/FA",conf:"H",notes:""},
+  // T3 Asia
+  {id:"@IranInThailand",tier:"T3",platform:"X",country:"תאילנד",region:"Asia",lang:"EN/FA",conf:"H",notes:"מוסמך גם למיאנמר ולאוס"},
+  {id:"@IranNigeria",tier:"T3",platform:"X",country:"ניגריה",region:"Africa",lang:"EN/FA",conf:"H",notes:"אבוג'ה"},
+  {id:"@Iran_in_India",tier:"T3",platform:"X",country:"הודו",region:"Asia",lang:"EN",conf:"H",notes:"ניו דלהי"},
+  {id:"@IranAmbIndia",tier:"T3",platform:"X",country:"הודו",region:"Asia",lang:"EN",conf:"H",notes:"שגריר מוחמד פת'אלי"},
+  {id:"@IRANinMumbai",tier:"T3",platform:"X",country:"הודו",region:"Asia",lang:"EN",conf:"H",notes:"קונסוליה מומבאי — הפעיל ביותר"},
+  {id:"@IraninChina",tier:"T3",platform:"X",country:"סין",region:"Asia",lang:"EN/FA",conf:"H",notes:"בייג'ינג; Weibo כפלטפורמה עיקרית"},
+  {id:"@IraninIslamabad",tier:"T3",platform:"X",country:"פקיסטן",region:"Asia",lang:"EN/UR",conf:"H",notes:"~38K עוקבים"},
+  {id:"@IRANinKabul",tier:"T3",platform:"X",country:"אפגניסטן",region:"Asia",lang:"EN/Dari",conf:"H",notes:"קאבול"},
+  {id:"@IraninDhaka",tier:"T3",platform:"X",country:"בנגלדש",region:"Asia",lang:"EN/BN",conf:"H",notes:"דאקה"},
+  {id:"@iraninmalaysia",tier:"T3",platform:"X",country:"מלזיה",region:"Asia",lang:"EN/MS",conf:"H",notes:"קואלה לומפור"},
+  {id:"@IraninIndonesia",tier:"T3",platform:"X",country:"אינדונזיה",region:"Asia",lang:"EN/ID",conf:"H",notes:"ג'קרטה"},
+  {id:"@IraninJapan",tier:"T3",platform:"X",country:"יפן",region:"Asia",lang:"EN/JA",conf:"H",notes:"טוקיו"},
+  {id:"@IraninSKorea",tier:"T3",platform:"X",country:"דרום קוריאה",region:"Asia",lang:"EN/KO",conf:"M",notes:"סיאול"},
+  // T3 Africa
+  {id:"@IraninSA",tier:"T3",platform:"X",country:"דרום אפריקה",region:"Africa",lang:"EN",conf:"H",notes:"כלל בקמפיין; תמונות אנטישמיות קודמות"},
+  {id:"@IraninZimbabwe",tier:"T3",platform:"X",country:"זימבבווה",region:"Africa",lang:"EN",conf:"H",notes:"הוביל את קמפיין המפתחות"},
+  {id:"@IRANinKENYA",tier:"T3",platform:"X",country:"קניה",region:"Africa",lang:"EN",conf:"H",notes:"נירובי"},
+  {id:"@IRANinETHIOPIA",tier:"T3",platform:"X",country:"אתיופיה",region:"Africa",lang:"EN",conf:"H",notes:"אדיס אבבה"},
+  {id:"@IraninAlgeria",tier:"T3",platform:"X",country:"אלג'יריה",region:"Africa",lang:"EN/AR",conf:"H",notes:"אלג'יר"},
+  // T3 Americas
+  {id:"@Eiranencaracas",tier:"T3",platform:"X",country:"ונצואלה",region:"Americas",lang:"ES",conf:"H",notes:"קראקס"},
+  {id:"@IRANinBRAZIL",tier:"T3",platform:"X",country:"ברזיל",region:"Americas",lang:"PT/EN",conf:"H",notes:"ברזיליה"},
+  {id:"@IRANINARGENTINA",tier:"T3",platform:"X",country:"ארגנטינה",region:"Americas",lang:"ES",conf:"H",notes:"בואנוס איירס"},
+  {id:"@iranincuba",tier:"T3",platform:"X",country:"קובה",region:"Americas",lang:"ES",conf:"M",notes:"הוואנה"},
+  // T4
+  {id:"@PressTV",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"IRIB אנגלית; איבד אימות 2024"},
+  {id:"@presstvturk",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"TR",conf:"H",notes:"Press TV טורקית — ינואר 2025"},
+  {id:"@HispanTV",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"ES",conf:"M",notes:"IRIB ספרדית"},
+  {id:"@hispantv_brasil",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"PT",conf:"H",notes:"HispanTV ברזיל — ינואר 2025"},
+  {id:"@AlalamNews",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"AR",conf:"M",notes:"IRIB ערבית; הושעה לסירוגין"},
+  {id:"@OfficialSaharTV",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"multi",conf:"H",notes:"IRIB רב-לשוני"},
+  {id:"@sahartvonline",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"multi",conf:"H",notes:"Sahar TV — משני"},
+  {id:"@EnSaharTV",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"Sahar TV — ענף אנגלי"},
+  {id:"@iribnews_irib",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN/FA",conf:"H",notes:"IRIB News — מוסדי"},
+  {id:"@IrnaEnglish",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"IRNA אנגלית — ~75K פרסומים"},
+  {id:"@Tasnimnews_EN",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"Tasnim — קשור ל-IRGC; 114K+ עוקבים"},
+  {id:"@Tasnimnews_Fa",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"FA",conf:"H",notes:"Tasnim פרסית"},
+  {id:"@Tasnimnews_He",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"HE",conf:"H",notes:"Tasnim עברית — הושק 2022"},
+  {id:"@EnglishFars",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"Fars News — קשור ל-IRGC"},
+  // T5
+  {id:"Marzieh Hashemi",tier:"T5",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"עוגן Press TV — מוכרת רשמית"},
+  {id:"H. Shariatmadari",tier:"T5",platform:"Web",country:"איראן",region:"Global",lang:"FA",conf:"H",notes:"עורך Kayhan; נציג חמינאי"},
+  {id:"Marwan Osman",tier:"T5",platform:"Telegram",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"כתב Press TV (DFRLab 2025)"},
+  // T6
+  {id:"@AlMayadeenNews",tier:"T6",platform:"X",country:"לבנון",region:"Middle East",lang:"AR",conf:"L",notes:"בייירות; פרו-חיזבאללה/פרו-איראן"},
+  {id:"@MayadeenEnglish",tier:"T6",platform:"X",country:"לבנון",region:"Middle East",lang:"EN",conf:"L",notes:"Al-Mayadeen אנגלית"},
+  {id:"Al-Manar",tier:"T6",platform:"X",country:"לבנון",region:"Middle East",lang:"AR",conf:"L",notes:"בבעלות חיזבאללה; הושעה לסירוגין"},
+  {id:"Al-Masirah",tier:"T6",platform:"X",country:"תימן",region:"Middle East",lang:"AR",conf:"L",notes:"מדיית חות'ים; הושעה לסירוגין"},
+];
+
+// ── LANG CONFIG ───────────────────────────────────────────────────────────────
+const LANG_COLORS = {
+  EN:     '#58a6ff',
+  FA:     '#f85149',
+  AR:     '#fb8500',
+  'EN/FA':'#bc8cff',
+  multi:  '#bc8cff',
+  HE:     '#3fb950',
+  other:  '#6e7681'
+};
+
+const LANG_FLAGS = {
+  EN: '🌐', FA: '🇮🇷', AR: '🌙', 'EN/FA': '🔀', multi: '🌍',
+  HE: '🕎', ES: '🌎', FR: '🇫🇷', DE: '🇩🇪', other: '💬'
+};
+
+const LANG_NAMES = {
+  EN: 'אנגלית', FA: 'פרסית', AR: 'ערבית', 'EN/FA': 'אנגלית / פרסית',
+  multi: 'רב-לשוני', HE: 'עברית', ES: 'ספרדית', FR: 'צרפתית',
+  DE: 'גרמנית', PT: 'פורטוגזית', RU: 'רוסית', TR: 'טורקית',
+  other: 'אחר'
+};
+
+const TIER_COLORS = { T1:'#f85149', T2:'#fb8500', T3:'#388bfd', T4:'#bc8cff', T5:'#3fb950', T6:'#6e7681' };
+
+// Strategy mapping
+const STRATEGIES = {
+  EN: 'פנייה לקהל בינלאומי דוברי אנגלית — מיצוב גלובלי ברמה הגבוהה ביותר',
+  FA: 'פנייה לקהל פרסי דובר — דיאסופרה ואיראן, מסרים מלכותיים ואידיאולוגיים',
+  AR: 'פנייה לעולם הערבי — שכנים ומדינות MENA, בניית בריתות אזוריות',
+  'EN/FA': 'אסטרטגיה דו-שפתית — פנייה לשני קהלים בו-זמנית: גלובלי ופרסי',
+  multi: 'פנייה רב-ערוצית — כיסוי קהלים מגוונים עם תוכן מותאם',
+  HE: 'פנייה ישירה לקהל ישראלי דובר עברית — חדירה לשיח הציבורי הישראלי',
+  ES: 'פנייה לעולם הספרדי-דובר — אמריקה הלטינית ואירופה',
+  FR: 'פנייה לקהל דובר צרפתית — קפריסין, אירופה מערבית ואפריקה',
+  DE: 'פנייה לגרמניה ואוסטריה — קהל דובר גרמנית',
+  other: 'פנייה לקהל מקומי דובר שפה — קהלים אזוריים ספציפיים'
+};
+
+// ── GROUP BY LANGUAGE ─────────────────────────────────────────────────────────
+function normalizeLang(lang) {
+  const primaryMap = {
+    'EN/FR': 'EN', 'AR/EN': 'AR', 'DE/EN': 'EN', 'EN/EL': 'EN',
+    'EN/HU': 'EN', 'EN/CZ': 'EN', 'EN/BG': 'EN', 'EN/RO': 'EN',
+    'EN/SR': 'EN', 'EN/BS': 'EN', 'RU/EN': 'other', 'AZ/EN': 'other',
+    'EN/HY': 'EN', 'EN/KA': 'EN', 'EN/Dari': 'EN',
+    'EN/UR': 'EN', 'EN/BN': 'EN', 'EN/MS': 'EN', 'EN/ID': 'EN',
+    'EN/JA': 'EN', 'EN/KO': 'EN', 'EN/AR': 'AR', 'PT/EN': 'other',
+    'NO/EN': 'EN', 'PT': 'other', 'IT': 'other', 'TR': 'other',
+    'UR': 'other', 'HI': 'other', 'RU': 'other', 'ES': 'ES',
+    'FR': 'FR', 'DE': 'DE'
+  };
+
+  // Keep these as-is
+  const keepAs = ['EN', 'FA', 'AR', 'EN/FA', 'multi', 'HE', 'ES', 'FR', 'DE'];
+  if (keepAs.includes(lang)) return lang;
+  return primaryMap[lang] || 'other';
+}
+
+function groupByLang() {
+  const groups = {};
+  NODES.forEach(n => {
+    const key = normalizeLang(n.lang);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(n);
+  });
+  return groups;
+}
+
+// ── INSIGHT GENERATOR ────────────────────────────────────────────────────────
+function generateGroupInsight(lang, accounts) {
+  const tiers = accounts.map(a => a.tier);
+  const t1Count = tiers.filter(t => t === 'T1').length;
+  const t2Count = tiers.filter(t => t === 'T2').length;
+  const regions = [...new Set(accounts.map(a => a.region))].filter(r => r !== 'Global');
+
+  const strategies = {
+    EN: 'פנייה לקהל בינלאומי דוברי אנגלית — מיצוב גלובלי',
+    FA: 'פנייה לקהל פרסי דובר — דיאסורה ואיראן',
+    AR: 'פנייה לעולם הערבי — שכנים ומדינות MENA',
+    'EN/FA': 'אסטרטגיה דו-שפתית — מיצוב לשני קהלים',
+    multi: 'פנייה רב-ערוצית — כיסוי קהלים מגוונים',
+    HE: 'פנייה ישירה לציבור הישראלי',
+    ES: 'פנייה לאמריקה הלטינית ואירופה הספרדית',
+    FR: 'פנייה לאירופה הצרפתית ואפריקה',
+    DE: 'פנייה לגרמניה ואוסטריה',
+  };
+
+  const insightText = t1Count > 0
+    ? `${t1Count} חשבונות ברמת השפעה T1 — קהל יעד אסטרטגי ראשוני`
+    : t2Count > 0
+      ? `${t2Count} חשבונות T2 — שכבת ביניים מוסדית חשובה`
+      : 'אין חשבונות T1/T2 — שכבת הסברה משנית אזורית';
+
+  return {
+    strategy: strategies[lang] || 'פנייה לקהל מקומי דובר שפה',
+    regions: regions.length > 0 ? regions.join(', ') : 'גלובלי',
+    t1Accounts: t1Count,
+    t2Accounts: t2Count,
+    insight: insightText
+  };
+}
+
+// ── RENDER GROUPS LIST ────────────────────────────────────────────────────────
+function renderGroups() {
+  const groups = groupByLang();
+  const list = document.getElementById('groups-list');
+  list.innerHTML = '';
+
+  // Sort by count descending
+  const sorted = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+
+  sorted.forEach(([lang, accounts]) => {
+    const col = LANG_COLORS[lang] || LANG_COLORS.other;
+    const flag = LANG_FLAGS[lang] || LANG_FLAGS.other;
+    const name = LANG_NAMES[lang] || lang;
+
+    const card = document.createElement('div');
+    card.className = 'group-card';
+    card.style.setProperty('--lang-color', col);
+
+    const previewAccs = accounts.slice(0, 8);
+    const overflow = accounts.length - previewAccs.length;
+
+    const chipsHtml = previewAccs.map(a =>
+      `<span class="acc-chip" style="color:${TIER_COLORS[a.tier]||col};border-color:${TIER_COLORS[a.tier]||col}22;background:${TIER_COLORS[a.tier]||col}10"
+             title="${a.id} — tier ${a.tier} — region ${a.region}">${a.id.replace('@','@')}</span>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="group-card-top">
+        <span class="lang-badge" style="color:${col};border-color:${col}50;background:${col}14">${lang}</span>
+        <div class="group-name">${name}</div>
+      </div>
+      <div class="group-count" style="color:${col}">${accounts.length}</div>
+      <div class="chip-row">
+        ${chipsHtml}
+        ${overflow > 0 ? `<span class="chip-more">+${overflow} נוספים</span>` : ''}
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.group-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      showGroupInsight(lang, accounts, col, flag, name);
+    });
+
+    list.appendChild(card);
+  });
+}
+
+// ── SHOW GROUP INSIGHT ────────────────────────────────────────────────────────
+function showGroupInsight(lang, accounts, col, flag, name) {
+  const ic = generateGroupInsight(lang, accounts);
+
+  document.getElementById('insight-placeholder').style.display = 'none';
+  const content = document.getElementById('insight-content');
+  content.style.display = 'flex';
+
+  const t1Accounts = accounts.filter(a => a.tier === 'T1');
+  const t2Accounts = accounts.filter(a => a.tier === 'T2');
+  const campaignAccs = accounts.filter(a => [
+    "@IraninZimbabwe","@IraninSA","@IRANinBULGARIA","@Iran_in_India",
+    "@IraninAustria","@Iran_in_UK","@IRANinTJ","@EmbassyofIrtoRF","@IraninBerlin"
+  ].includes(a.id));
+
+  const tacticsList = detectTactics(lang, accounts);
+
+  const allChipsHtml = accounts.map(a => {
+    const tc = TIER_COLORS[a.tier] || col;
+    return `<span class="acc-full-chip" style="color:${tc};border-color:${tc}40;background:${tc}10" title="${a.id} — tier ${a.tier} — region ${a.region}${a.notes ? ' — ' + a.notes : ''}">
+      <span class="tier-dot" style="background:${tc}"></span>
+      ${a.id}
+    </span>`;
+  }).join('');
+
+  content.innerHTML = `
+    <div class="ic-header">
+      <div class="ic-lang-big" style="color:${col};border-color:${col}60;background:${col}12">${lang}</div>
+      <div>
+        <div class="ic-title">${flag} ${name}</div>
+        <div class="ic-subtitle">${accounts.length} חשבונות · ${ic.regions}</div>
+      </div>
+    </div>
+
+    <div class="ic-section">
+      <div class="ic-section-title">תפקיד ואסטרטגיה</div>
+      <div class="ic-value">${STRATEGIES[lang] || ic.strategy}</div>
+    </div>
+
+    <div class="ic-sep"></div>
+
+    <div class="ic-section">
+      <div class="ic-section-title">טקטיקות שנצפו</div>
+      <div class="ic-value">${tacticsList}</div>
+    </div>
+
+    ${t1Accounts.length > 0 ? `
+    <div class="ic-section">
+      <div class="ic-section-title">חשבונות T1 בקבוצה</div>
+      <div class="t1-badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        ${t1Accounts.length} חשבונות T1: ${t1Accounts.map(a=>a.id).join(', ')}
+      </div>
+    </div>` : ''}
+
+    ${campaignAccs.length > 0 ? `
+    <div class="ic-section">
+      <div class="ic-section-title">השתתפות בקמפיין אפריל</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px">
+        ${campaignAccs.map(a => `<span style="font-size:15px;padding:4px 10px;border-radius:4px;background:rgba(227,179,65,0.12);border:1px solid rgba(227,179,65,0.35);color:#e3b341;font-weight:600">${a.id}</span>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <div class="ic-section">
+      <div class="ic-section-title">תובנה</div>
+      <div class="ic-insight-box"><strong>${ic.insight}</strong></div>
+    </div>
+
+    <hr class="accounts-sep">
+    <div class="accounts-title">חשבונות מלאים (${accounts.length})</div>
+    <div class="accounts-grid">${allChipsHtml}</div>
+  `;
+}
+
+function detectTactics(lang, accounts) {
+  const tactics = [];
+  if (['EN', 'AR', 'EN/FA', 'multi'].includes(lang)) tactics.push('מסגור בינלאומי');
+  if (['FA', 'AR'].includes(lang)) tactics.push('פנייה לקהל מאמין');
+  if (accounts.some(a => a.tier === 'T1')) tactics.push('הסתה עקיפה');
+  if (accounts.some(a => ["@IraninZimbabwe","@IraninSA","@IRANinBULGARIA","@Iran_in_India","@IraninAustria"].includes(a.id))) {
+    tactics.push('לגלוג ומוקינג');
+  }
+  if (accounts.some(a => a.region === 'Middle East')) tactics.push('בניית קהל אזורי');
+  tactics.push('שיקוף נרטיב');
+  return tactics.join(' · ');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderGroups();
+</script>
+</body>
+</html>
