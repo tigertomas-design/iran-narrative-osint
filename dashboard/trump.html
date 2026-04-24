@@ -433,16 +433,18 @@ header {
 
 </div>
 
+<script src="data.js"></script>
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────────
-const TRUMP_TWEETS = [
-  { date:"2026-02-28", count:1, topics:["השקת Operation Epic Fury"], narrative:"military-threat", aggression:4, targets:["Iran"], context:"השקת מבצע משותף ארה\"ב-ישראל נגד מתקני הגרעין האיראניים", verified:true },
-  { date:"2026-03-01", count:2, topics:["לו\"ז 4-5 שבועות","מבצע בעוצמה מלאה"], narrative:"military-threat", aggression:4, targets:["Iran"], context:"טראמפ מציין את משך הצפוי של המבצע", verified:true },
-  { date:"2026-03-02", count:3, topics:["יכולות טילים","השמדת הצי","סכנה גרעינית","מימון טרור"], narrative:"nuclear-threat", aggression:5, targets:["Iran"], context:"טראמפ מתאר ארבעה יעדים צבאיים עיקריים", verified:true },
-  { date:"2026-03-05", count:2, topics:["אולטימטום גרעיני","דדליין נוקלארי"], narrative:"nuclear-threat", aggression:4, targets:["Iran"], context:"אולטימטום ראשוני עם לוחות זמנים משתנים", verified:true },
-  { date:"2026-03-12", count:2, topics:["סנקציות נפט","לחץ כלכלי"], narrative:"sanctions", aggression:3, targets:["Iran"], context:"הרחבת סנקציות על ייצוא נפט איראני", verified:true },
-  { date:"2026-03-21", count:3, topics:["מצר הורמוז","מתקני נפט","אולטימטום 48 שעות"], narrative:"hormuz", aggression:5, targets:["Iran"], context:"טראמפ מאיים להשמיד מתקני נפט אם הורמוז לא ייפתח", verified:true },
-  { date:"2026-03-23", count:1, topics:["עיכוב 5 ימים","משא ומתן"], narrative:"military-threat", aggression:3, targets:["Iran"], context:"טראמפ דוחה מתקפות בשל התקדמות במשא ומתן", verified:true },
+// ── DATA — mapped from data.js TRUMP_POSTS ───────────────────────────────────
+// TRUMP_POSTS (40 entries, Jan 1 – Apr 24, full quotes) → backwards-compat format
+const TRUMP_TWEETS = TRUMP_POSTS.map(p => ({
+  ...p,
+  count: 1,
+  topics: p.topic || [],
+  date: p.date
+}));
+// Legacy alias for code that uses NEWS_EVENTS
+const NEWS_EVENTS = KEY_EVENTS;
   { date:"2026-03-26", count:1, topics:["דדליין תחילת אפריל"], narrative:"military-threat", aggression:3, targets:["Iran"], context:"עיכוב נוסף של המתקפות", verified:true },
   { date:"2026-03-30", count:2, topics:["שינוי משטר","אולטימטום הורמוז","השמדת תשתיות"], narrative:"nuclear-threat", aggression:5, targets:["Iran"], context:"פוסט ב-Truth Social מאיים להשמיד תחנות חשמל ותשתיות נפט", verified:true },
   { date:"2026-04-01", count:3, topics:["איום עידן אבן","לו\"ז 2-3 שבועות","מכה קשה"], narrative:"military-threat", aggression:5, targets:["Iran"], context:"טראמפ מכריז על לוח זמנים סופי", verified:true },
@@ -458,28 +460,14 @@ const TRUMP_TWEETS = [
   { date:"2026-04-23", count:2, topics:["הארכת הפסקת אש ישראל-לבנון","הארכה 3 שבועות"], narrative:"pro-israel", aggression:1, targets:["Israel","Lebanon"], context:"טראמפ מכריז על הארכת הפסקת אש ישראל-לבנון ב-3 שבועות", verified:true }
 ];
 
-const NEWS_EVENTS = [
-  { date:"2026-02-28", label:"השקת המבצע", desc:"ארה\"ב וישראל מתחילות קמפיין אווירי מתואם נגד מתקני גרעין; מצר הורמוז נסגר", type:"military" },
-  { date:"2026-03-02", label:"סגירת הורמוז", desc:"IRGC מאשרת סגירה מלאה של המצר; ~20% מייצוא הנפט העולמי מושפע", type:"military" },
-  { date:"2026-03-05", label:"אולטימטום ראשון", desc:"טראמפ מוציא אולטימטום גרעיני ראשון עם לוחות זמנים משתנים", type:"political" },
-  { date:"2026-03-19", label:"מבצע הורמוז", desc:"הפנטגון משיק מבצע נגד כלי שיט IRGC לכפיית פתיחת הורמוז", type:"military" },
-  { date:"2026-04-07", label:"אולטימטום ציוויליזציה", desc:"'ציוויליזציה שלמה תמות הלילה' — האיום הקיצוני ביותר של טראמפ", type:"turning-point" },
-  { date:"2026-04-08", label:"הפסקת אש", desc:"הפסקת אש זמנית של שבועיים מוכרזת; הורמוז נפתח חלקית", type:"diplomatic" },
-  { date:"2026-04-11", label:"כישלון איסלמבאד", desc:"שיחות ב-Islamabad נכשלות; Vance, Witkoff, Kushner לא מגיעים להסכם", type:"diplomatic" },
-  { date:"2026-04-13", label:"חסימה כפולה", desc:"הצי האמריקאי מתחיל לחסום נמלים איראנים; איראן גובה אגרות מעבר", type:"military" },
-  { date:"2026-04-19", label:"תקרית TOUSKA", desc:"אירוע ספנות ראשון מתועד בזמן הפסקת האש", type:"incident" },
-  { date:"2026-04-22", label:"ירי על ספינות", desc:"איראן תוקפת 3+ ספינות מסחריות; הפסקת האש בסכנה ממשית", type:"military" }
-];
-
-// Iranian embassy posts (for cross-reference in insight panel)
-const EMBASSY_POSTS = {
-  "2026-04-05": ["@IraninZimbabwe","@IraninSA","@Iran_in_India","@IraninAustria"],
-  "2026-04-06": ["@IraninBerlin","@IRANinBULGARIA","@IRANinTJ","@EmbassyofIrtoRF"],
-  "2026-04-07": ["@IraninBerlin","@IraninZimbabwe","@IraninSA"],
-  "2026-04-08": ["@IraninZimbabwe","@IraninSA"],
-  "2026-04-21": ["@IraninSA"],
-  "2026-04-22": ["@IraninSA"]
-};
+// EMBASSY_POSTS — built from CAMPAIGNS in data.js
+const EMBASSY_POSTS = {};
+Object.values(CAMPAIGNS).forEach(c => {
+  (c.core_posts || []).forEach(p => {
+    if (!EMBASSY_POSTS[p.date]) EMBASSY_POSTS[p.date] = [];
+    EMBASSY_POSTS[p.date].push(p.account);
+  });
+});
 
 // ── COLORS ───────────────────────────────────────────────────────────────────
 const NAR_COLORS = {
@@ -573,7 +561,7 @@ function buildTimeline() {
   const data = TRUMP_TWEETS.map(t => ({ ...t, dateObj: parseDate(t.date) }));
   const events = NEWS_EVENTS.map(e => ({ ...e, dateObj: parseDate(e.date) }));
 
-  const xMin = new Date('2026-02-25');
+  const xMin = new Date('2025-12-28');
   const xMax = new Date('2026-04-26');
 
   const x = d3.scaleTime().domain([xMin, xMax]).range([0, innerW]);
@@ -773,6 +761,11 @@ function showInsightPanel(d) {
         ${NAR_LABELS[d.narrative] || d.narrative}
       </div>
     </div>
+    ${d.quote ? `<div class="panel-section">
+      <div class="panel-section-title">ציטוט מלא</div>
+      <div style="font-size:16px;line-height:1.7;color:#e6edf3;border-right:3px solid ${col};padding-right:12px;font-style:italic;direction:ltr;text-align:left">"${d.quote}"</div>
+      ${d.platform ? `<div style="font-size:14px;color:var(--muted);margin-top:6px">📍 ${d.platform}${d.time_approx ? ' · ' + d.time_approx : ''}</div>` : ''}
+    </div>` : ''}
     <div class="panel-section">
       <div class="panel-section-title">נושאים</div>
       ${topicsHtml}

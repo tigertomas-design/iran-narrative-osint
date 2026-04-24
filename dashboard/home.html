@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>רשות נרטיב — בית</title>
+<title>רשתות נרטיב — בית</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -253,7 +253,7 @@ html, body {
 <div class="hero">
   <div class="osint-badge">OSINT · LIVE ANALYSIS</div>
 
-  <h1 class="hero-title">רשות נרטיב</h1>
+  <h1 class="hero-title">רשתות נרטיב</h1>
   <p class="hero-sub">מקרה בוחן: שאגת הארי 2026</p>
 
   <!-- Stats row -->
@@ -401,8 +401,8 @@ window.addEventListener('resize', () => {
 // ── DATA COMPLETENESS BADGE ───────────────────────────────────────────────────
 (function() {
   // POSTS keys represent accounts with documented posts
-  const NODES_COUNT = 104;
-  const DOCUMENTED = 17; // from POSTS object in index.html
+  const NODES_COUNT = 89;
+  const DOCUMENTED = 40; // accounts with verified post data in data.js + index.html
 
   const pct = Math.round((DOCUMENTED / NODES_COUNT) * 100);
   const dot = document.getElementById('status-dot');
