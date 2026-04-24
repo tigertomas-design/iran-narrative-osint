@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ציוצי טראמפ — Truth Social Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #21262d; --border2: #30363d;
+  --text: #e6edf3; --muted: #7d8590;
+  --T1: #f85149; --T2: #fb8500; --T3: #388bfd; --T4: #bc8cff; --T5: #3fb950; --T6: #6e7681;
+  --gold: #e3b341;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  font-weight: 300;
+  direction: rtl;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(180deg, #040c18 0%, #05101f 100%);
+  border-bottom: 1px solid rgba(227,179,65,0.15);
+  padding: 0 20px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.back-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 7px; padding: 5px 12px; font-size: 15px; font-weight: 600;
+  color: var(--muted); text-decoration: none; transition: all .18s;
+  flex-shrink: 0; font-family: 'Heebo', sans-serif;
+}
+.back-btn:hover { background: rgba(255,255,255,.08); color: var(--text); }
+
+.header-title {
+  font-size: 20px;
+  font-weight: 900;
+  background: linear-gradient(90deg, #e3b341 0%, #fb8500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-period {
+  font-size: 15px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-right: auto;
+  white-space: nowrap;
+}
+
+/* ── COMPLETENESS BADGE ── */
+#completeness-badge {
+  position: fixed;
+  top: 60px;
+  left: 12px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(22,27,34,0.9);
+  border: 1px solid rgba(251,133,0,0.3);
+  border-radius: 7px;
+  padding: 5px 10px;
+  font-size: 15px;
+  color: var(--T2);
+  backdrop-filter: blur(8px);
+  max-width: 320px;
+  line-height: 1.4;
+}
+.badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  background: #fb8500; box-shadow: 0 0 6px #fb850088;
+}
+
+/* ── STAT STRIP ── */
+.stat-strip {
+  display: flex;
+  gap: 10px;
+  padding: 10px 20px;
+  background: rgba(4,8,24,0.95);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.stat-card {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-right: 3px solid var(--card-accent, var(--border2));
+}
+
+.stat-num {
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--card-accent, var(--text));
+}
+
+.stat-label {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* ── VIEW TOGGLE ── */
+.view-toggle-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(4,8,24,0.8);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.view-btn {
+  padding: 6px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Heebo', sans-serif;
+  cursor: pointer;
+  transition: all .18s;
+}
+.view-btn.active {
+  background: rgba(56,139,253,0.12);
+  border-color: rgba(56,139,253,0.45);
+  color: #7ec8ff;
+}
+.view-btn:hover:not(.active) { border-color: var(--border2); color: var(--text); background: rgba(255,255,255,0.04); }
+
+/* ── MAIN BODY ── */
+.main-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  direction: rtl;
+}
+
+/* ── CHART AREA ── */
+#chart-area {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  padding: 16px 20px;
+}
+
+#chart-svg-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── NARRATIVE GRID ── */
+#narrative-grid {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+#narrative-grid::-webkit-scrollbar { width: 4px; }
+#narrative-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+.nar-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color .15s, transform .15s;
+  flex: 1;
+  min-width: 220px;
+  max-width: 320px;
+}
+.nar-card:hover { border-color: var(--nar-color, var(--border2)); transform: translateY(-2px); }
+.nar-card.selected { border-color: var(--nar-color, var(--border2)); background: rgba(255,255,255,0.03); }
+
+.nar-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.nar-card-count {
+  font-size: 32px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.nar-dates {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* Aggression gauge */
+.aggression-gauge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+.agg-label { font-size: 14px; color: var(--muted); white-space: nowrap; }
+.agg-dots { display: flex; gap: 4px; }
+.agg-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--border2);
+}
+.agg-dot.filled { background: var(--nar-color, var(--T1)); }
+
+/* ── INSIGHT PANEL ── */
+#insight-panel {
+  width: 320px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 18px;
+  text-align: center;
+  padding: 30px;
+  line-height: 1.7;
+}
+
+#panel-content {
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+}
+#panel-content::-webkit-scrollbar { width: 4px; }
+#panel-content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+.panel-header {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.panel-date {
+  font-size: 15px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 4px;
+  direction: ltr;
+  text-align: right;
+}
+
+.panel-count-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.panel-count-num {
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.panel-count-label {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.panel-narrative-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 700;
+  border: 1px solid;
+  margin-bottom: 8px;
+}
+
+.panel-section {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-section-title {
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.topic-chip {
+  display: inline-block;
+  padding: 4px 11px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  font-size: 15px;
+  color: var(--text);
+  margin: 2px 3px 2px 0;
+}
+
+.agg-meter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.agg-meter-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--border2);
+  flex-shrink: 0;
+}
+.agg-meter-dot.on { background: var(--agg-color, #f85149); box-shadow: 0 0 6px var(--agg-color, #f85149); }
+
+.target-tag {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  background: rgba(248,81,73,0.12);
+  color: var(--T1);
+  border: 1px solid rgba(248,81,73,0.25);
+  margin: 2px 3px 2px 0;
+}
+
+.insight-box {
+  padding: 12px 16px;
+  background: rgba(56,139,253,0.05);
+  border-top: 1px solid rgba(56,139,253,0.15);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.insight-box strong { color: #7ec8ff; font-weight: 600; }
+.insight-title {
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #7ec8ff;
+  margin-bottom: 6px;
+}
+
+/* ── D3 chart styles ── */
+.axis text { font-family: 'Heebo', sans-serif; font-size: 14px; }
+.axis path, .axis line { stroke: var(--border2); }
+.event-line { stroke-dasharray: 4 3; stroke-width: 1; opacity: 0.7; }
+.bar-group:hover rect { opacity: 0.85; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="home.html" class="back-btn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    חזרה
+  </a>
+  <span class="header-title">ציוצי טראמפ — ניתוח Truth Social</span>
+  <span class="header-period">28.2 – 24.4.2026</span>
+</header>
+
+<!-- Completeness badge -->
+<div id="completeness-badge">
+  <div class="badge-dot"></div>
+  <span>20 תאריכים מתועדים — מידע חלקי (Truth Social API נדרש לכיסוי 100%)</span>
+</div>
+
+<!-- Stat strip -->
+<div class="stat-strip" id="stat-strip">
+  <!-- Populated by JS -->
+</div>
+
+<!-- View toggle -->
+<div class="view-toggle-bar">
+  <button class="view-btn active" id="btn-timeline" onclick="switchView('timeline')">ציר זמן</button>
+  <button class="view-btn" id="btn-narrative" onclick="switchView('narrative')">לפי נרטיב</button>
+</div>
+
+<div class="main-body">
+
+  <!-- Chart / Narrative Grid -->
+  <div id="chart-area">
+    <svg id="chart-svg" style="width:100%;height:100%;"></svg>
+  </div>
+
+  <div id="narrative-grid"></div>
+
+  <!-- Insight Panel -->
+  <div id="insight-panel">
+    <div class="panel-placeholder" id="panel-placeholder">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--border2)" stroke-width="1.5" style="margin-bottom:10px"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      לחץ על עמודה<br>לצפייה בפרטים
+    </div>
+    <div id="panel-content"></div>
+  </div>
+
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const TRUMP_TWEETS = [
+  { date:"2026-02-28", count:1, topics:["השקת Operation Epic Fury"], narrative:"military-threat", aggression:4, targets:["Iran"], context:"השקת מבצע משותף ארה\"ב-ישראל נגד מתקני הגרעין האיראניים", verified:true },
+  { date:"2026-03-01", count:2, topics:["לו\"ז 4-5 שבועות","מבצע בעוצמה מלאה"], narrative:"military-threat", aggression:4, targets:["Iran"], context:"טראמפ מציין את משך הצפוי של המבצע", verified:true },
+  { date:"2026-03-02", count:3, topics:["יכולות טילים","השמדת הצי","סכנה גרעינית","מימון טרור"], narrative:"nuclear-threat", aggression:5, targets:["Iran"], context:"טראמפ מתאר ארבעה יעדים צבאיים עיקריים", verified:true },
+  { date:"2026-03-05", count:2, topics:["אולטימטום גרעיני","דדליין נוקלארי"], narrative:"nuclear-threat", aggression:4, targets:["Iran"], context:"אולטימטום ראשוני עם לוחות זמנים משתנים", verified:true },
+  { date:"2026-03-12", count:2, topics:["סנקציות נפט","לחץ כלכלי"], narrative:"sanctions", aggression:3, targets:["Iran"], context:"הרחבת סנקציות על ייצוא נפט איראני", verified:true },
+  { date:"2026-03-21", count:3, topics:["מצר הורמוז","מתקני נפט","אולטימטום 48 שעות"], narrative:"hormuz", aggression:5, targets:["Iran"], context:"טראמפ מאיים להשמיד מתקני נפט אם הורמוז לא ייפתח", verified:true },
+  { date:"2026-03-23", count:1, topics:["עיכוב 5 ימים","משא ומתן"], narrative:"military-threat", aggression:3, targets:["Iran"], context:"טראמפ דוחה מתקפות בשל התקדמות במשא ומתן", verified:true },
+  { date:"2026-03-26", count:1, topics:["דדליין תחילת אפריל"], narrative:"military-threat", aggression:3, targets:["Iran"], context:"עיכוב נוסף של המתקפות", verified:true },
+  { date:"2026-03-30", count:2, topics:["שינוי משטר","אולטימטום הורמוז","השמדת תשתיות"], narrative:"nuclear-threat", aggression:5, targets:["Iran"], context:"פוסט ב-Truth Social מאיים להשמיד תחנות חשמל ותשתיות נפט", verified:true },
+  { date:"2026-04-01", count:3, topics:["איום עידן אבן","לו\"ז 2-3 שבועות","מכה קשה"], narrative:"military-threat", aggression:5, targets:["Iran"], context:"טראמפ מכריז על לוח זמנים סופי", verified:true },
+  { date:"2026-04-05", count:3, topics:["מפתחות הורמוז","תיאום קמפיין"], narrative:"hormuz", aggression:4, targets:["Iran"], context:"תחילת קמפיין המגיבים הדיפלומטיים האיראניים — 9 שגרירויות", verified:true },
+  { date:"2026-04-06", count:2, topics:["סנקציות","תוכנית גרעינית"], narrative:"sanctions", aggression:3, targets:["Iran"], context:"המשך לחץ בזמן התפשטות קמפיין המגיב", verified:true },
+  { date:"2026-04-07", count:4, topics:["אולטימטום ציוויליזציה","איום השמדה קבועה","הפסקת אש שבועיים"], narrative:"nuclear-threat", aggression:5, targets:["Iran"], context:"ההצהרה הקיצונית ביותר: 'ציוויליזציה שלמה תמות הלילה'", verified:true },
+  { date:"2026-04-08", count:2, topics:["הפסקת אש הוסכמה","פתיחת הורמוז"], narrative:"ceasefire", aggression:1, targets:["Iran"], context:"ארה\"ב ואיראן מכריזות על הפסקת אש זמנית", verified:true },
+  { date:"2026-04-13", count:3, topics:["סגר ימי","חסימה כפולה"], narrative:"hormuz", aggression:4, targets:["Iran"], context:"חיל הים האמריקאי מתחיל לחסום נמלים איראנים", verified:true },
+  { date:"2026-04-19", count:2, topics:["ספינת TOUSKA","תקרית ימית"], narrative:"hormuz", aggression:3, targets:["Iran"], context:"תקרית ספנות מסחרית בהורמוז", verified:true },
+  { date:"2026-04-20", count:2, topics:["אזהרת פצצות","פקיעת הפסקת אש"], narrative:"military-threat", aggression:5, targets:["Iran"], context:"ראיון PBS: 'הרבה פצצות יתחילו להתפוצץ' אם הפסקת האש תפקע", verified:true },
+  { date:"2026-04-21", count:3, topics:["הארכת הפסקת אש","המשך חסימה"], narrative:"ceasefire", aggression:2, targets:["Iran"], context:"טראמפ מאריך הפסקת אש, נותן לאיראן 3-5 ימים למשא ומתן", verified:true },
+  { date:"2026-04-22", count:4, topics:["מתקפה על ספינות","הסלמה בהורמוז"], narrative:"hormuz", aggression:4, targets:["Iran"], context:"איראן תוקפת לפחות 3 ספינות מסחריות; הפסקת האש עומדת לקריסה", verified:true },
+  { date:"2026-04-23", count:2, topics:["הארכת הפסקת אש ישראל-לבנון","הארכה 3 שבועות"], narrative:"pro-israel", aggression:1, targets:["Israel","Lebanon"], context:"טראמפ מכריז על הארכת הפסקת אש ישראל-לבנון ב-3 שבועות", verified:true }
+];
+
+const NEWS_EVENTS = [
+  { date:"2026-02-28", label:"השקת המבצע", desc:"ארה\"ב וישראל מתחילות קמפיין אווירי מתואם נגד מתקני גרעין; מצר הורמוז נסגר", type:"military" },
+  { date:"2026-03-02", label:"סגירת הורמוז", desc:"IRGC מאשרת סגירה מלאה של המצר; ~20% מייצוא הנפט העולמי מושפע", type:"military" },
+  { date:"2026-03-05", label:"אולטימטום ראשון", desc:"טראמפ מוציא אולטימטום גרעיני ראשון עם לוחות זמנים משתנים", type:"political" },
+  { date:"2026-03-19", label:"מבצע הורמוז", desc:"הפנטגון משיק מבצע נגד כלי שיט IRGC לכפיית פתיחת הורמוז", type:"military" },
+  { date:"2026-04-07", label:"אולטימטום ציוויליזציה", desc:"'ציוויליזציה שלמה תמות הלילה' — האיום הקיצוני ביותר של טראמפ", type:"turning-point" },
+  { date:"2026-04-08", label:"הפסקת אש", desc:"הפסקת אש זמנית של שבועיים מוכרזת; הורמוז נפתח חלקית", type:"diplomatic" },
+  { date:"2026-04-11", label:"כישלון איסלמבאד", desc:"שיחות ב-Islamabad נכשלות; Vance, Witkoff, Kushner לא מגיעים להסכם", type:"diplomatic" },
+  { date:"2026-04-13", label:"חסימה כפולה", desc:"הצי האמריקאי מתחיל לחסום נמלים איראנים; איראן גובה אגרות מעבר", type:"military" },
+  { date:"2026-04-19", label:"תקרית TOUSKA", desc:"אירוע ספנות ראשון מתועד בזמן הפסקת האש", type:"incident" },
+  { date:"2026-04-22", label:"ירי על ספינות", desc:"איראן תוקפת 3+ ספינות מסחריות; הפסקת האש בסכנה ממשית", type:"military" }
+];
+
+// Iranian embassy posts (for cross-reference in insight panel)
+const EMBASSY_POSTS = {
+  "2026-04-05": ["@IraninZimbabwe","@IraninSA","@Iran_in_India","@IraninAustria"],
+  "2026-04-06": ["@IraninBerlin","@IRANinBULGARIA","@IRANinTJ","@EmbassyofIrtoRF"],
+  "2026-04-07": ["@IraninBerlin","@IraninZimbabwe","@IraninSA"],
+  "2026-04-08": ["@IraninZimbabwe","@IraninSA"],
+  "2026-04-21": ["@IraninSA"],
+  "2026-04-22": ["@IraninSA"]
+};
+
+// ── COLORS ───────────────────────────────────────────────────────────────────
+const NAR_COLORS = {
+  "military-threat": "#f85149",
+  "nuclear-threat":  "#bc8cff",
+  "hormuz":          "#388bfd",
+  "ceasefire":       "#3fb950",
+  "sanctions":       "#fb8500",
+  "pro-israel":      "#e3b341"
+};
+const NAR_LABELS = {
+  "military-threat": "איום צבאי",
+  "nuclear-threat":  "איום גרעיני",
+  "hormuz":          "הורמוז",
+  "ceasefire":       "הפסקת אש",
+  "sanctions":       "סנקציות",
+  "pro-israel":      "פרו-ישראל"
+};
+
+const EVENT_TYPE_COLORS = {
+  military: "#f85149", political: "#fb8500", diplomatic: "#3fb950",
+  "turning-point": "#bc8cff", incident: "#e3b341"
+};
+
+// ── STATS ────────────────────────────────────────────────────────────────────
+function calcStats() {
+  const total = TRUMP_TWEETS.reduce((s, t) => s + t.count, 0);
+  const antiIran = TRUMP_TWEETS.filter(t => t.targets && t.targets.includes("Iran")).reduce((s, t) => s + t.count, 0);
+  const aggressive = TRUMP_TWEETS.filter(t => t.aggression >= 4).reduce((s, t) => s + t.count, 0);
+  const diplomatic = TRUMP_TWEETS.filter(t => t.narrative === "ceasefire" || t.aggression <= 2).reduce((s, t) => s + t.count, 0);
+  return { total, antiIran, aggressive, diplomatic };
+}
+
+function renderStats() {
+  const s = calcStats();
+  const strip = document.getElementById('stat-strip');
+  strip.innerHTML = `
+    <div class="stat-card" style="--card-accent:#e3b341">
+      <div class="stat-num" style="color:#e3b341">${s.total}</div>
+      <div class="stat-label">סה"כ ציוצים מתועדים</div>
+    </div>
+    <div class="stat-card" style="--card-accent:#f85149">
+      <div class="stat-num" style="color:#f85149">${s.antiIran}</div>
+      <div class="stat-label">נגד איראן</div>
+    </div>
+    <div class="stat-card" style="--card-accent:#bc8cff">
+      <div class="stat-num" style="color:#bc8cff">${s.aggressive}</div>
+      <div class="stat-label">אגרסיביות גבוהה (≥4)</div>
+    </div>
+    <div class="stat-card" style="--card-accent:#3fb950">
+      <div class="stat-num" style="color:#3fb950">${s.diplomatic}</div>
+      <div class="stat-label">דיפלומטיה / הפסקת אש</div>
+    </div>
+  `;
+}
+
+// ── VIEW SWITCH ───────────────────────────────────────────────────────────────
+let currentView = 'timeline';
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('btn-timeline').classList.toggle('active', view === 'timeline');
+  document.getElementById('btn-narrative').classList.toggle('active', view === 'narrative');
+  document.getElementById('chart-area').style.display = view === 'timeline' ? 'block' : 'none';
+  document.getElementById('narrative-grid').style.display = view === 'narrative' ? 'flex' : 'none';
+
+  if (view === 'timeline') buildTimeline();
+  else buildNarrativeGrid();
+}
+
+// ── TIMELINE D3 ───────────────────────────────────────────────────────────────
+function buildTimeline() {
+  const container = document.getElementById('chart-area');
+  const svgEl = document.getElementById('chart-svg');
+  const W = container.clientWidth;
+  const H = container.clientHeight;
+
+  d3.select('#chart-svg').selectAll('*').remove();
+  const svg = d3.select('#chart-svg')
+    .attr('width', W)
+    .attr('height', H);
+
+  const margin = { top: 40, right: 24, bottom: 55, left: 36 };
+  const innerW = W - margin.left - margin.right;
+  const innerH = H - margin.top - margin.bottom;
+
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  // Parse dates
+  const parseDate = d3.timeParse('%Y-%m-%d');
+  const data = TRUMP_TWEETS.map(t => ({ ...t, dateObj: parseDate(t.date) }));
+  const events = NEWS_EVENTS.map(e => ({ ...e, dateObj: parseDate(e.date) }));
+
+  const xMin = new Date('2026-02-25');
+  const xMax = new Date('2026-04-26');
+
+  const x = d3.scaleTime().domain([xMin, xMax]).range([0, innerW]);
+  const y = d3.scaleLinear().domain([0, d3.max(data, d => d.count) + 1]).range([innerH, 0]);
+
+  // Grid lines
+  g.append('g').attr('class', 'grid')
+    .selectAll('line').data(y.ticks(5)).join('line')
+    .attr('x1', 0).attr('x2', innerW)
+    .attr('y1', d => y(d)).attr('y2', d => y(d))
+    .attr('stroke', '#21262d').attr('stroke-width', 1);
+
+  // Event vertical lines
+  const evtG = g.append('g').attr('class', 'events');
+  events.forEach(ev => {
+    const xPos = x(ev.dateObj);
+    const col = EVENT_TYPE_COLORS[ev.type] || '#7d8590';
+
+    evtG.append('line')
+      .attr('class', 'event-line')
+      .attr('x1', xPos).attr('x2', xPos)
+      .attr('y1', 0).attr('y2', innerH)
+      .attr('stroke', col);
+
+    // Label above
+    const labelG = evtG.append('g').attr('transform', `translate(${xPos}, -4)`);
+    labelG.append('text')
+      .attr('text-anchor', 'middle')
+      .attr('font-size', '13px')
+      .attr('font-family', 'Heebo, sans-serif')
+      .attr('fill', col)
+      .attr('transform', 'rotate(-40)')
+      .attr('dx', -2)
+      .text(ev.label);
+  });
+
+  // Bars
+  const barW = Math.max(8, innerW / data.length * 0.55);
+
+  const barG = g.append('g').attr('class', 'bars');
+  data.forEach(d => {
+    const xPos = x(d.dateObj);
+    const col = NAR_COLORS[d.narrative] || '#7d8590';
+    const barH = innerH - y(d.count);
+
+    const grp = barG.append('g').attr('class', 'bar-group')
+      .attr('transform', `translate(${xPos - barW / 2}, ${y(d.count)})`)
+      .style('cursor', 'pointer')
+      .on('click', () => showInsightPanel(d));
+
+    grp.append('rect')
+      .attr('width', barW)
+      .attr('height', barH)
+      .attr('rx', 3)
+      .attr('fill', col)
+      .attr('opacity', 0.8);
+
+    // Count label on bar if tall enough
+    if (barH > 22) {
+      grp.append('text')
+        .attr('x', barW / 2)
+        .attr('y', barH / 2 + 5)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '15px')
+        .attr('font-weight', '700')
+        .attr('font-family', 'Heebo, sans-serif')
+        .attr('fill', '#fff')
+        .text(d.count);
+    }
+  });
+
+  // X axis
+  const xAxis = d3.axisBottom(x)
+    .ticks(d3.timeDay.every(7))
+    .tickFormat(d3.timeFormat('%d.%m'));
+
+  g.append('g').attr('class', 'axis')
+    .attr('transform', `translate(0,${innerH})`)
+    .call(xAxis)
+    .selectAll('text')
+    .attr('font-family', 'Heebo, sans-serif')
+    .attr('font-size', '14px')
+    .attr('fill', '#7d8590');
+
+  // Y axis
+  g.append('g').attr('class', 'axis')
+    .call(d3.axisLeft(y).ticks(5).tickSize(-innerW))
+    .selectAll('text')
+    .attr('font-family', 'Heebo, sans-serif')
+    .attr('font-size', '14px')
+    .attr('fill', '#7d8590');
+
+  // Legend
+  const legendData = Object.entries(NAR_COLORS);
+  const legendG = svg.append('g').attr('transform', `translate(${margin.left}, ${H - 14})`);
+  let lx = 0;
+  legendData.forEach(([nar, col]) => {
+    const grp = legendG.append('g').attr('transform', `translate(${lx}, 0)`);
+    grp.append('rect').attr('width', 8).attr('height', 8).attr('rx', 2).attr('fill', col).attr('y', -8);
+    grp.append('text').attr('x', 11).attr('y', -1)
+      .attr('font-size', '13px').attr('font-family', 'Heebo, sans-serif')
+      .attr('fill', '#7d8590').text(NAR_LABELS[nar] || nar);
+    lx += NAR_LABELS[nar] ? (NAR_LABELS[nar].length * 9 + 26) : 90;
+  });
+}
+
+// ── NARRATIVE GRID ────────────────────────────────────────────────────────────
+function buildNarrativeGrid() {
+  const grid = document.getElementById('narrative-grid');
+  grid.innerHTML = '';
+
+  // Group by narrative
+  const groups = {};
+  TRUMP_TWEETS.forEach(t => {
+    if (!groups[t.narrative]) groups[t.narrative] = [];
+    groups[t.narrative].push(t);
+  });
+
+  Object.entries(groups).forEach(([nar, tweets]) => {
+    const col = NAR_COLORS[nar] || '#7d8590';
+    const totalCount = tweets.reduce((s, t) => s + t.count, 0);
+    const avgAgg = tweets.reduce((s, t) => s + t.aggression, 0) / tweets.length;
+    const dates = tweets.map(t => t.date.replace('2026-', ''));
+
+    const card = document.createElement('div');
+    card.className = 'nar-card';
+    card.style.setProperty('--nar-color', col);
+
+    const dotsHtml = [1,2,3,4,5].map(i =>
+      `<div class="agg-dot ${i <= Math.round(avgAgg) ? 'filled' : ''}"></div>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="nar-card-title" style="color:${col}">${NAR_LABELS[nar] || nar}</div>
+      <div class="nar-card-count" style="color:${col}">${totalCount}</div>
+      <div class="nar-dates">${dates.join(' · ')}</div>
+      <div class="aggression-gauge" style="--nar-color:${col}">
+        <span class="agg-label">אגרסיביות ממוצעת:</span>
+        <div class="agg-dots">${dotsHtml}</div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.nar-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      showNarrativeInsight(nar, tweets);
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+// ── INSIGHT PANEL — Timeline click ───────────────────────────────────────────
+function showInsightPanel(d) {
+  const col = NAR_COLORS[d.narrative] || '#7d8590';
+  const aggColor = d.aggression >= 4 ? '#f85149' : d.aggression === 3 ? '#fb8500' : '#3fb950';
+
+  // Cross-reference: find embassy posts within 72h
+  const dt = new Date(d.date);
+  const responses = [];
+  Object.entries(EMBASSY_POSTS).forEach(([postDate, accs]) => {
+    const pd = new Date(postDate);
+    const diffH = (pd - dt) / (1000 * 3600);
+    if (diffH >= 0 && diffH <= 72) {
+      responses.push(...accs.map(a => `${a} (${Math.round(diffH)}ש')`));
+    }
+  });
+
+  const insightHtml = responses.length > 0
+    ? `<div class="insight-box">
+        <div class="insight-title">תובנה אוטומטית</div>
+        תגובה אפשרית: שגרירויות <strong>${responses.join(', ')}</strong> פרסמו תוך 72 שעות
+      </div>`
+    : `<div class="insight-box">
+        <div class="insight-title">תובנה אוטומטית</div>
+        לא תועדו פרסומי שגרירויות ב-72 השעות שלאחר ציוץ זה
+      </div>`;
+
+  const dotsHtml = [1,2,3,4,5].map(i =>
+    `<div class="agg-meter-dot ${i <= d.aggression ? 'on' : ''}" style="--agg-color:${aggColor}"></div>`
+  ).join('');
+
+  const targetsHtml = (d.targets || []).map(t => `<span class="target-tag">${t}</span>`).join('');
+  const topicsHtml = (d.topics || []).map(t => `<span class="topic-chip">${t}</span>`).join('');
+
+  document.getElementById('panel-placeholder').style.display = 'none';
+  const pc = document.getElementById('panel-content');
+  pc.style.display = 'flex';
+  pc.innerHTML = `
+    <div class="panel-header">
+      <div class="panel-date">${d.date.replace('2026-','').replace('-','/')}</div>
+      <div class="panel-count-row">
+        <div class="panel-count-num" style="color:${col}">${d.count}</div>
+        <div class="panel-count-label">ציוצים ביום זה</div>
+      </div>
+      <div class="panel-narrative-badge" style="color:${col};border-color:${col};background:${col}18">
+        ${NAR_LABELS[d.narrative] || d.narrative}
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">נושאים</div>
+      ${topicsHtml}
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">הקשר</div>
+      <div style="font-size:16px;line-height:1.65;color:var(--muted)">${d.context}</div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">רמת אגרסיביות</div>
+      <div class="agg-meter">${dotsHtml}<span style="font-size:16px;color:${aggColor};font-weight:700;margin-right:4px">${d.aggression}/5</span></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">מטרות</div>
+      ${targetsHtml}
+    </div>
+    ${insightHtml}
+  `;
+}
+
+// ── INSIGHT PANEL — Narrative click ──────────────────────────────────────────
+function showNarrativeInsight(nar, tweets) {
+  const col = NAR_COLORS[nar] || '#7d8590';
+  const totalCount = tweets.reduce((s, t) => s + t.count, 0);
+  const maxAgg = Math.max(...tweets.map(t => t.aggression));
+  const avgAgg = (tweets.reduce((s, t) => s + t.aggression, 0) / tweets.length).toFixed(1);
+
+  const dotsHtml = [1,2,3,4,5].map(i =>
+    `<div class="agg-meter-dot ${i <= Math.round(maxAgg) ? 'on' : ''}" style="--agg-color:${col}"></div>`
+  ).join('');
+
+  const datesHtml = tweets.map(t =>
+    `<div style="font-size:16px;line-height:1.9;color:var(--muted)">${t.date.replace('2026-','').replace('-','/')} — ${t.count} ציוצים — ${t.context.substring(0,60)}...</div>`
+  ).join('');
+
+  document.getElementById('panel-placeholder').style.display = 'none';
+  const pc = document.getElementById('panel-content');
+  pc.style.display = 'flex';
+  pc.innerHTML = `
+    <div class="panel-header">
+      <div class="panel-date">סה"כ: ${tweets.length} תאריכים</div>
+      <div class="panel-count-row">
+        <div class="panel-count-num" style="color:${col}">${totalCount}</div>
+        <div class="panel-count-label">ציוצים בנרטיב</div>
+      </div>
+      <div class="panel-narrative-badge" style="color:${col};border-color:${col};background:${col}18">
+        ${NAR_LABELS[nar] || nar}
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">אגרסיביות מקסימלית / ממוצעת</div>
+      <div class="agg-meter">${dotsHtml}</div>
+      <div style="font-size:16px;color:var(--muted);margin-top:4px">מקסימום ${maxAgg} · ממוצע ${avgAgg}</div>
+    </div>
+    <div class="panel-section" style="flex:1;overflow-y:auto">
+      <div class="panel-section-title">תאריכים</div>
+      ${datesHtml}
+    </div>
+  `;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderStats();
+buildTimeline();
+
+window.addEventListener('resize', () => {
+  if (currentView === 'timeline') buildTimeline();
+});
+</script>
+</body>
+</html>
