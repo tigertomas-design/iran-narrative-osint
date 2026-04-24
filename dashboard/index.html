@@ -1,0 +1,3521 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>רשת הנרטיב האיראנית — שלב 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="data.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0d1117;
+  --surface:   #161b22;
+  --border:    #21262d;
+  --border2:   #30363d;
+  --text:      #e6edf3;
+  --muted:     #7d8590;
+  --T1: #f85149; --T2: #fb8500; --T3: #388bfd;
+  --T4: #bc8cff; --T5: #3fb950; --T6: #6e7681;
+  --gold: #e3b341;
+}
+
+[data-theme="light"] {
+  --bg: #f6f8fa;
+  --surface: #ffffff;
+  --border: #d0d7de;
+  --border2: #adb5bd;
+  --text: #1a1f2e;
+  --muted: #57606a;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  direction: rtl;
+}
+
+/* ── BACK BUTTON ── */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 7px; padding: 5px 12px; font-size: 15px; font-weight: 600;
+  color: var(--muted); text-decoration: none; transition: all .18s;
+  flex-shrink: 0; font-family: 'Heebo', sans-serif;
+}
+.back-btn:hover { background: rgba(255,255,255,.08); color: var(--text); }
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(180deg, #040c18 0%, #05101f 100%);
+  padding: 0 20px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  position: relative;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #388bfd28 25%, #bc8cff45 50%, #388bfd28 75%, transparent 100%);
+}
+
+/* Brand block */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.brand-icon {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, rgba(56,139,253,.15), rgba(188,140,255,.12));
+  border: 1px solid rgba(56,139,253,.3);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  box-shadow: 0 0 12px rgba(56,139,253,.15);
+}
+.brand-meta { display: flex; flex-direction: column; gap: 1px; }
+header h1 {
+  font-size: 20px;
+  font-weight: 900;
+  white-space: nowrap;
+  background: linear-gradient(90deg, #7dbfff 0%, #c8a5ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -.2px;
+  line-height: 1.2;
+}
+header .sub {
+  color: #4a5568;
+  font-size: 15px;
+  white-space: nowrap;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+.phase-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(56,139,253,.08);
+  border: 1px solid rgba(56,139,253,.2);
+  border-radius: 5px;
+  padding: 3px 9px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #58a6ff;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+.header-sep {
+  width: 1px;
+  height: 26px;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,.1), transparent);
+  flex-shrink: 0;
+  margin: 0 16px;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+  margin-right: auto;
+}
+.tier-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 8px;
+  padding: 3px 4px;
+}
+.tier-btn {
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 4px 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  font-family: 'Heebo', sans-serif;
+  transition: all .18s cubic-bezier(.4,0,.2,1);
+  letter-spacing: -.1px;
+}
+.tier-btn.inactive { opacity: .2; }
+.tier-btn:hover    { opacity: .8 !important; }
+
+.t1 { color: var(--T1); }
+.t1.active { background: rgba(248,81,73,.12);   border-color: rgba(248,81,73,.45); }
+.t2 { color: var(--T2); }
+.t2.active { background: rgba(251,133,0,.12);   border-color: rgba(251,133,0,.45); }
+.t3 { color: var(--T3); }
+.t3.active { background: rgba(56,139,253,.12);  border-color: rgba(56,139,253,.45); }
+.t4 { color: var(--T4); }
+.t4.active { background: rgba(188,140,255,.12); border-color: rgba(188,140,255,.45); }
+.t5 { color: var(--T5); }
+.t5.active { background: rgba(63,185,80,.12);   border-color: rgba(63,185,80,.45); }
+.t6 { color: var(--T6); }
+.t6.active { background: rgba(110,118,129,.12); border-color: rgba(110,118,129,.4); }
+
+.campaign-btn {
+  background: transparent;
+  border: 1px solid rgba(227,179,65,.45);
+  color: var(--gold);
+  border-radius: 7px;
+  padding: 4px 13px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Heebo', sans-serif;
+  transition: all .18s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.campaign-btn:hover { background: rgba(227,179,65,.08); }
+.campaign-btn.on {
+  background: linear-gradient(135deg, rgba(227,179,65,.2), rgba(227,179,65,.08));
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(227,179,65,.2);
+}
+
+/* ── HEADER GROUPS ── */
+.hdr-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+#hdr-filters { gap: 6px; }
+#hdr-actions { gap: 8px; margin-right: auto; }
+
+/* ── MODE BUTTONS ── */
+.mode-group {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 9px;
+  padding: 3px;
+  gap: 2px;
+}
+.mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Heebo', sans-serif;
+  cursor: pointer;
+  transition: all .18s cubic-bezier(.4,0,.2,1);
+  white-space: nowrap;
+}
+.mode-btn:hover { color: var(--text); background: rgba(255,255,255,.05); }
+.mode-btn.active {
+  background: linear-gradient(135deg, rgba(56,139,253,.2), rgba(188,140,255,.12));
+  border-color: rgba(88,166,255,.35);
+  color: #7ec8ff;
+  box-shadow: 0 1px 8px rgba(56,139,253,.15);
+}
+.mode-btn.active svg { stroke: #7ec8ff; }
+.mode-btn svg { transition: stroke .18s; flex-shrink: 0; }
+
+select {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  color: var(--text);
+  border-radius: 7px;
+  padding: 4px 10px;
+  font-size: 15px;
+  font-family: 'Heebo', sans-serif;
+  cursor: pointer;
+  direction: rtl;
+  transition: border-color .15s;
+}
+select:hover { border-color: rgba(255,255,255,.16); }
+
+/* ── SCAN BAR ── */
+#scan-bar {
+  background: rgba(4,8,24,.95);
+  border-bottom: 1px solid rgba(56,139,253,.12);
+  padding: 5px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 12px;
+}
+#scan-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 15px;
+  color: #4a5568;
+  direction: rtl;
+}
+#scan-status strong { color: #6b7280; font-weight: 600; }
+.scan-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #3fb950;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px #3fb95088;
+}
+.scan-dot.scanning {
+  background: #fb8500;
+  box-shadow: 0 0 6px #fb850088;
+  animation: blink 0.9s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.scan-dot.error { background: #f85149; box-shadow: 0 0 6px #f8514988; }
+#scan-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  background: transparent;
+  border: 1px solid rgba(56,139,253,.3);
+  border-radius: 6px;
+  color: #58a6ff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Heebo', sans-serif;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+#scan-btn:hover { background: rgba(56,139,253,.08); border-color: #58a6ff; }
+#scan-btn:disabled { opacity: .4; cursor: not-allowed; }
+#scan-btn svg { flex-shrink: 0; transition: transform .5s; }
+#scan-btn.spinning svg { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#auto-scan-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 14px; color: #3fb950; opacity: .7;
+  font-family: 'SF Mono', monospace; letter-spacing: .3px;
+  padding: 3px 8px; border: 1px solid rgba(63,185,80,.2);
+  border-radius: 4px; background: rgba(63,185,80,.05);
+  white-space: nowrap;
+}
+#auto-scan-badge svg { color: #3fb950; }
+
+/* ── MAIN LAYOUT ── */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  direction: rtl;
+}
+
+/* ── GRAPH ── */
+#graph {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+#graph svg { width: 100%; height: 100%; }
+#scan-btn svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+.link { stroke: var(--border2); stroke-opacity: .55; }
+.link.campaign { stroke: var(--gold); stroke-opacity: .45; stroke-dasharray: 4 3; }
+
+.node circle { cursor: pointer; }
+.node.dimmed circle { opacity: .07; }
+.node.dimmed text  { opacity: 0; }
+.node text {
+  font-size: 9.5px;
+  fill: var(--muted);
+  pointer-events: none;
+  user-select: none;
+  font-family: 'Heebo', sans-serif;
+}
+
+.campaign-ring {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+.campaign-ring.on {
+  opacity: 1;
+  animation: pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { stroke-opacity:1; }
+  50%      { stroke-opacity:.2; }
+}
+
+/* Tooltip */
+#tooltip {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 10px 13px;
+  pointer-events: none;
+  display: none;
+  max-width: 200px;
+  z-index: 200;
+  box-shadow: 0 6px 20px rgba(0,0,0,.6);
+  direction: rtl;
+}
+#tooltip .tt-h { font-weight: 700; font-size: 15px; margin-bottom: 5px; direction: ltr; }
+#tooltip .tt-r { color: var(--muted); font-size: 14px; line-height: 1.7; }
+#tooltip .tt-r span { color: var(--text); }
+
+/* Legend */
+#legend {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(22,27,34,.92);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 10px 12px;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+#legend .lt { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+#legend .lr { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; font-size: 15px; }
+#legend .ld { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+#stats {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(22,27,34,.92);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  pointer-events: none;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.9;
+  backdrop-filter: blur(4px);
+  direction: rtl;
+}
+#stats span { color: var(--text); font-weight: 600; font-size: 18px; }
+
+/* ── NARRATIVE BAR ── */
+#narrative-bar {
+  background: linear-gradient(180deg, #04091a 0%, #050d1c 100%);
+  border-bottom: 1px solid rgba(56,139,253,.1);
+  padding: 7px 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  position: relative;
+}
+#narrative-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 40px; right: 40px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(188,140,255,.15), transparent);
+  pointer-events: none;
+}
+#narrative-bar .nb-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(188,140,255,.65);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  white-space: nowrap;
+}
+.nar-btn {
+  border: 1px solid;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  font-family: 'Heebo', sans-serif;
+  transition: all .18s cubic-bezier(.4,0,.2,1);
+  white-space: nowrap;
+}
+.nar-btn:hover { transform: translateY(-1px); opacity: .85; }
+.nar-btn.selected { color: #060d1a !important; box-shadow: 0 2px 10px rgba(0,0,0,.5); }
+.nar-btn.clear-btn {
+  border-color: var(--border2);
+  color: var(--muted);
+}
+.nar-btn.clear-btn:hover { border-color: var(--text); color: var(--text); transform: none; }
+
+/* tactic highlight ring */
+.tactic-ring {
+  fill: none;
+  stroke-width: 3;
+  opacity: 0;
+  pointer-events: none;
+}
+.tactic-ring.on {
+  opacity: 1;
+  animation: tpulse 1.8s ease-in-out infinite;
+}
+@keyframes tpulse {
+  0%,100% { stroke-opacity:1; }
+  50%      { stroke-opacity:.3; }
+}
+
+/* tactic panel */
+.tactic-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.tactic-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.tactic-desc {
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.tactic-acc-list {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.tactic-acc-chip {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+  cursor: pointer;
+  direction: ltr;
+  transition: opacity .15s;
+}
+.tactic-acc-chip:hover { opacity: .7; }
+.tactic-posts-title {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--muted);
+  padding: 10px 14px 6px;
+}
+
+/* ── SIDE PANEL ── */
+#side {
+  width: 38%;
+  min-width: 340px;
+  max-width: 480px;
+  background: var(--surface);
+  border-right: 1px solid var(--border2);   /* RTL: border on right = left side of graph */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Account header */
+#side-header {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+#side-header .acc-placeholder {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0 10px;
+  line-height: 1.7;
+}
+#acc-info { display: none; }
+#acc-handle {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  direction: ltr;
+  text-align: right;
+}
+#acc-badge {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.acc-meta { font-size: 16px; color: var(--muted); line-height: 2; }
+.acc-meta span { color: var(--text); }
+
+#acc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  font-family: 'Heebo', sans-serif;
+  transition: border-color .15s, background .15s;
+}
+#acc-link:hover { border-color: var(--T3); background: rgba(56,139,253,.08); }
+#acc-link svg { flex-shrink: 0; }
+
+#acc-campaign-badge {
+  display: none;
+  margin-top: 8px;
+  background: rgba(227,179,65,.1);
+  border: 1px solid rgba(227,179,65,.35);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 15px;
+  color: var(--gold);
+  line-height: 1.5;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.tab {
+  flex: 1;
+  padding: 9px 0;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  transition: all .15s;
+}
+.tab.active { color: var(--text); border-bottom-color: var(--T3); }
+
+/* Posts feed */
+#posts-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  scroll-behavior: smooth;
+}
+#posts-feed::-webkit-scrollbar { width: 4px; }
+#posts-feed::-webkit-scrollbar-track { background: transparent; }
+#posts-feed::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+.feed-placeholder {
+  color: var(--muted);
+  font-size: 18px;
+  text-align: center;
+  padding: 30px 10px;
+  line-height: 1.8;
+}
+
+.post-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  transition: border-color .15s;
+}
+.post-card:hover { border-color: var(--border2); }
+.post-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.post-date { font-size: 15px; color: var(--muted); direction: ltr; }
+.post-conf {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.conf-H { background: rgba(63,185,80,.15); color: var(--T5); }
+.conf-M { background: rgba(251,133,0,.15); color: var(--T2); }
+.conf-L { background: rgba(110,118,129,.15); color: var(--T6); }
+
+.post-text {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text);
+  direction: ltr;
+  text-align: left;
+}
+.post-text strong { color: var(--gold); font-weight: 700; }
+
+.post-score {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.score-label { font-size: 14px; color: var(--muted); }
+.score-bar { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 2px; transition: width .4s; }
+.score-num { font-size: 14px; font-weight: 700; color: var(--muted); }
+
+.post-url {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--T3);
+  text-decoration: none;
+  direction: ltr;
+  border: 1px solid rgba(56,139,253,.25);
+  border-radius: 4px;
+  background: rgba(56,139,253,.06);
+  transition: all .15s;
+}
+.post-url:hover { border-color: var(--T3); background: rgba(56,139,253,.12); }
+.post-url-search {
+  color: var(--muted);
+  border-color: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  font-style: italic;
+}
+.post-url-search:hover { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: var(--text); }
+
+/* Insights tab */
+#insights-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 14px;
+  scroll-behavior: smooth;
+  display: none;
+}
+#insights-feed::-webkit-scrollbar { width: 4px; }
+#insights-feed::-webkit-scrollbar-track { background: transparent; }
+#insights-feed::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* Gallery tab */
+#gallery-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  scroll-behavior: smooth;
+  display: none;
+}
+#gallery-feed::-webkit-scrollbar { width: 4px; }
+#gallery-feed::-webkit-scrollbar-track { background: transparent; }
+#gallery-feed::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 2px;
+}
+.media-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  transition: border-color .15s, transform .15s;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+.media-card:hover { border-color: var(--T3); transform: translateY(-2px); }
+.media-type-icon { font-size: 22px; display: block; text-align: center; margin-bottom: 6px; }
+.media-type-badge {
+  font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; color: var(--muted); margin-bottom: 4px; direction: ltr;
+}
+.media-desc { font-size: 15px; line-height: 1.5; color: var(--text); direction: rtl; }
+.media-date { font-size: 14px; color: var(--muted); margin-top: 5px; direction: ltr; }
+.media-note { font-size: 13px; color: var(--muted); margin-top: 3px; font-style: italic; }
+.gallery-no-media { color: var(--muted); font-size: 16px; text-align: center; padding: 24px 10px; line-height: 1.8; }
+
+.insight-block {
+  margin-bottom: 18px;
+}
+.insight-label {
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.insight-val {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.insight-note {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 3px;
+}
+.tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.tag {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 15px;
+  color: var(--text);
+}
+.score-big {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+.score-big-num {
+  font-size: 28px;
+  font-weight: 800;
+}
+.score-big-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.score-big-fill { height: 100%; border-radius: 3px; }
+
+.explore-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 9px;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Heebo', sans-serif;
+  transition: all .15s;
+  background: var(--bg);
+}
+.explore-btn:hover { border-color: var(--T3); background: rgba(56,139,253,.07); color: var(--T3); }
+.explore-sep { height: 1px; background: var(--border); margin: 14px 0; }
+
+#view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  background: rgba(188,140,255,.08);
+  border: 1px solid rgba(188,140,255,.3);
+  border-radius: 20px;
+  color: #bc8cff;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Heebo', sans-serif;
+  cursor: pointer;
+  transition: all .18s;
+  white-space: nowrap;
+}
+#view-toggle:hover { background: rgba(188,140,255,.15); border-color: #bc8cff; }
+#view-toggle.active {
+  background: linear-gradient(135deg, rgba(188,140,255,.25), rgba(88,166,255,.15));
+  border-color: #bc8cff;
+  box-shadow: 0 0 14px rgba(188,140,255,.2);
+  color: #d4a7ff;
+}
+/* Narrative nodes in graph */
+.narrative-node circle {
+  cursor: default;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+.narrative-node text {
+  font-size: 14px;
+  font-weight: 700;
+  fill: #e6edf3;
+  pointer-events: none;
+  user-select: none;
+  font-family: 'Heebo', sans-serif;
+}
+.narrative-label-bg {
+  fill: rgba(13,17,23,.85);
+  rx: 4px;
+}
+
+#theme-toggle, #insights-btn {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 7px;
+  padding: 5px 10px;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  font-size: 14px; font-weight: 600; font-family: 'Heebo', sans-serif;
+  transition: all .18s cubic-bezier(.4,0,.2,1);
+  flex-shrink: 0;
+}
+#theme-toggle:hover, #insights-btn:hover {
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+}
+#insights-btn { color: #bc8cff; border-color: rgba(188,140,255,.25); }
+#insights-btn:hover { background: rgba(188,140,255,.08); }
+
+/* Light mode adjustments */
+[data-theme="light"] header {
+  background: linear-gradient(180deg, #f0f4f8 0%, #e8eef4 100%);
+}
+[data-theme="light"] header::after {
+  background: linear-gradient(90deg, transparent 0%, rgba(56,139,253,0.2) 25%, rgba(88,80,200,0.25) 50%, rgba(56,139,253,0.2) 75%, transparent 100%);
+}
+[data-theme="light"] .brand-icon {
+  background: linear-gradient(135deg, rgba(56,139,253,.12), rgba(88,80,200,.1));
+  border-color: rgba(56,139,253,.25);
+}
+[data-theme="light"] header h1 {
+  background: linear-gradient(90deg, #1a6abf 0%, #6030b0 100%);
+  -webkit-background-clip: text; background-clip: text;
+}
+[data-theme="light"] .header-sep {
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.1), transparent);
+}
+[data-theme="light"] .tier-group {
+  background: rgba(0,0,0,.03);
+  border-color: rgba(0,0,0,.08);
+}
+[data-theme="light"] .mode-group {
+  background: rgba(0,0,0,.03);
+  border-color: rgba(0,0,0,.08);
+}
+[data-theme="light"] .mode-btn.active {
+  background: linear-gradient(135deg, rgba(56,139,253,.15), rgba(88,80,200,.1));
+  border-color: rgba(56,139,253,.3);
+  color: #1a6abf;
+}
+[data-theme="light"] #theme-toggle, [data-theme="light"] #insights-btn {
+  border-color: rgba(0,0,0,.12);
+  background: rgba(0,0,0,.03);
+  color: #57606a;
+}
+[data-theme="light"] #theme-toggle:hover { background: rgba(0,0,0,.06); color: #1a1f2e; }
+[data-theme="light"] .phase-badge { color: #1a6abf; background: rgba(56,139,253,.08); border-color: rgba(56,139,253,.2); }
+[data-theme="light"] .campaign-btn { border-color: rgba(160,120,20,.4); }
+
+/* ── SMALL DESKTOP 1280px ── */
+@media (max-width: 1280px) {
+  header { padding: 0 14px; gap: 0; }
+  .header-sep { margin: 0 10px; }
+  header h1 { font-size: 18px; }
+  .mode-btn { padding: 4px 10px; font-size: 14px; gap: 4px; }
+  .tier-btn { padding: 3px 9px; font-size: 13px; }
+  #side { width: 34%; min-width: 310px; }
+  #scan-bar { padding: 4px 14px; font-size: 13px; }
+  #theme-toggle, #insights-btn { padding: 4px 8px; }
+  .campaign-btn { padding: 3px 11px; font-size: 13px; }
+}
+
+/* ── LAPTOP 1180px ─ hide mode-btn text labels, show icons only ── */
+@media (max-width: 1180px) {
+  header { padding: 0 12px; }
+  .header-sep { margin: 0 8px; height: 20px; }
+  header h1 { font-size: 16px; }
+  .brand-meta .sub { display: none; }
+  .brand-icon { width: 26px; height: 26px; }
+
+  /* Mode buttons: icon-only */
+  .mode-btn span { display: none; }
+  .mode-btn { padding: 5px 7px; gap: 0; }
+
+  /* Lang toggle: icon only */
+  #lang-toggle span { display: none; }
+  #lang-toggle { padding: 5px 7px; }
+
+  /* Insights button: icon only */
+  #insights-btn { font-size: 0; padding: 5px 8px; }
+  #insights-btn svg { display: inline-block; }
+
+  /* Tier buttons: tighter */
+  .tier-btn { padding: 3px 8px; font-size: 13px; }
+  .tier-group { padding: 3px; gap: 2px; }
+
+  /* Region select: shorter */
+  #region-filter { font-size: 13px; max-width: 110px; }
+
+  /* Sidebar narrower */
+  #side { width: 30%; min-width: 280px; max-width: 380px; }
+
+  /* Scan bar: compress */
+  #scan-bar { padding: 3px 12px; gap: 8px; font-size: 13px; }
+  #auto-scan-badge { font-size: 13px; }
+
+  /* Campaign button: tighter */
+  .campaign-btn { padding: 3px 10px; font-size: 13px; }
+  .phase-badge { font-size: 12px; padding: 2px 7px; letter-spacing: .5px; }
+}
+
+/* ── SMALL LAPTOP 1024px ─ aggressive compression ── */
+@media (max-width: 1024px) {
+  header { padding: 0 10px; height: 48px; }
+  .header-sep { margin: 0 6px; height: 18px; }
+  header h1 { font-size: 14px; }
+
+  /* Brand: icon only on very tight screens */
+  .brand-meta { display: none; }
+  .brand-icon { width: 28px; height: 28px; border-radius: 7px; }
+
+  /* Tier group: smaller */
+  .tier-btn { padding: 2px 7px; font-size: 12px; border-radius: 4px; }
+  .tier-group { padding: 2px 3px; gap: 1px; }
+
+  /* Region select: hidden at this width */
+  #region-filter { display: none; }
+
+  /* Mode group: tighter */
+  .mode-btn { padding: 4px 6px; }
+  .mode-group { padding: 2px; gap: 1px; border-radius: 7px; }
+
+  /* Actions: hide phase badge, tighter theme/insights */
+  .phase-badge { display: none; }
+  #theme-toggle { padding: 4px 6px; }
+  #insights-btn { padding: 4px 6px; }
+  #lang-toggle { padding: 4px 6px; }
+  .campaign-btn { padding: 2px 9px; font-size: 12px; }
+  .campaign-btn svg { width: 9px; height: 9px; }
+
+  /* Scan bar: hide data range text, keep timestamp */
+  #scan-bar { padding: 3px 10px; font-size: 13px; }
+  #scan-bar strong { font-size: 13px; }
+  /* Hide the date range suffix — keep timestamp visible */
+  .scan-range { display: none; }
+
+  /* Sidebar: fixed narrower */
+  #side { width: 290px; min-width: 260px; max-width: 290px; }
+  .tab { font-size: 14px; padding: 7px 0; }
+  #side-header { padding: 10px 12px 8px; }
+  .post-card { padding: 9px 11px; }
+  .post-text { font-size: 14px; }
+
+  /* Narrative bar: scroll horizontally */
+  #narrative-bar { flex-wrap: nowrap; overflow-x: auto; padding: 5px 10px; }
+  #narrative-bar::-webkit-scrollbar { height: 2px; }
+
+  /* Legend: smaller */
+  #legend { bottom: 8px; left: 8px; padding: 8px 10px; font-size: 13px; }
+  #stats { bottom: 8px; padding: 5px 8px; font-size: 13px; }
+}
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  header { flex-wrap: wrap; height: auto; padding: 8px 12px; gap: 6px; }
+  header h1 { font-size: 12px; }
+  .controls { flex-wrap: wrap; gap: 4px; margin-right: 0; }
+  .tier-btn { font-size: 10px; padding: 2px 6px; }
+  .campaign-btn { font-size: 10px; padding: 2px 7px; }
+  select { font-size: 10px; }
+  #narrative-bar { padding: 5px 10px; gap: 4px; }
+  .nar-btn { font-size: 10px; padding: 2px 8px; }
+  .main { flex-direction: column-reverse; }
+  #side {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    height: 50vh;
+    border-right: none;
+    border-top: 1px solid var(--border2);
+  }
+  #graph { min-height: 45vh; flex: 1; }
+  #legend { display: none; }
+  #stats { font-size: 10px; padding: 5px 8px; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .gallery-grid { grid-template-columns: 1fr; }
+  header h1 { font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <!-- Back button (RTL: visually leftmost) -->
+  <a href="home.html" class="back-btn">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    <span>בית</span>
+  </a>
+
+  <!-- Group 1: Brand (rightmost in RTL) -->
+  <div class="brand">
+    <div class="brand-icon">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/><line x1="7" y1="19" x2="17" y2="19"/></svg>
+    </div>
+    <div class="brand-meta">
+      <h1>רשת הנרטיב האיראנית</h1>
+      <span class="sub">OSINT · שלב 1 · 2026</span>
+    </div>
+  </div>
+
+  <div class="header-sep"></div>
+
+  <!-- Group 2: Filters -->
+  <div class="hdr-group" id="hdr-filters">
+    <div class="tier-group">
+      <button class="tier-btn active t1" data-tier="T1">T1</button>
+      <button class="tier-btn active t2" data-tier="T2">T2</button>
+      <button class="tier-btn active t3" data-tier="T3">T3</button>
+      <button class="tier-btn active t4" data-tier="T4">T4</button>
+      <button class="tier-btn active t5" data-tier="T5">T5</button>
+      <button class="tier-btn active t6" data-tier="T6">T6</button>
+    </div>
+    <select id="region-filter">
+      <option value="all">כל האזורים</option>
+      <option value="Middle East">המזרח התיכון</option>
+      <option value="Europe West">אירופה מערבית</option>
+      <option value="Europe East">אירופה מזרחית</option>
+      <option value="Post-Soviet">פוסט-סובייטי</option>
+      <option value="Asia">אסיה</option>
+      <option value="Africa">אפריקה</option>
+      <option value="Americas">אמריקות</option>
+      <option value="Global">גלובלי</option>
+    </select>
+  </div>
+
+  <div class="header-sep"></div>
+
+  <!-- Group 3: View mode toggle (3 modes + circles) -->
+  <div class="hdr-group mode-group" id="hdr-modes">
+    <button class="mode-btn active" id="mode-accounts" onclick="setView('accounts')" title="מצב חשבונות">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="19" cy="11" r="2"/><path d="M23 21v-1a2 2 0 0 0-2-2h-2"/></svg>
+      <span>חשבונות</span>
+    </button>
+    <button class="mode-btn" id="mode-narratives" onclick="setView('narratives')" title="מצב נרטיבים">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/></svg>
+      <span>נרטיבים</span>
+    </button>
+    <button class="mode-btn" id="mode-timeline" onclick="setView('timeline')" title="ציר זמן">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="8 8 3 12 8 16"/><line x1="8" y1="12" x2="21" y2="12"/><circle cx="21" cy="12" r="2"/><line x1="12" y1="6" x2="12" y2="3"/><line x1="17" y1="7" x2="19" y2="5"/><line x1="7" y1="7" x2="5" y2="5"/></svg>
+      <span>ציר זמן</span>
+    </button>
+    <button class="mode-btn" id="mode-circles" onclick="setView('circles')" title="מעגלי השפעה">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="4"/><circle cx="5" cy="8" r="1.5"/><circle cx="19" cy="17" r="2.5"/></svg>
+      <span>מעגלים</span>
+    </button>
+    <button class="mode-btn" id="mode-network" onclick="setView('network')" title="רשת קשרים">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><circle cx="12" cy="12" r="2.5"/><line x1="7" y1="12" x2="9.5" y2="12"/><line x1="14.5" y1="12" x2="17" y2="6"/><line x1="14.5" y1="12" x2="17" y2="18"/></svg>
+      <span>רשת קשרים</span>
+    </button>
+  </div>
+
+  <div class="header-sep"></div>
+
+  <!-- Group 4: Actions -->
+  <div class="hdr-group" id="hdr-actions">
+    <button class="campaign-btn" id="campaign-toggle">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      קמפיין אפריל
+    </button>
+    <button id="lang-toggle" onclick="toggleLangMode()" class="mode-btn" title="מצב שפה">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span>שפה</span>
+    </button>
+    <button id="theme-toggle" onclick="toggleTheme()" title="מצב תצוגה">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button id="insights-btn" onclick="openInsights()" title="תובנות וניתוח">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/></svg>
+      תובנות
+    </button>
+  </div>
+</header>
+
+<div id="insights-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:200;" onclick="closeInsights()"></div>
+<div id="insights-drawer" style="display:none;position:fixed;bottom:0;left:0;right:0;height:420px;background:var(--surface);border-top:1px solid var(--border);z-index:201;padding:20px 28px;overflow-y:auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2 style="font-size:17px;font-weight:800;color:var(--text)">תובנות וניתוח</h2>
+    <button onclick="closeInsights()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">×</button>
+  </div>
+  <div id="insights-content" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;"></div>
+</div>
+
+<!-- SCAN STATUS BAR -->
+<div id="scan-bar">
+  <div id="scan-status">
+    <span id="scan-dot" class="scan-dot"></span>
+    <span id="scan-text">סריקה אחרונה: <strong id="scan-time">24.4.2026 · 08:03</strong><span class="scan-range"> — נתונים מכסים <strong>28.2.2026 – 24.4.2026</strong></span></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <span id="auto-scan-badge" title="סריקה אוטומטית מתוזמנת יומית ב-08:00">
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      סריקה אוטומטית · 08:00
+    </span>
+    <button id="scan-btn" onclick="runScan()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+      סרוק עכשיו
+    </button>
+  </div>
+</div>
+
+<!-- NARRATIVE BAR -->
+<div id="narrative-bar">
+  <span class="nb-label">נרטיב ←</span>
+  <button class="nar-btn" data-tactic="dehumanization"  style="color:#f85149;border-color:#f85149">⚠️ דה-הומניזציה</button>
+  <button class="nar-btn" data-tactic="incitement"      style="color:#fb8500;border-color:#fb8500">🔥 הסתה / איום</button>
+  <button class="nar-btn" data-tactic="mockery"         style="color:#e3b341;border-color:#e3b341">😏 לגלוג / הומור</button>
+  <button class="nar-btn" data-tactic="victim_inversion" style="color:#bc8cff;border-color:#bc8cff">🔄 היפוך קורבן</button>
+  <button class="nar-btn" data-tactic="legal_weapon"    style="color:#58a6ff;border-color:#58a6ff">⚖️ נשק משפטי</button>
+  <button class="nar-btn" data-tactic="whataboutism"    style="color:#3fb950;border-color:#3fb950">↩️ ווטאביזם</button>
+  <button class="nar-btn" data-tactic="coordination"    style="color:#e3b341;border-color:#e3b341">🔗 תיאום קמפיין</button>
+  <button class="nar-btn clear-btn" id="clear-tactic">✕ נקה</button>
+</div>
+
+<div class="main">
+
+  <!-- RIGHT: side panel (RTL = visually on right) -->
+  <div id="side">
+    <div id="side-header">
+      <div class="acc-placeholder" id="acc-placeholder">לחץ על צומת ברשת<br>לצפייה בפרטים, פרסומים ותובנות</div>
+      <div id="acc-info">
+        <div id="acc-handle"></div>
+        <div id="acc-badge"></div>
+        <div class="acc-meta">
+          <div>פלטפורמה: <span id="acc-platform"></span></div>
+          <div>מדינה: <span id="acc-country"></span></div>
+          <div>שפה: <span id="acc-lang"></span></div>
+          <div>מהימנות: <span id="acc-conf"></span></div>
+        </div>
+        <a id="acc-link" href="#" target="_blank" rel="noopener">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          פתח ב-X
+        </a>
+        <div id="acc-campaign-badge">⚡ משתתף מאושר בקמפיין "מפתחות הורמוז" (5–7 אפריל 2026)</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="posts">📋 פרסומים</div>
+      <div class="tab" data-tab="insights">💡 תובנות</div>
+      <div class="tab" data-tab="gallery">🖼️ גלריה</div>
+    </div>
+
+    <div id="posts-feed">
+      <div class="feed-placeholder">בחר חשבון מהגרף<br>לצפייה בפרסומים מתועדים</div>
+    </div>
+
+    <div id="insights-feed">
+      <div class="feed-placeholder">בחר חשבון מהגרף<br>לצפייה בתובנות</div>
+    </div>
+
+    <div id="gallery-feed">
+      <div class="gallery-no-media">בחר חשבון מהגרף<br>לצפייה בגלריית המדיה</div>
+    </div>
+
+  </div>
+
+  <!-- LEFT: graph -->
+  <div id="graph">
+    <svg id="svg"></svg>
+    <div id="tooltip">
+      <div class="tt-h" id="tt-h"></div>
+      <div class="tt-r">שכבה: <span id="tt-tier"></span></div>
+      <div class="tt-r">מדינה: <span id="tt-country"></span></div>
+      <div class="tt-r">מהימנות: <span id="tt-conf"></span></div>
+    </div>
+    <div id="legend">
+      <div class="lt">שכבות</div>
+      <div class="lr"><div class="ld" style="background:var(--T1)"></div>T1 — גרעין המשטר</div>
+      <div class="lr"><div class="ld" style="background:var(--T2)"></div>T2 — מוסדות</div>
+      <div class="lr"><div class="ld" style="background:var(--T3)"></div>T3 — שגרירויות</div>
+      <div class="lr"><div class="ld" style="background:var(--T4)"></div>T4 — מדיה ממלכתית</div>
+      <div class="lr"><div class="ld" style="background:var(--T5)"></div>T5 — פרשנים</div>
+      <div class="lr"><div class="ld" style="background:var(--T6)"></div>T6 — פרוקסי</div>
+    </div>
+    <div id="stats">
+      צמתים גלויים: <span id="stat-nodes">—</span><br>
+      קשרים: <span id="stat-links">—</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DEEP-LINK FROM HOME PAGE ────────────────────────────────────────────────
+const _sv = localStorage.getItem('startView');
+if (_sv) {
+  localStorage.removeItem('startView');
+  document.addEventListener('DOMContentLoaded', () => setTimeout(() => setView(_sv), 150));
+}
+
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const TC = { T1:"#f85149",T2:"#fb8500",T3:"#388bfd",T4:"#bc8cff",T5:"#3fb950",T6:"#6e7681" };
+const TL = { T1:"גרעין המשטר",T2:"מוסד",T3:"שגרירות",T4:"מדיה ממלכתית",T5:"פרשן",T6:"מדיה פרוקסי" };
+const CL = { H:"גבוה ✓",M:"בינוני ~",L:"נמוך ?" };
+
+const CAMPAIGN = new Set(["@IraninZimbabwe","@IraninSA","@IRANinBULGARIA","@Iran_in_India",
+  "@IraninAustria","@Iran_in_UK","@IRANinTJ","@EmbassyofIrtoRF","@IraninBerlin"]);
+
+// Aggressiveness scale color
+function scoreColor(s){
+  const c=["","#3fb950","#58a6ff","#fb8500","#f85149","#ff0000"];
+  return c[Math.round(s)]||"#6e7681";
+}
+
+// ─── POSTS DATABASE ──────────────────────────────────────────────────────────
+const POSTS = {
+  "@araghchi": [
+    { date:"5 מרץ 2026", conf:"H", score:3,
+      text:`"Long prepared for this war, Iran's Powerful Armed Forces are ensuring that it becomes a <strong>quagmire</strong> for whomever chooses to pursue it. We negotiated twice with this U.S. Administration. Both times, we were attacked in the middle of talks. <strong>It bears full responsibility for bloodshed</strong>."`,
+      url:"https://x.com/araghchi/status/2029638058270957718" },
+    { date:"אמצע מרץ 2026", conf:"H", score:5,
+      text:`"Our response to Israel's attack on our infrastructure employed a <strong>FRACTION of our power</strong>. The ONLY reason for restraint was respect for requested de-escalation. <strong>ZERO restraint</strong> if our infrastructures are struck again."`,
+      url:"https://x.com/araghchi/status/2034627715882504560" },
+    { date:"18 מרץ 2026", conf:"M", score:3,
+      text:`"Israel launched war on Iran, not the other way around." — ראיון עם אל-ג'זירה.`,
+      url:null },
+    { date:"מאוחר מרץ 2026", conf:"M", score:2,
+      text:`ביקר את "הגישה השלילית והמוטה של <strong>הממלכה המאוחדת</strong> וכמה מדינות אירופאיות כלפי התוקפנות הבוטה הזו."`,
+      url:null },
+  ],
+  "@IRIMFA_SPOX": [
+    { date:"28 פבר 2026", conf:"M", score:3,
+      text:`"Iran is defending itself and has <strong>no red lines</strong> on this matter... we are forced to attack the source of the enemy's aggressions."`,
+      url:null },
+    { date:"19 מרץ 2026", conf:"M", score:4,
+      text:`תיאר את פעולות ארה"ב וישראל כ-"<strong>מעשי טרור</strong>" ב"<strong>מלחמה בלתי חוקית</strong>" נגד איראן — ראיון ABC 7.30.`,
+      url:null },
+    { date:"10 מרץ 2026", conf:"M", score:4,
+      text:`האשים את פון דר ליין ב-"<strong>הלבנת פשע התוקפנות האמריקאי-ישראלי ופשעי המלחמה נגד האיראנים</strong>."`,
+      url:null },
+  ],
+  "@IRANinMumbai": [
+    { date:"1 אפריל 2026", conf:"H", score:3,
+      text:`"On April Fools' Day, it's almost poetic that Donald #Trump still manages to outdo the jokes; talking about a 'new' #Iran #president when Dr. #Pezeshkian has been in office all along. Reality check: presidents aren't replaced by tweets... that's what elections are for."`,
+      url:"https://x.com/IRANinMumbai/status/2039336810720211357" },
+    { date:"31 מרץ 2026", conf:"H", score:4,
+      text:`דיווח על טענת משמרות המהפכה כי "מבצע חילוץ שתוכנן על ידי ישראל וארה"ב בשדה תעופה נטוש באיספהאן <strong>נכשל בשל התערבות בזמן של כוחותינו</strong>."`,
+      url:"https://x.com/IRANinMumbai/status/2040724653438837077" },
+    { date:"8 אפריל 2026", conf:"M", score:2,
+      text:`"We'd genuinely love to, but at the moment there are no vacancies..." — בדיחה תגובתית למי שביקש 'לצרף' את הצבא האיראני.`,
+      url:null },
+    { date:"10 אפריל 2026", conf:"M", score:3,
+      text:`"<strong>The Strait stays closed until the blockade is lifted.</strong> Simple math." — תמיכה בעמדת איראן על קשר בין פתיחת המיצר להסרת הצי.`,
+      url:null },
+  ],
+  "@IraninZimbabwe": [
+    { date:"~4 אפריל 2026", conf:"H", score:2,
+      text:`"Behold the legacy of the Persian Empire, rooted in the very bedrock of history. Had some possessed even a shred of historical literacy, they would realize that a people and a government who stand as the heirs to one of mankind's first civilizations deserve nothing less than the utmost respect." — מסגור ציוויליזציוני לפני ספייק הקמפיין.`,
+      url:"https://x.com/IRANinZIMBABWE/status/2039794548759552499" },
+    { date:"~4 אפריל 2026", conf:"H", score:2,
+      text:`"<strong>Be polite and pass.</strong>" — תגובה קצרה וסרקסטית בתחילת המתח.`,
+      url:"https://x.com/IRANinZIMBABWE/status/2040292780715499722" },
+    { date:"5 אפריל 2026", conf:"H", score:4,
+      text:`"<strong>We've lost the keys.</strong>" — הפרסום שזרע את הקמפיין; פרסם ראשון לאחר האולטימטום של טראמפ. התפשט ל-8 שגרירויות תוך 48 שעות.`,
+      url:"https://x.com/IRANinZIMBABWE/status/2040805772850774428" },
+    { date:"6 אפריל 2026", conf:"H", score:3,
+      text:`"<strong>Next request, please.</strong>" — משיב בלגלוג לדרישות ההמשך של טראמפ.`,
+      url:"https://x.com/IRANinZIMBABWE/status/2040930954043093285" },
+    { date:"7 אפריל 2026", conf:"H", score:3,
+      text:`"8 P.M. is not that good. <strong>Could you change it to between 1 and 2 P.M., or if possible, 1 and 2 A.M.?</strong> Thank you for your attention to this important matter. I.E.Z." — לגלוג ישיר על המועד האחרון של טראמפ.`,
+      url:"https://x.com/IRANinZIMBABWE/status/2041063891497632113" },
+    { date:"7 אפריל 2026", conf:"H", score:3,
+      text:`"<strong>We found the keys. @IraninSA</strong>" — ציוץ תגובה ל-@IraninSA; סגרו את לולאת הקמפיין בציינם שהמפתחות "נמצאו" — רומז שהם בשליטתם.`,
+      url:"https://x.com/IRANinZIMBABWE/status/2041666510238650422" },
+    { date:"8 אפריל 2026", conf:"M", score:2,
+      text:`"<strong>Ceasefire.</strong>" — ציוץ חד-מילתי לאחר הכרזת הפסקת האש. 6.9M צפיות. — ISD Global.`,
+      url:null },
+  ],
+  "@IraninSA": [
+    { date:"אפריל 2026", conf:"H", score:5,
+      text:`⚠️ <strong>תמונה אנטישמית:</strong> פרסמה תמונה של חולדה עם כיפה ופיאות, רוכבת על נשר אמריקאי. כיתוב: <strong>"Who holds the reins?"</strong> — כותרת משנה: <strong>"The U.S. seeks to implement the policies of Israeli Zionists."</strong> שימוש בסמל 'חולדה' — טרופ נאצי מובהק. מקור: Times of Israel / ADL.`,
+      url:null },
+    { date:"5–6 אפריל 2026", conf:"H", score:3,
+      text:`"<strong>Shh… the key's under the flowerpot. Just open for friends.</strong>" — תגובה ל-Zimbabwe; הרחבת המם לשרשרת שגרירויות.`,
+      url:null },
+    { date:"6 אפריל 2026", conf:"H", score:4,
+      text:`"Seriously think about the <strong>25th amendment, Section 4</strong>." — קריאה פומבית להדחת הנשיא.`,
+      url:null },
+    { date:"6 אפריל 2026", conf:"H", score:4,
+      text:`"Humanity must know what kind of <strong>creatures</strong> are leading the American people." — שפה מדה-אנושית לתיאור ממשל ארה"ב.`,
+      url:null },
+    { date:"8 אפריל 2026", conf:"H", score:2,
+      text:`"<strong>Say hello to the new world superpower.</strong>" — ביום הפסקת האש; ניצחון נרטיבי.`,
+      url:null },
+    { date:"3 אפריל 2026", conf:"H", score:3,
+      text:`"The regime change happened successfully. MAGA 😀" — לגלוג סרקסטי על כישלון יעד שינוי המשטר האמריקאי. פרסום בעקבות הפסקת האש הראשונה.`,
+      url:"https://x.com/IraninSA/status/2040058819179315528" },
+    { date:"18 אפריל 2026", conf:"M", score:4,
+      text:`תגובה לסגירה מחודשת של מיצר הורמוז: "<strong>We opened it for friends. You are not friends.</strong>" — איראן סגרה מחדש את המיצר לאחר שארה"ב סירבה להסיר את הצי.`,
+      url:null },
+    { date:"22 אפריל 2026", conf:"M", score:4,
+      text:`"Iran seized ships to counter the unlawful US blockade — an act of <strong>piracy against sovereign shipping</strong>." — לאחר תקרית ספינת TOUSKA ב-19 אפריל; הצגת פעולות ישראל/ארה"ב כפיראטיות. מקור: Al Jazeera liveblog.`,
+      url:null },
+  ],
+  "@IraninBerlin": [
+    { date:"6 אפריל 2026", conf:"H", score:2,
+      text:`"Let this be the last tweet of today... '<strong>Israel is the main source of instability in the region.</strong>' And please don't forget: Iran didn't start this war. Iran is defending its people against an act of aggression. <strong>#istandwithiran</strong>"`,
+      url:"https://x.com/IraninBerlin/status/2040899571920863313" },
+    { date:"7 אפריל 2026", conf:"H", score:3,
+      text:`"Let this be the last tweet of today: <strong>A new order for the Strait of Hormuz is emerging</strong>. It is being worked on." — איתות לסדר אזורי חדש.`,
+      url:"https://x.com/IraninBerlin/status/2041271016358359261" },
+    { date:"9 אפריל 2026", conf:"M", score:3,
+      text:`"<strong>Israel attacks Lebanon. US calls it 'defensive'.</strong> Iran calls it what it is: a violation of the ceasefire. #istandwithiran" — הצגת ישראל כמפרת הפסקת האש.`,
+      url:null },
+  ],
+  "@IraninAustria": [
+    { date:"5 אפריל 2026", conf:"H", score:4,
+      text:`"#POTUS has stooped to an unprecedented level of <strong>begging</strong>, laced with bitter, hollow rudeness and threats. The desperation is almost palpable, dripping from every syllable—especially the haphazardly hurled expletives." — מסגור טראמפ כמתחנן ומיואש; הוסיף גרפיקת "18+" על הציוץ.`,
+      url:"https://x.com/IraninAustria/status/2040806753789444361" },
+    { date:"5 אפריל 2026", conf:"H", score:3,
+      text:`"We solemnly remind everyone, once again, that attacking civilian infrastructure constitutes a <strong>War Crime</strong>." — תזכיר רשמי לאחר האיומים על תחנות הכוח.`,
+      url:"https://x.com/IraninAustria/status/2040806753789444361" },
+  ],
+  "@Iran_in_India": [
+    { date:"5 אפריל 2026", conf:"H", score:4,
+      text:`"Swearing and throwing insults are how sore loser brats behave. <strong>Get a grip on yourself, old man!</strong>" — תקיפה אישית ישירה של טראמפ; הצטרף לקמפיין תוך שעות.`,
+      url:"https://x.com/Iran_in_India/status/2040826238911295743" },
+    { date:"2 אפריל 2026", conf:"H", score:5,
+      text:`"We will not be driven back to the Stone Age by your bombings. We are a nation with <strong>7,000 years of civilization</strong>. History knows us well. What is clear is this: it is YOU who have carried the killing of children and crimes against humanity from the Stone Age into the modern world." — ישראל/ארה"ב כמי שמביאים 'פשע נגד האנושות'.`,
+      url:"https://x.com/Iran_in_India/status/2039639206738448881" },
+  ],
+  "@IRANinBULGARIA": [
+    { date:"6 אפריל 2026", conf:"H", score:3,
+      text:`"<strong>Take it easy tiger, keep your cool.</strong>" — לגלוג שקט על האגרסיביות של טראמפ.`,
+      url:null },
+    { date:"6 אפריל 2026", conf:"H", score:4,
+      text:`"Doors open for friends. <strong>Epstein's friends need keys 🔐</strong>" — הקישור לאפשטיין כקיצור דה-לגיטימציה; אחד הפרסומים החריפים ביותר מבחינת ניסוח. מאומת בציוץ ישיר.`,
+      url:"https://x.com/IRANinBULGARIA/status/2041193587182862347" },
+  ],
+  "@IRANinTJ": [
+    { date:"6 אפריל 2026", conf:"M", score:3,
+      text:`השתתפות בקמפיין "המפתחות" — לעג לאולטימטום טראמפ. ציטוט ספציפי לא שוחזר; מקור: אל-ג'זירה.`,
+      url:null },
+  ],
+  "@EmbassyofIrtoRF": [
+    { date:"6 אפריל 2026", conf:"M", score:3,
+      text:`פרסם תמונת מם — דון קיחוטה עם כיתוב הקושר לאולטימטום טראמפ. פרשנות ויזואלית ולא טקסטואלית.`,
+      url:null },
+  ],
+  "@Iran_in_UK": [
+    { date:"5 אפריל 2026", conf:"H", score:2,
+      text:`<strong>ציטוט מארק טוויין:</strong> "It is better to keep your mouth closed and let people think you are a fool than to open it and remove all doubt." — ביחד עם שיר פרסי מאת רומי על סכנת מסירת חרב לידי מטורף. גישה ספרותית ייחודית. מקור: France24.`,
+      url:null },
+    { date:"6 אפריל 2026", conf:"H", score:3,
+      text:`"Let this be the last tweet of today: '<strong>Israel is the main source of instability in the region.</strong>' And please don't forget: Iran didn't start this war. Iran is defending its people against an act of aggression. <strong>#istandwithiran</strong>" — קו פחות אגרסיבי, מכוון לקהל אירופאי.`,
+      url:null },
+    { date:"16 אפריל 2026", conf:"M", score:2,
+      text:`"<strong>A ceasefire with Lebanon. A blockade on Iran. A peace that isn't.</strong>" — ביקורת על הפסקת האש שאינה מרימה את הצי האמריקאי.`,
+      url:null },
+  ],
+  "@IranInThailand": [
+    { date:"5 אפריל 2026", conf:"H", score:3,
+      text:`"Judging by how <strong>POTUS swears like a teenager</strong>, it seems the US has reached the Stone Age sooner than expected." — לגלוג על גסות הרוח של טראמפ בתגובה לאיום 'עידן האבן'. מקור: Al-Monitor, France24.`,
+      url:null },
+  ],
+  "@IRANinKENYA": [
+    { date:"מרץ 2026", conf:"M", score:4,
+      text:`גינה את ה"תוקפנות הפחדנית של ארה"ב וישראל" (<strong>"cowardly US-Israel aggression"</strong>) בהצהרה רשמית, שבה נשבעה איראן הגנה עצמית. מקור: People Daily Kenya.`,
+      url:null },
+    { date:"אפריל 2026", conf:"M", score:3,
+      text:`שגריר ד"ר עלי גולמפור הודיע כי <strong>קניה אינה מטרה</strong> — אך אישר ש"מתקני ארה"ב בסביבה" עשויים להיות מטרות. ראיון Nation Africa.`,
+      url:null },
+  ],
+  "@IRANinETHIOPIA": [
+    { date:"חלון הנחקר", conf:"L", score:1,
+      text:`שגרירות אדיס אבבה. אתיופיה שמרה על קשרים דו-צדדיים עם ישראל; השגרירות האיראנית לא הוציאה הצהרות ציבוריות מתועדות נגד ישראל בחלון הנחקר.`,
+      url:null },
+  ],
+  "@IraninAlgeria": [
+    { date:"פבר–מרץ 2026", conf:"M", score:4,
+      text:`אלג'יריה גינתה את ה"תוקפנות האמריקאית-ציונית" (<strong>"American-Zionist aggression"</strong>) — "הפרה בוטה של הריבונות". השגרירות האיראנית פרסמה בקנה אחד עם הצהרת משרד החוץ האלג'יראי.`,
+      url:null },
+  ],
+  "@IraninSKorea": [
+    { date:"חלון הנחקר", conf:"L", score:1,
+      text:`שגרירות סיאול. ידית @IraninSKorea לא אומתה לחלוטין בפס הנוכחי. אין ציוצים מתועדים בחלון הנחקר.`,
+      url:null },
+  ],
+  "@IraninIslamabad": [
+    { date:"אפריל 2026", conf:"H", score:3,
+      text:`"You don't know how <strong>civilizations</strong> work because Never had one. They are not born over a night and will not die over a night." — תגובה לאיום 'עידן האבן'; ישראל ארה"ב מוצגות כחסרות עומק ציוויליזציוני.`,
+      url:"https://x.com/IraninIslamabad/status/2041519063948767430" },
+  ],
+};
+
+// ─── MEDIA DATABASE ──────────────────────────────────────────────────────────
+const MEDIA = {
+  "@IraninZimbabwe": [
+    { type:"meme", desc:"\"We've lost the keys.\" — הציוץ שזרע את קמפיין אפריל; פורסם ראשון לאחר אולטימטום טראמפ", url:"https://x.com/IRANinZIMBABWE/status/2040805772850774428", date:"5 אפריל 2026" },
+    { type:"meme", desc:"\"Next request, please.\" — לגלוג על דרישות המשך", url:"https://x.com/IRANinZIMBABWE/status/2040930954043093285", date:"6 אפריל 2026" },
+    { type:"meme", desc:"\"Could you change it to between 1 and 2 A.M.?\" — לגלוג ישיר על המועד האחרון", url:"https://x.com/IRANinZIMBABWE/status/2041063891497632113", date:"7 אפריל 2026" },
+    { type:"text", desc:"\"Behold the legacy of the Persian Empire\" — מסגור ציוויליזציוני לפני ספייק הקמפיין", url:"https://x.com/IRANinZIMBABWE/status/2039794548759552499", date:"~4 אפריל 2026" },
+  ],
+  "@IraninBerlin": [
+    { type:"text", desc:"\"Israel is the main source of instability in the region.\" #istandwithiran", url:"https://x.com/IraninBerlin/status/2040899571920863313", date:"6 אפריל 2026" },
+    { type:"text", desc:"\"A new order for the Strait of Hormuz is emerging.\" — הצהרת סדר אזורי", url:"https://x.com/IraninBerlin/status/2041271016358359261", date:"7 אפריל 2026" },
+  ],
+  "@IRANinMumbai": [
+    { type:"meme", desc:"\"On April Fools' Day...\" — לגלוג על טענות טראמפ לנשיא חדש", url:"https://x.com/IRANinMumbai/status/2039336810720211357", date:"1 אפריל 2026" },
+    { type:"news", desc:"דיווח על כישלון מבצע ישראלי-אמריקאי באספהאן", url:"https://x.com/IRANinMumbai/status/2040724653438837077", date:"31 מרץ 2026" },
+  ],
+  "@EmbassyofIrtoRF": [
+    { type:"image", desc:"מם דון קיחוטה — פרשנות ויזואלית לאולטימטום טראמפ; רוסיה בחרה בהפניה ספרותית-ויזואלית", url:null, date:"6 אפריל 2026", note:"תמונה לא ניתנת להצגה ישירה — מקור: אל-ג'זירה" },
+  ],
+  "@araghchi": [
+    { type:"text", desc:"\"ZERO restraint\" — הצהרת הכוונות הנועזת ביותר מהחלון; מרץ 2026", url:"https://x.com/araghchi/status/2034627715882504560", date:"אמצע מרץ 2026" },
+    { type:"text", desc:"\"quagmire\" — מסגור מלחמת ההתשה; ציוץ שאומץ על ידי שגרירויות", url:"https://x.com/araghchi/status/2029638058270957718", date:"5 מרץ 2026" },
+  ],
+  "@IranInThailand": [
+    { type:"meme", desc:"\"Judging by how POTUS swears like a teenager, it seems the US has reached the Stone Age sooner than expected\" — לגלוג ספציפי על גסות הרוח", url:null, date:"5 אפריל 2026" },
+  ],
+  "@Iran_in_UK": [
+    { type:"text", desc:"ציטוט מארק טוויין + שיר רומי — גישה ספרותית ייחודית לקמפיין לגלוג", url:null, date:"5 אפריל 2026" },
+    { type:"text", desc:"\"Israel is the main source of instability\" — #istandwithiran", url:"https://x.com/IraninBerlin/status/2040899571920863313", date:"6 אפריל 2026" },
+  ],
+  "@IraninSA": [
+    { type:"image", desc:"⚠️ תמונה אנטישמית: חולדה עם כיפה ופיאות רוכבת על נשר. \"Who holds the reins? The U.S. seeks to implement the policies of Israeli Zionists.\" — קישור ישיר ל'שליטה ציונית' בארה\"ב", url:null, date:"אפריל 2026", note:"מקור: Times of Israel Blog / ADL. תמונה מתועדת כאנטישמית לפי הגדרת IHRA" },
+  ],
+  "@IraninIslamabad": [
+    { type:"text", desc:"\"You don't know how civilizations work because Never had one\" — תגובה לאיום 'עידן האבן'", url:"https://x.com/IraninIslamabad/status/2041519063948767430", date:"אפריל 2026" },
+  ],
+};
+
+// ─── INSIGHTS DATABASE ───────────────────────────────────────────────────────
+const INSIGHTS = {
+  "@araghchi": {
+    role:"שר החוץ — ממסגר הנרטיב המרכזי",
+    register:"משפטי-בינלאומי (סעיף 51) + איום מפורש",
+    avgScore: 3.5,
+    keywords:["ביצה","FRACTION","ZERO restraint","aggression","quagmire"],
+    coordination:"מוביל — שגרירויות מאמצות את שפתו תוך ימים",
+    note:"הציוץ 'quagmire' (5 מרץ) מסגר את כל השיח הלאחר; 'ZERO restraint' (מרץ) הוא הצהרת כוונות נדירות ביחיד.",
+    xHandle:"araghchi",
+  },
+  "@IRANinMumbai": {
+    role:"קונסוליה מומבאי — הפעיל ביותר בחלון",
+    register:"מבצעי יומי + לגלוג + מסגור ציוויליזציוני",
+    avgScore: 3.2,
+    keywords:["April Fools","rescue operation","quagmire","human chain"],
+    coordination:"אימץ שפת הקמפיין; 9 פרסומים מתועדים — הכי הרבה בחלון",
+    note:"ייחודי: משלב לגלוג קל (1 אפריל) עם תכנים IRGC ותפעוליים. הפרסום ב-8 אפריל ('no vacancies') מסמן ירידת מתח לאחר הפסקת אש.",
+    xHandle:"IRANinMumbai",
+  },
+  "@IraninZimbabwe": {
+    role:"שגרירות זימבבווה — זרע הקמפיין",
+    register:"לגלוג",
+    avgScore: 4,
+    keywords:["we've lost the keys","Hormuz","mockery"],
+    coordination:"ראשון לפרסם — Al Jazeera מתעד זאת כנקודת ה-seed",
+    note:"'We've lost the keys' — משפט אחד שהפך למם. הגיע תוך שעות מהאולטימטום; מרמז על תגובה מתואמת מוכנה מראש.",
+    xHandle:"IraninZimbabwe",
+  },
+  "@IraninSA": {
+    role:"שגרירות דרום אפריקה — החריף בשגרירויות",
+    register:"אנטישמיות גלויה + דה-לגיטימציה + שפה מדה-אנושית",
+    avgScore: 4.2,
+    keywords:["who holds the reins","Israeli Zionists","rat image","creatures","25th amendment"],
+    coordination:"השתתפה באפריל 5–8; פרסמה תוכן אנטישמי מפורש המקשר ישראל לשליטה על ארה\"ב",
+    note:"⚠️ תמונת 'חולדה עם כיפה' — שימוש בסמל נאצי לפי הגדרת IHRA. פרסום 'Who holds the reins?' הוא הדוגמה הישירה ביותר לנרטיב 'שליטה ציונית'. מדינת BRICS; שגרירות דרום-אפריקאית בתיאום ברור עם קו MFA.",
+    xHandle:"IraninSA",
+  },
+  "@IraninBerlin": {
+    role:"שגרירות גרמניה",
+    register:"פורמלי + רמיזות לסדר אזורי חדש",
+    avgScore: 2.5,
+    keywords:["#istandwithiran","new order","Hormuz","instability"],
+    coordination:"השתתפה בקמפיין; קו פחות אגרסיבי — מכוון לקהל אירופאי",
+    note:"הציוץ 'new order for the Strait of Hormuz is emerging' (7 אפריל) הוא איתות ריבוני מפורש — חריג ביחס לשאר השגרירויות.",
+    xHandle:"IraninBerlin",
+  },
+  "@IraninAustria": {
+    role:"שגרירות אוסטריה",
+    register:"מוסרני / 'הגן על קטינים'",
+    avgScore: 4,
+    keywords:["unprecedented level","begging","protect minors","18+"],
+    coordination:"קמפיין אפריל; ניסוח 18+ לציוצים מסוימים",
+    note:"מאומת בדוח אל-ג'זירה; אוסטריה — מדינת EU — פרסמה לגלוג מסדר 4, מה שמפריך את הסבר 'קוצר של מדינה עוינת'.",
+    xHandle:"IraninAustria",
+  },
+  "@Iran_in_India": {
+    role:"שגרירות הודו — ניו דלהי",
+    register:"לגלוג פרסונלי — תקיפת טראמפ",
+    avgScore: 4,
+    keywords:["old man","get a grip","sore loser","brats"],
+    coordination:"השתתפה בקמפיין; הפרסום המאומת שלה הוא תקיפה אד-הומינם ישירה",
+    note:"'old man' — שפה שהופיעה גם בשגרירויות אחרות כמקשר; ניסוח 'sore loser brats' יוצא דופן לגוף דיפלומטי.",
+    xHandle:"Iran_in_India",
+  },
+  "@IRANinBULGARIA": {
+    role:"שגרירות בולגריה",
+    register:"דה-לגיטימציה — הקשר אפשטיין",
+    avgScore: 4,
+    keywords:["Epstein's friends","keys","delegitimization"],
+    coordination:"קמפיין אפריל; פרסום אחד מאומת — אחד החריפים ביותר",
+    note:"בולגריה היא מדינת EU/NATO. 'Epstein's friends' — קיצור לגיטימציה המקשר ממשל טראמפ לפדופיליה. פרסום יחיד עם השפעה גבוהה.",
+    xHandle:"IRANinBULGARIA",
+  },
+  "@IRIMFA_SPOX": {
+    role:"דובר משרד החוץ — בקאי",
+    register:"משפטי-בינלאומי + האשמה ישירה",
+    avgScore: 3.3,
+    keywords:["no red lines","terrorist acts","illegal war","crime of aggression"],
+    coordination:"מגדיר טון; שגרירויות מד-אחסות שפתו",
+    note:"הצהרת '28 פברואר' ('no red lines') היא הצהרת הפתיחה לחלון כולו. ראיון ABC 7.30 (19 מרץ) הגיע לקהל אנגלופוני רחב.",
+    xHandle:"IRIMFA_SPOX",
+  },
+  "@IranInThailand": {
+    role:"שגרירות תאילנד — מוסמכת למיאנמר ולאוס",
+    register:"לגלוג — השוואה תרבותית",
+    avgScore: 3,
+    keywords:["Stone Age","teenager","POTUS","civilization"],
+    coordination:"השתתפה בגל לגלוג אפריל 5; ציטוט מאושר על ידי Al-Monitor ו-France24",
+    note:"הציוץ 'Stone Age sooner than expected' הוא היפוך קלאסי של נרטיב: כשטראמפ מאיים להחזיר איראן לעידן האבן — תאילנד מציגה את ארה\"ב כזו שכבר שם.",
+    xHandle:"IranInThailand",
+  },
+  "@Iran_in_UK": {
+    role:"שגרירות בריטניה — גישה ספרותית",
+    register:"לגלוג אינטלקטואלי + נרטיב ישראל",
+    avgScore: 2.5,
+    keywords:["Mark Twain","Rumi","fool","Israel instability","#istandwithiran"],
+    coordination:"השתתפה בקמפיין; ציטוט טוויין ורומי — ייחודי מבין כל השגרירויות",
+    note:"בחירת ציטוטי מארק טוויין ורומי בו-זמנית — מסגרת אינטלקטואלית מחושבת למוקד קהל בריטי. פרסום 'Israel is the main source of instability' ישיר ומאתגר ביחס לדינמיקה האיחוד האירופי.",
+    xHandle:"Iran_in_UK",
+  },
+  "@IraninIslamabad": {
+    role:"שגרירות פקיסטן — ~38K עוקבים",
+    register:"ציוויליזציוני / מסגור היסטורי",
+    avgScore: 3,
+    keywords:["civilizations","never had one","Stone Age","born over a night"],
+    coordination:"השתתפה בגל אפריל; ציוץ מאומת עם URL ישיר",
+    note:"'You don't know how civilizations work because Never had one' — תגובה פרובוקטיבית לישראל/ארה\"ב; פקיסטן מדינה מוסלמית בעלת קשרים עם ישראל — הציוץ מגיע מחשבון רשמי במתח דיפלומטי.",
+    xHandle:"IraninIslamabad",
+  },
+  "@IRANinKENYA": {
+    role:"שגרירות קניה — נירובי",
+    register:"הצהרות רשמיות + גינויי 'תוקפנות'",
+    avgScore: 3.5,
+    keywords:["US-Israel aggression","cowardly","self-defence","Kenya not a target"],
+    coordination:"פרסמה הצהרה רשמית; אישרה שמתקני ארה\"ב הם מטרות פוטנציאליות",
+    note:"ייחודי: שגריר ד\"ר גולמפור הצהיר ישירות ש'קניה אינה מטרה' אך 'מתקני ארה\"ב הם'. קניה מארחת בסיסי ארה\"ב — ההצהרה רגישה דיפלומטית. מקור: People Daily Kenya, Nation Africa.",
+    xHandle:"IRANinKENYA",
+  },
+};
+
+// ─── NODES ───────────────────────────────────────────────────────────────────
+const nodes = [
+  // T1
+  {id:"@khamenei_ir",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"חשבון אנגלי ראשי; khamenei.ir"},
+  {id:"@Khamenei_fa",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"FA",conf:"H",notes:"חשבון פרסי"},
+  {id:"@ar_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"AR",conf:"H",notes:"חשבון ערבי"},
+  {id:"@Khamenei_es",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"ES",conf:"M",notes:"ספרדית"},
+  {id:"@fr_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"FR",conf:"H",notes:"צרפתית"},
+  {id:"@Khamenei_fra",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"FR",conf:"H",notes:"צרפתית — משני"},
+  {id:"@de_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"DE",conf:"M",notes:"גרמנית"},
+  {id:"@it_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"IT",conf:"M",notes:"איטלקית"},
+  {id:"@tr_Khamenei_ir",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"TR",conf:"M",notes:"טורקית"},
+  {id:"@ur_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"UR",conf:"M",notes:"אורדו"},
+  {id:"@in_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"HI",conf:"H",notes:"הינדי — הושק 2020"},
+  {id:"@ru_Khamenei",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"RU",conf:"L",notes:"רוסית"},
+  {id:"@Khamenei_m",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"multi",conf:"H",notes:"Khamenei Media"},
+  {id:"@drpezeshkian",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN/FA",conf:"H",notes:"נשיא פזשכיאן — חשבון אישי"},
+  {id:"@araghchi",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN/FA",conf:"H",notes:"שר החוץ ארגצ'י — ממסגר הנרטיב"},
+  {id:"@Iran_GOV",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"ממשלת הרפובליקה האסלאמית"},
+  {id:"@IRIMFA_SPOX",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"דובר משרד החוץ בקאי"},
+  {id:"@IRIran_Military",tier:"T1",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"L",notes:"לא מאומת כחשבון IRGC רשמי"},
+  // T2
+  {id:"@IRIMFA_EN",tier:"T2",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"משרד החוץ — אנגלית"},
+  {id:"@Iran_UN",tier:"T2",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"נציגות קבועה לאו\"ם — ניו יורק"},
+  {id:"@PMIRAN_GENEVA",tier:"T2",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"נציגות לאו\"ם — ז'נבה"},
+  {id:"@IranmissionEU",tier:"T2",platform:"X",country:"בלגיה",region:"Europe West",lang:"EN/FR",conf:"H",notes:"שגרירות + נציגות לאיחוד האירופי"},
+  // T3 Middle East
+  {id:"@IranEmbassyLB",tier:"T3",platform:"X",country:"לבנון",region:"Middle East",lang:"AR",conf:"H",notes:"ביירות"},
+  {id:"@IRANinQATAR",tier:"T3",platform:"X",country:"קטר",region:"Middle East",lang:"AR/EN",conf:"H",notes:"דוחא"},
+  {id:"@IranembassyDam",tier:"T3",platform:"X",country:"סוריה",region:"Middle East",lang:"AR",conf:"M",notes:"דמשק — מצב תפעולי תנודתי"},
+  // T3 Europe West
+  {id:"@Iran_in_UK",tier:"T3",platform:"X",country:"בריטניה",region:"Europe West",lang:"EN",conf:"H",notes:"לונדון"},
+  {id:"@IRANinFRANCE",tier:"T3",platform:"X",country:"צרפת",region:"Europe West",lang:"FR",conf:"H",notes:"פריז"},
+  {id:"@IraninBerlin",tier:"T3",platform:"X",country:"גרמניה",region:"Europe West",lang:"DE/EN",conf:"H",notes:"Iran In Deutschland"},
+  {id:"@IraninSpain",tier:"T3",platform:"X",country:"ספרד",region:"Europe West",lang:"ES",conf:"M",notes:"מדריד"},
+  {id:"@IRANinBELGIQUE",tier:"T3",platform:"X",country:"בלגיה",region:"Europe West",lang:"FR",conf:"M",notes:"בריסל — דו-צדדי"},
+  {id:"@IRAN_in_NL",tier:"T3",platform:"X",country:"הולנד",region:"Europe West",lang:"EN",conf:"H",notes:"האג"},
+  {id:"@IraninAustria",tier:"T3",platform:"X",country:"אוסטריה",region:"Europe West",lang:"DE/EN",conf:"H",notes:"וינה"},
+  {id:"@IRANinNorway",tier:"T3",platform:"X",country:"נורווגיה",region:"Europe West",lang:"NO/EN",conf:"H",notes:"אוסלו"},
+  {id:"@IRANinFINLAND",tier:"T3",platform:"X",country:"פינלנד",region:"Europe West",lang:"EN",conf:"M",notes:"הלסינקי"},
+  {id:"@IRANinGREECE",tier:"T3",platform:"X",country:"יוון",region:"Europe West",lang:"EN/EL",conf:"H",notes:"אתונה"},
+  // T3 Europe East
+  {id:"@IRANinHUNGARY",tier:"T3",platform:"X",country:"הונגריה",region:"Europe East",lang:"EN/HU",conf:"H",notes:"בודפשט"},
+  {id:"@IRANinCZECH",tier:"T3",platform:"X",country:"צ'כיה",region:"Europe East",lang:"EN/CZ",conf:"H",notes:"פראג"},
+  {id:"@IRANinBULGARIA",tier:"T3",platform:"X",country:"בולגריה",region:"Europe East",lang:"EN/BG",conf:"H",notes:"פרסום 'Epstein's friends'"},
+  {id:"@IRANinROMANIA",tier:"T3",platform:"X",country:"רומניה",region:"Europe East",lang:"EN/RO",conf:"H",notes:"בוקרשט"},
+  {id:"@IraninSerbia",tier:"T3",platform:"X",country:"סרביה",region:"Europe East",lang:"EN/SR",conf:"H",notes:"בלגרד"},
+  {id:"@IRANinBiH",tier:"T3",platform:"X",country:"בוסניה",region:"Europe East",lang:"EN/BS",conf:"H",notes:"סרייבו"},
+  // T3 Post-Soviet
+  {id:"@EmbassyofIrtoRF",tier:"T3",platform:"X",country:"רוסיה",region:"Post-Soviet",lang:"RU/EN",conf:"M",notes:"ידית תנודתית — Al Jazeera מצטטת גרסה זו"},
+  {id:"@IRANINBAKU",tier:"T3",platform:"X",country:"אזרבייג'ן",region:"Post-Soviet",lang:"AZ/EN",conf:"H",notes:"באקו"},
+  {id:"@iraninyerevan",tier:"T3",platform:"X",country:"ארמניה",region:"Post-Soviet",lang:"EN/HY",conf:"H",notes:"ירוואן"},
+  {id:"@IraninGeorgia",tier:"T3",platform:"X",country:"גאורגיה",region:"Post-Soviet",lang:"EN/KA",conf:"H",notes:"טביליסי"},
+  {id:"@IRANinTJ",tier:"T3",platform:"X",country:"טג'יקיסטן",region:"Post-Soviet",lang:"EN/FA",conf:"H",notes:""},
+  // T3 Asia
+  {id:"@IranInThailand",tier:"T3",platform:"X",country:"תאילנד",region:"Asia",lang:"EN/FA",conf:"H",notes:"מוסמך גם למיאנמר ולאוס"},
+  {id:"@IranNigeria",tier:"T3",platform:"X",country:"ניגריה",region:"Africa",lang:"EN/FA",conf:"H",notes:"אבוג'ה"},
+  {id:"@Iran_in_India",tier:"T3",platform:"X",country:"הודו",region:"Asia",lang:"EN",conf:"H",notes:"ניו דלהי"},
+  {id:"@IranAmbIndia",tier:"T3",platform:"X",country:"הודו",region:"Asia",lang:"EN",conf:"H",notes:"שגריר מוחמד פת'אלי"},
+  {id:"@IRANinMumbai",tier:"T3",platform:"X",country:"הודו",region:"Asia",lang:"EN",conf:"H",notes:"קונסוליה מומבאי — הפעיל ביותר"},
+  {id:"@IraninChina",tier:"T3",platform:"X",country:"סין",region:"Asia",lang:"EN/FA",conf:"H",notes:"בייג'ינג; Weibo כפלטפורמה עיקרית"},
+  {id:"@IraninIslamabad",tier:"T3",platform:"X",country:"פקיסטן",region:"Asia",lang:"EN/UR",conf:"H",notes:"~38K עוקבים"},
+  {id:"@IRANinKabul",tier:"T3",platform:"X",country:"אפגניסטן",region:"Asia",lang:"EN/Dari",conf:"H",notes:"קאבול"},
+  {id:"@IraninDhaka",tier:"T3",platform:"X",country:"בנגלדש",region:"Asia",lang:"EN/BN",conf:"H",notes:"דאקה"},
+  {id:"@iraninmalaysia",tier:"T3",platform:"X",country:"מלזיה",region:"Asia",lang:"EN/MS",conf:"H",notes:"קואלה לומפור"},
+  {id:"@IraninIndonesia",tier:"T3",platform:"X",country:"אינדונזיה",region:"Asia",lang:"EN/ID",conf:"H",notes:"ג'קרטה"},
+  {id:"@IraninJapan",tier:"T3",platform:"X",country:"יפן",region:"Asia",lang:"EN/JA",conf:"H",notes:"טוקיו"},
+  {id:"@IraninSKorea",tier:"T3",platform:"X",country:"דרום קוריאה",region:"Asia",lang:"EN/KO",conf:"M",notes:"סיאול"},
+  // T3 Africa
+  {id:"@IraninSA",tier:"T3",platform:"X",country:"דרום אפריקה",region:"Africa",lang:"EN",conf:"H",notes:"כלל בקמפיין; תמונות אנטישמיות קודמות"},
+  {id:"@IraninZimbabwe",tier:"T3",platform:"X",country:"זימבבווה",region:"Africa",lang:"EN",conf:"H",notes:"הוביל את קמפיין המפתחות"},
+  {id:"@IRANinKENYA",tier:"T3",platform:"X",country:"קניה",region:"Africa",lang:"EN",conf:"H",notes:"נירובי"},
+  {id:"@IRANinETHIOPIA",tier:"T3",platform:"X",country:"אתיופיה",region:"Africa",lang:"EN",conf:"H",notes:"אדיס אבבה"},
+  {id:"@IraninAlgeria",tier:"T3",platform:"X",country:"אלג'יריה",region:"Africa",lang:"EN/AR",conf:"H",notes:"אלג'יר"},
+  // T3 Americas
+  {id:"@Eiranencaracas",tier:"T3",platform:"X",country:"ונצואלה",region:"Americas",lang:"ES",conf:"H",notes:"קראקס"},
+  {id:"@IRANinBRAZIL",tier:"T3",platform:"X",country:"ברזיל",region:"Americas",lang:"PT/EN",conf:"H",notes:"ברזיליה"},
+  {id:"@IRANINARGENTINA",tier:"T3",platform:"X",country:"ארגנטינה",region:"Americas",lang:"ES",conf:"H",notes:"בואנוס איירס"},
+  {id:"@iranincuba",tier:"T3",platform:"X",country:"קובה",region:"Americas",lang:"ES",conf:"M",notes:"הוואנה"},
+  // T4
+  {id:"@PressTV",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"IRIB אנגלית; איבד אימות 2024"},
+  {id:"@presstvturk",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"TR",conf:"H",notes:"Press TV טורקית — ינואר 2025"},
+  {id:"@HispanTV",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"ES",conf:"M",notes:"IRIB ספרדית"},
+  {id:"@hispantv_brasil",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"PT",conf:"H",notes:"HispanTV ברזיל — ינואר 2025"},
+  {id:"@AlalamNews",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"AR",conf:"M",notes:"IRIB ערבית; הושעה לסירוגין"},
+  {id:"@OfficialSaharTV",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"multi",conf:"H",notes:"IRIB רב-לשוני"},
+  {id:"@sahartvonline",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"multi",conf:"H",notes:"Sahar TV — משני"},
+  {id:"@EnSaharTV",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"Sahar TV — ענף אנגלי"},
+  {id:"@iribnews_irib",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN/FA",conf:"H",notes:"IRIB News — מוסדי"},
+  {id:"@IrnaEnglish",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"IRNA אנגלית — ~75K פרסומים"},
+  {id:"@Tasnimnews_EN",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"Tasnim — קשור ל-IRGC; 114K+ עוקבים"},
+  {id:"@Tasnimnews_Fa",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"FA",conf:"H",notes:"Tasnim פרסית"},
+  {id:"@Tasnimnews_He",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"HE",conf:"H",notes:"Tasnim עברית — הושק 2022"},
+  {id:"@EnglishFars",tier:"T4",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"Fars News — קשור ל-IRGC"},
+  // T5
+  {id:"Marzieh Hashemi",tier:"T5",platform:"X",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"עוגן Press TV — מוכרת רשמית"},
+  {id:"H. Shariatmadari",tier:"T5",platform:"Web",country:"איראן",region:"Global",lang:"FA",conf:"H",notes:"עורך Kayhan; נציג חמינאי"},
+  {id:"Marwan Osman",tier:"T5",platform:"Telegram",country:"איראן",region:"Global",lang:"EN",conf:"H",notes:"כתב Press TV (DFRLab 2025)"},
+  // T6
+  {id:"@AlMayadeenNews",tier:"T6",platform:"X",country:"לבנון",region:"Middle East",lang:"AR",conf:"L",notes:"בייירות; פרו-חיזבאללה/פרו-איראן"},
+  {id:"@MayadeenEnglish",tier:"T6",platform:"X",country:"לבנון",region:"Middle East",lang:"EN",conf:"L",notes:"Al-Mayadeen אנגלית"},
+  {id:"Al-Manar",tier:"T6",platform:"X",country:"לבנון",region:"Middle East",lang:"AR",conf:"L",notes:"בבעלות חיזבאללה; הושעה לסירוגין"},
+  {id:"Al-Masirah",tier:"T6",platform:"X",country:"תימן",region:"Middle East",lang:"AR",conf:"L",notes:"מדיית חות'ים; הושעה לסירוגין"},
+];
+
+// ─── LINKS ───────────────────────────────────────────────────────────────────
+const links = [];
+["@Khamenei_fa","@ar_Khamenei","@Khamenei_es","@fr_Khamenei","@Khamenei_fra",
+ "@de_Khamenei","@it_Khamenei","@tr_Khamenei_ir","@ur_Khamenei","@in_Khamenei",
+ "@ru_Khamenei","@Khamenei_m"].forEach(t=>links.push({source:"@khamenei_ir",target:t,type:"tier"}));
+links.push({source:"@araghchi",target:"@IRIMFA_SPOX",type:"tier"});
+links.push({source:"@araghchi",target:"@IRIMFA_EN",type:"tier"});
+["@IRIMFA_EN","@Iran_UN","@PMIRAN_GENEVA","@IranmissionEU"].forEach(t=>links.push({source:"@IRIMFA_SPOX",target:t,type:"tier"}));
+["@Iran_in_UK","@IraninBerlin","@IRANinMumbai","@IraninZimbabwe","@IraninSA","@Iran_in_India","@IraninAustria","@IRANinTJ"].forEach(t=>links.push({source:"@IRIMFA_EN",target:t,type:"tier"}));
+["@PressTV","@IrnaEnglish","@Tasnimnews_EN","@EnglishFars","@iribnews_irib"].forEach(t=>links.push({source:"@IRIMFA_SPOX",target:t,type:"amplify"}));
+["@HispanTV","@hispantv_brasil","@presstvturk","@AlalamNews"].forEach(t=>links.push({source:"@PressTV",target:t,type:"amplify"}));
+["@OfficialSaharTV","@sahartvonline","@EnSaharTV"].forEach(t=>links.push({source:"@iribnews_irib",target:t,type:"amplify"}));
+links.push({source:"Marzieh Hashemi",target:"@PressTV",type:"tier"});
+links.push({source:"Marwan Osman",target:"@PressTV",type:"tier"});
+links.push({source:"H. Shariatmadari",target:"@IRIMFA_SPOX",type:"tier"});
+links.push({source:"@AlMayadeenNews",target:"@MayadeenEnglish",type:"tier"});
+const camp=[...CAMPAIGN];
+for(let i=0;i<camp.length;i++) for(let j=i+1;j<camp.length;j++) links.push({source:camp[i],target:camp[j],type:"campaign"});
+
+// ─── NARRATIVE VIEW DATA ──────────────────────────────────────────────────────
+const NARRATIVES = [
+  {
+    id:"N1", label:"דה-לגיטימציה של ישראל",
+    sublabel:"'ציוני' = לא לגיטימי / קולוניאלי",
+    color:"#f85149", r:22,
+    accounts:["@IraninSA","@IraninBerlin","@Iran_in_UK","@IRANinMumbai","@IraninZimbabwe","@araghchi","@IRIMFA_SPOX","@Iran_UN","@IRANinBULGARIA","@IraninAlgeria"],
+    strength:{"@IraninSA":5,"@IraninBerlin":4,"@Iran_in_UK":3,"@IRANinMumbai":2,"@IraninZimbabwe":2,"@araghchi":4,"@IRIMFA_SPOX":4,"@Iran_UN":3,"@IRANinBULGARIA":3,"@IraninAlgeria":3}
+  },
+  {
+    id:"N2", label:"איראן כקורבן",
+    sublabel:"'לא התחלנו' · סעיף 51 · הגנה עצמית",
+    color:"#bc8cff", r:22,
+    accounts:["@araghchi","@IRIMFA_SPOX","@IraninBerlin","@Iran_in_UK","@IRANinMumbai","@Iran_in_India","@IraninAustria","@IRANinKENYA"],
+    strength:{"@araghchi":5,"@IRIMFA_SPOX":4,"@IraninBerlin":4,"@Iran_in_UK":3,"@IRANinMumbai":2,"@Iran_in_India":3,"@IraninAustria":3,"@IRANinKENYA":3}
+  },
+  {
+    id:"N3", label:"לגלוג ועוצמה",
+    sublabel:"מם · לגלוג על טראמפ · 'עידן האבן'",
+    color:"#e3b341", r:20,
+    accounts:["@IraninZimbabwe","@IraninSA","@IRANinMumbai","@IranInThailand","@Iran_in_India","@IraninAustria","@IRANinBULGARIA","@EmbassyofIrtoRF","@IRANinTJ","@Iran_in_UK","@IraninIslamabad"],
+    strength:{"@IraninZimbabwe":5,"@IraninSA":4,"@IRANinMumbai":4,"@IranInThailand":3,"@Iran_in_India":4,"@IraninAustria":4,"@IRANinBULGARIA":3,"@EmbassyofIrtoRF":2,"@IRANinTJ":2,"@Iran_in_UK":3,"@IraninIslamabad":3}
+  },
+  {
+    id:"N4", label:"ציוויליזציה מול ברבריות",
+    sublabel:"7,000 שנה · כורש · ארה\"ב = ברברים",
+    color:"#58a6ff", r:18,
+    accounts:["@Iran_in_India","@IraninSA","@IraninZimbabwe","@IraninIslamabad","@Iran_in_UK"],
+    strength:{"@Iran_in_India":5,"@IraninSA":4,"@IraninZimbabwe":3,"@IraninIslamabad":4,"@Iran_in_UK":2}
+  },
+  {
+    id:"N5", label:"דה-הומניזציה",
+    sublabel:"'יצורים' · 'חולדה עם כיפה' · אד-הומינם",
+    color:"#ff6b6b", r:17,
+    accounts:["@IraninSA","@Iran_in_India","@IRANinBULGARIA","@IraninAustria"],
+    strength:{"@IraninSA":5,"@Iran_in_India":4,"@IRANinBULGARIA":4,"@IraninAustria":3}
+  },
+  {
+    id:"N6", label:"תיאום קמפיין",
+    sublabel:"9 שגרירויות · 48 שעות · 'המפתחות'",
+    color:"#3fb950", r:18,
+    accounts:["@IraninZimbabwe","@IraninSA","@IRANinBULGARIA","@Iran_in_India","@IraninAustria","@Iran_in_UK","@IRANinTJ","@EmbassyofIrtoRF","@IraninBerlin","@IRANinMumbai"],
+    strength:{"@IraninZimbabwe":5,"@IraninSA":4,"@IRANinBULGARIA":4,"@Iran_in_India":4,"@IraninAustria":4,"@Iran_in_UK":3,"@IRANinTJ":3,"@EmbassyofIrtoRF":3,"@IraninBerlin":4,"@IRANinMumbai":3}
+  },
+  {
+    id:"N7", label:"שליטה ציונית בארה\"ב",
+    sublabel:"'מי מחזיק ברסן?' · קונספירציה",
+    color:"#ff9500", r:15,
+    accounts:["@IraninSA","@IRANinBULGARIA"],
+    strength:{"@IraninSA":5,"@IRANinBULGARIA":3}
+  },
+];
+
+// ─── NODES ALIAS (uppercase) ─────────────────────────────────────────────────
+const NODES = nodes;
+
+// ─── TRUMP TWEETS ─────────────────────────────────────────────────────────────
+const TRUMP_TWEETS = [
+  { date: "2026-03-05", count: 3, topics: ["אולטימטום", "דדליין גרעיני"] },
+  { date: "2026-03-12", count: 2, topics: ["סנקציות נפט"] },
+  { date: "2026-03-21", count: 4, topics: ["הורמוז", "איום צבאי"] },
+  { date: "2026-04-01", count: 2, topics: ["גרעין"] },
+  { date: "2026-04-05", count: 5, topics: ["מפתחות הורמוז", "איום תקיפה"] },
+  { date: "2026-04-06", count: 3, topics: ["סנקציות", "גרעין"] },
+  { date: "2026-04-08", count: 2, topics: ["הפסקת אש"] },
+  { date: "2026-04-13", count: 4, topics: ["סגר ימי"] },
+  { date: "2026-04-19", count: 3, topics: ["ספינת TOUSKA"] },
+  { date: "2026-04-22", count: 5, topics: ["ירי על ספינות", "עימות"] },
+];
+
+// ─── THEME ────────────────────────────────────────────────────────────────────
+let currentTheme = localStorage.getItem('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', currentTheme);
+function toggleTheme() {
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  localStorage.setItem('theme', currentTheme);
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.innerHTML = currentTheme === 'dark'
+    ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`
+    : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+}
+
+// ─── LANGUAGE MODE ────────────────────────────────────────────────────────────
+let langMode = false;
+const LANG_COLORS = { EN: '#58a6ff', FA: '#f85149', AR: '#fb8500', 'EN/FA': '#bc8cff', multi: '#bc8cff', other: '#6e7681' };
+function toggleLangMode() {
+  langMode = !langMode;
+  document.getElementById('lang-toggle')?.classList.toggle('active', langMode);
+  // Update node colors in-place — no need to restart simulation
+  d3.select('#graph').selectAll('.node circle:not(.tactic-ring):not(.campaign-ring)')
+    .attr('fill', d => d ? nodeColor(d) : null);
+  // If in timeline or circles view, do a full rebuild since those don't use live selections
+  if (viewMode === 'timeline' || viewMode === 'circles') build();
+}
+function nodeColor(n) {
+  if (langMode) return LANG_COLORS[n.lang] || LANG_COLORS.other;
+  const tierColors = { T1: '#f85149', T2: '#fb8500', T3: '#388bfd', T4: '#bc8cff', T5: '#3fb950', T6: '#6e7681' };
+  return tierColors[n.tier] || '#6e7681';
+}
+
+// ─── OPEN PANEL SHIM ─────────────────────────────────────────────────────────
+function openPanel(acc, post) {
+  const node = NODES.find(n => n.id === acc || n.id === acc.replace('@','') || ('@'+n.id) === acc);
+  if (node) { _lastNode = node; openSide(node); }
+}
+
+let viewMode = "accounts"; // "accounts" | "narratives" | "timeline" | "circles"
+
+// ─── VIEW MODE ──────────────────────────────────────────────────────────────
+function setView(mode) {
+  viewMode = mode;
+  // Update mode buttons
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  const modeEl = document.getElementById('mode-' + mode);
+  if (modeEl) modeEl.classList.add('active');
+  if (viewMode === "circles") { buildCirclesView(); return; }
+  if (viewMode === "network") { buildNetworkView(); return; }
+  build();
+}
+
+// Keep backward compat alias
+function toggleView() {
+  setView(viewMode === 'accounts' ? 'narratives' : 'accounts');
+}
+
+// ─── TACTICS ─────────────────────────────────────────────────────────────────
+const TACTICS = {
+  dehumanization: {
+    label: "דה-הומניזציה",
+    emoji: "⚠️",
+    color: "#f85149",
+    desc: "שימוש בשפה מדה-אנושית: 'creatures', 'old man', 'Epstein's friends' — ובמיוחד תמונת החולדה האנטישמית של @IraninSA המקשרת ישראל לשליטה בארה\"ב",
+    accounts: ["@IraninSA","@Iran_in_India","@IRANinBULGARIA"],
+    posts: {
+      "@IraninSA": [
+        { date:"אפ׳ 2026", conf:"H", score:5, text:`⚠️ <strong>תמונה אנטישמית:</strong> חולדה עם כיפה ופיאות רוכבת על נשר אמריקאי. "<strong>Who holds the reins?</strong>" + "The U.S. seeks to implement the policies of <strong>Israeli Zionists</strong>." — שימוש בסמל 'חולדה' מהפרופגנדה הנאצית; קישור ישיר לישראל. מקור: ToI / ADL.` },
+        { date:"6 אפ׳ 2026", conf:"H", score:4, text:`"Humanity must know what kind of <strong>creatures</strong> are leading the American people."` },
+        { date:"6 אפ׳ 2026", conf:"H", score:4, text:`"Seriously think about the <strong>25th amendment, Section 4</strong>."` },
+      ],
+      "@Iran_in_India": [
+        { date:"5 אפ׳ 2026", conf:"H", score:4, text:`"Swearing and throwing insults are how sore loser brats behave. <strong>Get a grip on yourself, old man!</strong>"` },
+      ],
+      "@IRANinBULGARIA": [
+        { date:"6 אפ׳ 2026", conf:"H", score:4, text:`"<strong>Epstein's friends need keys</strong>." — הקשת ממשל טראמפ לפדופיליה כקיצור דה-לגיטימציה.` },
+      ],
+    }
+  },
+  incitement: {
+    label: "הסתה / איום",
+    emoji: "🔥",
+    color: "#fb8500",
+    desc: "הצהרות מאיימות מפורשות — 'ZERO restraint', 'no red lines', 'legitimate military objectives'",
+    accounts: ["@araghchi","@IRIMFA_SPOX","@Iran_UN"],
+    posts: {
+      "@araghchi": [
+        { date:"אמצע מרץ 2026", conf:"H", score:5, text:`"<strong>ZERO restraint</strong> if our infrastructures are struck again. Any end to this war must address damage to our civilian sites."` },
+        { date:"5 מרץ 2026", conf:"H", score:3, text:`"Iran's Armed Forces are ensuring that it becomes a <strong>quagmire</strong>... It bears full responsibility for bloodshed."` },
+      ],
+      "@IRIMFA_SPOX": [
+        { date:"28 פבר 2026", conf:"M", score:3, text:`"Iran is defending itself and has <strong>no red lines</strong> on this matter... we are forced to attack the source of the enemy's aggressions."` },
+      ],
+      "@Iran_UN": [
+        { date:"סוף פבר 2026", conf:"M", score:5, text:`מכתב לאו"ם: "all bases, facilities, and assets of the hostile forces in the region shall be regarded as <strong>legitimate military objectives</strong>."` },
+      ],
+    }
+  },
+  mockery: {
+    label: "לגלוג / הומור",
+    emoji: "😏",
+    color: "#e3b341",
+    desc: "לגלוג וסרקזם כלפי טראמפ וממשלו — מם, פרודיה, רמיזות לאפריל פולס",
+    accounts: ["@IRANinMumbai","@IraninZimbabwe","@IraninAustria","@EmbassyofIrtoRF","@Iran_in_India"],
+    posts: {
+      "@IRANinMumbai": [
+        { date:"1 אפ׳ 2026", conf:"H", score:3, text:`"On April Fools' Day, it's almost poetic that Donald #Trump still manages to outdo the jokes; talking about a 'new' #Iran #president when Dr. #Pezeshkian has been in office all along."`, url:"https://x.com/IRANinMumbai/status/2039336810720211357" },
+        { date:"8 אפ׳ 2026", conf:"H", score:2, text:`"We'd genuinely love to, but at the moment there are no vacancies. Their current team is all Iranian (with a <strong>soft spot for #India</strong>)..." — תגובה ויראלית להצעת גולש שאיראן תגייס הודים לצוות המדיה. מקור: BusinessToday / Republic World.` },
+      ],
+      "@IraninZimbabwe": [
+        { date:"5 אפ׳ 2026", conf:"H", score:4, text:`"<strong>We've lost the keys.</strong>" — הפרסום הראשון שזרע את מם הורמוז.` },
+      ],
+      "@IraninAustria": [
+        { date:"5 אפ׳ 2026", conf:"H", score:4, text:`"POTUS has stooped to an unprecedented level of <strong>begging</strong>, laced with bitter, hollow rudeness and threats."` },
+      ],
+      "@EmbassyofIrtoRF": [
+        { date:"6 אפ׳ 2026", conf:"M", score:3, text:`פרסם מם ויזואלי — דון קיחוטה — בתגובה לאולטימטום טראמפ. פרשנות ויזואלית ולא טקסטואלית.` },
+      ],
+      "@Iran_in_India": [
+        { date:"5 אפ׳ 2026", conf:"H", score:4, text:`"Swearing and throwing insults are how sore loser <strong>brats</strong> behave. Get a grip on yourself, old man!"` },
+      ],
+    }
+  },
+  victim_inversion: {
+    label: "היפוך קורבן",
+    emoji: "🔄",
+    color: "#bc8cff",
+    desc: "מסגור איראן כקורבן — 'Iran didn't start this war', 'self-defense', 'unprovoked aggression'",
+    accounts: ["@IraninBerlin","@araghchi","@IRIMFA_SPOX","@IRANinMumbai","@Iran_in_UK"],
+    posts: {
+      "@IraninBerlin": [
+        { date:"6 אפ׳ 2026", conf:"H", score:2, text:`"Iran didn't start this war. <strong>Iran is defending its people against an act of aggression</strong>. #istandwithiran"`, url:"https://x.com/IraninBerlin/status/2040899571920863313" },
+      ],
+      "@araghchi": [
+        { date:"5 מרץ 2026", conf:"H", score:3, text:`"We negotiated twice with this U.S. Administration. Both times, we were attacked in the middle of talks. <strong>It bears full responsibility for bloodshed</strong>."` },
+        { date:"18 מרץ 2026", conf:"M", score:3, text:`"Israel launched war on Iran, not the other way around."` },
+      ],
+      "@IRIMFA_SPOX": [
+        { date:"19 מרץ 2026", conf:"M", score:4, text:`"<strong>terrorist acts</strong>" ו"<strong>illegal war</strong>" — תיאור המלחמה כהתקפה בלתי פרובוקטיבית על איראן.` },
+      ],
+      "@Iran_in_UK": [
+        { date:"6 אפ׳ 2026", conf:"H", score:3, text:`השתתפות בקמפיין עם מסגור ספרותי/היסטורי — "Israel is the main source of instability in the region."` },
+      ],
+    }
+  },
+  legal_weapon: {
+    label: "נשק משפטי",
+    emoji: "⚖️",
+    color: "#58a6ff",
+    desc: "שימוש סלקטיבי בשפה משפטית בינלאומית — 'Article 51', 'UN Charter', 'crime of aggression'",
+    accounts: ["@araghchi","@IRIMFA_SPOX","@Iran_UN","@IRIMFA_EN"],
+    posts: {
+      "@araghchi": [
+        { date:"5 מרץ 2026", conf:"H", score:3, text:`שימוש ב-Article 51 לתיאור התגובה האיראנית כ"הגנה עצמית חוקית" — בזמן שמחריב תשתיות ישראליות.` },
+      ],
+      "@IRIMFA_SPOX": [
+        { date:"10 מרץ 2026", conf:"M", score:4, text:`"<strong>laundering US/Israeli crime of aggression and war crimes</strong>" — הצגת פעולות EU כשותפות לפשע מלחמה.` },
+        { date:"19 מרץ 2026", conf:"M", score:4, text:`"<strong>illegal war</strong>" / "<strong>unlawful use of force</strong>" — מינוח או"מ מתוך ה-UN Charter.` },
+      ],
+      "@Iran_UN": [
+        { date:"סוף פבר 2026", conf:"M", score:3, text:`מכתב לאו"ם בשם Article 51 — ביקוש לכינוס מועצת הביטחון תוך כדי הצהרה על "legitimate military objectives".` },
+      ],
+    }
+  },
+  whataboutism: {
+    label: "ווטאביזם",
+    emoji: "↩️",
+    color: "#3fb950",
+    desc: "הסחת תשומת לב מהתנהגות איראנית על-ידי הצבעה על כשלי המערב — אפשטיין, עניין הסגת גבול",
+    accounts: ["@IRANinBULGARIA","@IraninSA"],
+    posts: {
+      "@IRANinBULGARIA": [
+        { date:"6 אפ׳ 2026", conf:"H", score:4, text:`"Epstein's friends need keys." — ה'אפשטיין' משמש כ-whataboutism: 'אל תדבר על איראן כשממשלך מחובר לפדופיל'.` },
+      ],
+      "@IraninSA": [
+        { date:"6 אפ׳ 2026", conf:"H", score:4, text:`"Seriously think about the 25th amendment, Section 4." — הסחה: 'הנהגת ארה"ב היא הבעיה, לא איראן'.` },
+      ],
+    }
+  },
+  coordination: {
+    label: "תיאום קמפיין",
+    emoji: "🔗",
+    color: "#e3b341",
+    desc: "9 שגרירויות פרסמו תוך 48 שעות — שפה משותפת, מֵמ 'המפתחות', תיאום גלוי או מרכזי",
+    accounts: ["@IraninZimbabwe","@IraninSA","@IRANinBULGARIA","@Iran_in_India","@IraninAustria","@Iran_in_UK","@IRANinTJ","@EmbassyofIrtoRF","@IraninBerlin"],
+    posts: {
+      "@IraninZimbabwe": [
+        { date:"5 אפ׳ 2026", conf:"H", score:4, text:`"<strong>We've lost the keys.</strong>" — ראשון לפרסם; זרע הקמפיין.`, url:"https://x.com/IRANinZIMBABWE/status/2040805772850774428" },
+        { date:"7 אפ׳ 2026", conf:"H", score:3, text:`"Could you change it to between 1 and 2 A.M.? Thank you for your attention to this important matter."`, url:"https://x.com/IRANinZIMBABWE/status/2041063891497632113" },
+      ],
+      "@IraninSA": [
+        { date:"5–6 אפ׳ 2026", conf:"H", score:3, text:`"<strong>Shh… the key's under the flowerpot. Just open for friends.</strong>" — הרחבת המם.` },
+        { date:"6 אפ׳ 2026", conf:"H", score:4, text:`"25th amendment, Section 4" + "creatures are leading the American people."` },
+        { date:"8 אפ׳ 2026", conf:"H", score:2, text:`"Say hello to the new world superpower." — ביום הפסקת האש.` },
+      ],
+      "@IRANinBULGARIA": [
+        { date:"6 אפ׳ 2026", conf:"H", score:3, text:`"<strong>Take it easy tiger, keep your cool.</strong>" — לגלוג על האגרסיביות.` },
+        { date:"6 אפ׳ 2026", conf:"H", score:4, text:`"Doors open for friends. <strong>Epstein's friends need keys.</strong>"` },
+      ],
+      "@Iran_in_India":  [{ date:"5 אפ׳ 2026", conf:"H", score:4, text:`"Get a grip on yourself, old man!" — הצטרף בשעות הראשונות.` }],
+      "@IraninAustria":  [{ date:"5 אפ׳ 2026", conf:"H", score:4, text:`"unprecedented level of begging" — גרסה אוסטרית.` }],
+      "@Iran_in_UK":     [{ date:"6 אפ׳ 2026", conf:"H", score:3, text:`ניסוח ספרותי/היסטורי — "Israel is the main source of instability in the region."` }],
+      "@IRANinTJ":       [{ date:"6 אפ׳ 2026", conf:"M", score:3, text:`השתתפות בקמפיין — לגלוג על אולטימטום טראמפ. אל-ג'זירה.` }],
+      "@EmbassyofIrtoRF":[{ date:"6 אפ׳ 2026", conf:"M", score:3, text:`מם דון קיחוטה — גרסה רוסית ויזואלית של המם.` }],
+      "@IraninBerlin":   [{ date:"7 אפ׳ 2026", conf:"H", score:3, text:`"A new order for the Strait of Hormuz is emerging." — סיום הקמפיין עם הצהרת סדר אזורי.`, url:"https://x.com/IraninBerlin/status/2041271016358359261" }],
+    }
+  },
+};
+
+let activeTactic = null;
+
+// ─── GRAPH SETUP ─────────────────────────────────────────────────────────────
+const svg = d3.select("#svg");
+let g     = svg.append("g");
+let width  = document.getElementById("graph").offsetWidth;
+let height = document.getElementById("graph").offsetHeight;
+
+const zoom = d3.zoom().scaleExtent([.15,5]).on("zoom",e=>g.attr("transform",e.transform));
+svg.call(zoom);
+
+function nodeR(d){ return {T1:10,T2:9,T3:6,T4:7,T5:6,T6:5}[d.tier]||6; }
+
+let activeTiers = new Set(["T1","T2","T3","T4","T5","T6"]);
+let activeRegion = "all";
+let campaignOn   = false;
+let sim, linkSel, nodeSel;
+
+function visNodes(){ return nodes.filter(d=>activeTiers.has(d.tier)&&(activeRegion==="all"||d.region===activeRegion)); }
+function visLinks(vn){
+  const ids=new Set(vn.map(d=>d.id));
+  return links.filter(l=>{
+    const s=typeof l.source==="object"?l.source.id:l.source;
+    const t=typeof l.target==="object"?l.target.id:l.target;
+    return ids.has(s)&&ids.has(t);
+  });
+}
+
+function build(){
+  if(viewMode === "narratives") { buildNarrativeView(); return; }
+  if(viewMode === "timeline")   { buildTimelineView();  return; }
+  if(viewMode === "circles")    { buildCirclesView();   return; }
+  // Restore the main SVG if coming from a view that replaced innerHTML
+  const graphEl = document.getElementById('graph');
+  if (!graphEl.querySelector('#svg')) {
+    graphEl.innerHTML = '';
+    const svgEl = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svgEl.id = 'svg'; svgEl.style.width='100%'; svgEl.style.height='100%';
+    graphEl.appendChild(svgEl);
+    g = d3.select('#svg').append('g');
+    d3.select('#svg').call(d3.zoom().scaleExtent([.15,5]).on("zoom",e=>g.attr("transform",e.transform)));
+    // re-append overlay elements
+    const tt = document.createElement('div'); tt.id='tooltip';
+    tt.innerHTML='<div class="tt-h" id="tt-h"></div><div class="tt-r">שכבה: <span id="tt-tier"></span></div><div class="tt-r">מדינה: <span id="tt-country"></span></div><div class="tt-r">מהימנות: <span id="tt-conf"></span></div>';
+    tt.style.cssText='position:absolute;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:10px 13px;pointer-events:none;display:none;max-width:200px;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.6);direction:rtl;';
+    graphEl.appendChild(tt);
+  }
+  g.selectAll("*").remove();
+  const vn=visNodes(), vl=visLinks(vn);
+  d3.select("#stat-nodes").text(vn.length);
+  d3.select("#stat-links").text(vl.length);
+
+  sim = d3.forceSimulation(vn)
+    .force("link",d3.forceLink(vl).id(d=>d.id)
+      .distance(d=>d.type==="campaign"?70:d.type==="amplify"?90:55)
+      .strength(d=>d.type==="campaign"?.35:.12))
+    .force("charge",d3.forceManyBody().strength(d=>({T1:-220,T2:-120,T3:-55,T4:-80,T5:-60,T6:-40})[d.tier]||-55))
+    .force("center",d3.forceCenter(width/2,height/2))
+    .force("collision",d3.forceCollide(d=>nodeR(d)+4))
+    .force("x",d3.forceX(width/2).strength(.03))
+    .force("y",d3.forceY(height/2).strength(.03));
+
+  linkSel = g.append("g").selectAll("line").data(vl).join("line")
+    .attr("class",d=>"link"+(d.type==="campaign"?" campaign":""))
+    .attr("stroke-width",d=>d.type==="campaign"?1.5:.8);
+
+  const ng = g.append("g").selectAll("g").data(vn).join("g")
+    .attr("class","node")
+    .call(d3.drag().on("start",ds).on("drag",dd).on("end",de));
+
+  ng.append("circle").attr("class","tactic-ring").attr("r",d=>nodeR(d)+9);
+  ng.append("circle").attr("class","campaign-ring").attr("r",d=>nodeR(d)+7);
+  ng.append("circle")
+    .attr("r",d=>nodeR(d))
+    .attr("fill",d=>nodeColor(d))
+    .attr("stroke",d=>CAMPAIGN.has(d.id)?"#e3b341":"#0d1117")
+    .attr("stroke-width",d=>CAMPAIGN.has(d.id)?1.5:1);
+  ng.append("text").attr("dx",d=>nodeR(d)+3).attr("dy","0.35em").text(d=>d.id.replace("@",""));
+
+  ng.on("mouseover",(e,d)=>{
+    document.getElementById("tooltip").style.display="block";
+    document.getElementById("tt-h").textContent=d.id;
+    document.getElementById("tt-tier").textContent=`${d.tier} — ${TL[d.tier]}`;
+    document.getElementById("tt-country").textContent=d.country;
+    document.getElementById("tt-conf").textContent=CL[d.conf]||d.conf;
+    posTooltip(e);
+  }).on("mousemove",posTooltip)
+    .on("mouseout",()=>document.getElementById("tooltip").style.display="none")
+    .on("click",(e,d)=>{openSide(d);e.stopPropagation();});
+
+  sim.on("tick",()=>{
+    linkSel.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y)
+           .attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+    ng.attr("transform",d=>`translate(${d.x},${d.y})`);
+  });
+  nodeSel=ng;
+  updateRings();
+}
+
+// ─── DATE PARSER ─────────────────────────────────────────────────────────────
+function parseDateStr(raw) {
+  if (!raw) return null;
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) { const d = new Date(raw.substring(0,10)); return isNaN(d) ? null : d; }
+  const M = {
+    "ינואר":0,"פברואר":1,"מרץ":2,"אפריל":3,"מאי":4,"יוני":5,"יולי":6,"אוגוסט":7,"ספטמבר":8,"אוקטובר":9,"נובמבר":10,"דצמבר":11,
+    "ינו׳":0,"פבר׳":1,"אפ׳":3,"אוג׳":7,"ספט׳":8,"אוק׳":9,"נוב׳":10,"דצמ׳":11,"פבר":1,
+    "Jan":0,"Feb":1,"Mar":2,"Apr":3,"May":4,"Jun":5,"Jul":6,"Aug":7,"Sep":8,"Oct":9,"Nov":10,"Dec":11
+  };
+  for (const [heb, mon] of Object.entries(M)) {
+    // "5 אפריל 2026" or "5–8 אפריל 2026" or "5-8 אפריל 2026"
+    const m1 = raw.match(new RegExp(`(\\d{1,2})(?:\\s*[-–]\\d{1,2})?\\s*${heb}\\s*(\\d{4})`));
+    if (m1) return new Date(+m1[2], mon, +m1[1]);
+    // "אפריל 2026" / "מאוחר מרץ 2026" / "אמצע מרץ 2026"
+    const m2 = raw.match(new RegExp(`(?:מאוחר\\s+|אמצע\\s+|תחילת\\s+|מוקדם\\s+)?${heb}\\s+(\\d{4})`));
+    if (m2) {
+      const day = /מאוחר/.test(raw) ? 22 : /אמצע/.test(raw) ? 15 : 5;
+      return new Date(+m2[1], mon, day);
+    }
+  }
+  return null;
+}
+
+// ─── COORDINATION NETWORK VIEW ───────────────────────────────────────────────
+function buildNetworkView() {
+  const el = document.getElementById('graph');
+  el.innerHTML = '';
+  const W = el.clientWidth, H = el.clientHeight;
+
+  const NAR_COL = { hormuz:'#388bfd','military-threat':'#f85149','nuclear-threat':'#bc8cff',ceasefire:'#3fb950',sanctions:'#fb8500',sovereignty:'#e3b341',relay:'rgba(255,255,255,0.18)' };
+  const seederSet = new Set(["@IraninZimbabwe","@IRIMFA_SPOX","@araghchi","@IrnaEnglish","@drpezeshkian"]);
+  const ampSet    = new Set(["@IraninSA","@IRANinBULGARIA","@Iran_in_UK","@EmbassyofIrtoRF","@IRANinTJ","@PressTV","@Tasnimnews_EN","@EnglishFars","@AlMayadeenNews","@MayadeenEnglish","@s_m_marandi","@hispantv_brasil","@HispanTV","@IRANINARGENTINA","@IRIran_Military"]);
+
+  const rawEdges = [
+    {s:"@IraninZimbabwe",t:"@IraninSA",       type:"coord",  nar:"hormuz",         conf:true,  w:3},
+    {s:"@IraninSA",      t:"@IRANinBULGARIA", type:"coord",  nar:"hormuz",         conf:true,  w:2},
+    {s:"@IraninZimbabwe",t:"@IRANinBULGARIA", type:"coord",  nar:"hormuz",         conf:true,  w:2},
+    {s:"@IraninZimbabwe",t:"@Iran_in_UK",     type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@EmbassyofIrtoRF",type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@IRANinTJ",       type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@IraninAlgeria",  type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@IRANinKENYA",    type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@IraninBerlin",   type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@Iran_in_India",  type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@IraninAustria",  type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IrnaEnglish",   t:"@PressTV",        type:"relay",  nar:"nuclear-threat", conf:true,  w:3},
+    {s:"@PressTV",       t:"@Tasnimnews_EN",  type:"relay",  nar:"military-threat",conf:true,  w:3},
+    {s:"@Tasnimnews_EN", t:"@EnglishFars",    type:"relay",  nar:"military-threat",conf:true,  w:2},
+    {s:"@PressTV",       t:"@AlMayadeenNews", type:"relay",  nar:"hormuz",         conf:true,  w:2},
+    {s:"@IRIMFA_SPOX",   t:"@IrnaEnglish",   type:"relay",  nar:"nuclear-threat", conf:true,  w:3},
+    {s:"@IRIMFA_SPOX",   t:"@PressTV",       type:"relay",  nar:"nuclear-threat", conf:true,  w:3},
+    {s:"@araghchi",      t:"@IrnaEnglish",   type:"relay",  nar:"ceasefire",      conf:true,  w:3},
+    {s:"@araghchi",      t:"@PressTV",       type:"relay",  nar:"ceasefire",      conf:true,  w:2},
+    {s:"@IRIMFA_EN",     t:"@IrnaEnglish",   type:"relay",  nar:"nuclear-threat", conf:true,  w:2},
+    {s:"@drpezeshkian",  t:"@araghchi",      type:"relay",  nar:"sovereignty",    conf:true,  w:2},
+    {s:"@drpezeshkian",  t:"@IRIMFA_SPOX",   type:"relay",  nar:"sovereignty",    conf:true,  w:2},
+    {s:"@IRIran_Military",t:"@Tasnimnews_EN",type:"relay",  nar:"military-threat",conf:true,  w:2},
+    {s:"@Tasnimnews_EN", t:"@araghchi",      type:"conflict",nar:"hormuz",        conf:true,  w:2},
+    {s:"@AlMayadeenNews",t:"@MayadeenEnglish",type:"relay", nar:"hormuz",         conf:true,  w:2},
+    {s:"@HispanTV",      t:"@hispantv_brasil",type:"relay", nar:"sanctions",      conf:true,  w:2},
+    {s:"@s_m_marandi",   t:"@PressTV",       type:"relay",  nar:"nuclear-threat", conf:true,  w:2},
+    {s:"@IranNigeria",   t:"@IraninAlgeria", type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IRANinKENYA",   t:"@IRANinETHIOPIA",type:"coord", nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninSA",      t:"@IRANinKENYA",   type:"coord",  nar:"hormuz",         conf:false, w:1},
+  ];
+
+  const inauthNodes = [
+    {id:"BRICS4CLICKS",tier:"IX",type:"inauthentic",country:"Unknown",region:"Global",lang:"multi",status:"active",notes:"23 חשבונות. 772M+ צפיות. IRGC-linked.",views:772000000,role:"amplifier"},
+    {id:"Verified4War", tier:"IX",type:"inauthentic",country:"South Asia",region:"Global",lang:"multi",status:"active",notes:"18 חשבונות. 370M+ צפיות.",views:370000000,role:"amplifier"},
+  ];
+  const inauthEdges = [
+    {s:"BRICS4CLICKS",t:"@IraninZimbabwe",type:"inauth",conf:true,w:4},
+    {s:"BRICS4CLICKS",t:"@IraninSA",      type:"inauth",conf:true,w:4},
+    {s:"BRICS4CLICKS",t:"@PressTV",       type:"inauth",conf:true,w:3},
+    {s:"Verified4War", t:"@IraninZimbabwe",type:"inauth",conf:true,w:3},
+    {s:"Verified4War", t:"@IraninSA",     type:"inauth",conf:true,w:3},
+  ];
+
+  let showInauth = false;
+
+  const svgN = d3.select(el).append('svg').attr('width',W).attr('height',H).style('font-family','Heebo');
+  const zoomN = d3.zoom().scaleExtent([0.1,4]).on('zoom',e=>gN.attr('transform',e.transform));
+  svgN.call(zoomN);
+  const gN = svgN.append('g');
+
+  const defs = svgN.append('defs');
+  const glow = defs.append('filter').attr('id','nv-glow').attr('x','-60%').attr('y','-60%').attr('width','220%').attr('height','220%');
+  glow.append('feGaussianBlur').attr('stdDeviation','5').attr('result','b');
+  const mg = glow.append('feMerge'); mg.append('feMergeNode').attr('in','b'); mg.append('feMergeNode').attr('in','SourceGraphic');
+  const arr = defs.append('marker').attr('id','nv-arr').attr('markerWidth',7).attr('markerHeight',7).attr('refX',16).attr('refY',3).attr('orient','auto');
+  arr.append('path').attr('d','M0,0 L0,6 L7,3 z').attr('fill','rgba(255,255,255,0.25)');
+
+  const tierCx = { T1:{x:W*.5,y:H*.13}, T2:{x:W*.5,y:H*.3}, T3:{x:W*.5,y:H*.65}, T4:{x:W*.27,y:H*.5}, T5:{x:W*.73,y:H*.38}, T6:{x:W*.18,y:H*.75}, IX:{x:W*.82,y:H*.62} };
+
+  function render() {
+    gN.selectAll('*').remove();
+
+    // Enrich nodes with role + coord_score
+    const vPosts = (typeof VIRAL_POSTS !== 'undefined') ? VIRAL_POSTS : [];
+    const viewsMap = {};
+    vPosts.forEach(p => { viewsMap[p.account] = (viewsMap[p.account]||0) + (p.views||0); });
+
+    const allEdges = [...rawEdges, ...(showInauth ? inauthEdges : [])];
+    let simNodes = nodes.map(n => ({
+      ...n,
+      role: seederSet.has(n.id) ? 'seeder' : ampSet.has(n.id) ? 'amplifier' : null,
+      coord_score: allEdges.filter(e => e.s===n.id||e.t===n.id).length,
+      views: viewsMap[n.id] || 0,
+    }));
+    if (showInauth) simNodes = [...simNodes, ...inauthNodes.map(n => ({...n, coord_score: inauthEdges.filter(e=>e.s===n.id).length}))];
+
+    const idMap = {}; simNodes.forEach(n => idMap[n.id] = n);
+    const simEdges = allEdges
+      .filter(e => idMap[e.s] && idMap[e.t])
+      .map(e => ({...e, source: idMap[e.s], target: idMap[e.t]}));
+
+    function nr(d) { return Math.max(7, (d.tier==='T1'?13:d.tier==='T2'?11:7) + d.coord_score*1.5); }
+    function nc(d) { if(d.type==='inauthentic') return '#ff6b6b'; if(d.status==='inactive') return '#2a2a2a'; return TC[d.tier]||'#6e7681'; }
+
+    const linkG  = gN.append('g');
+    const nodeG  = gN.append('g');
+    const labelG = gN.append('g');
+
+    const sim2 = d3.forceSimulation(simNodes)
+      .force('link', d3.forceLink(simEdges).id(d=>d.id).distance(d=>d.conf?65:105).strength(d=>d.conf?0.32:0.1))
+      .force('charge', d3.forceManyBody().strength(d=>-160-nr(d)*5))
+      .force('collide', d3.forceCollide(d=>nr(d)+11))
+      .force('x', d3.forceX(d=>(tierCx[d.tier]||{x:W*.5}).x).strength(0.07))
+      .force('y', d3.forceY(d=>(tierCx[d.tier]||{y:H*.5}).y).strength(0.07))
+      .force('center', d3.forceCenter(W*.5,H*.5).strength(0.02))
+      .alphaDecay(0.025);
+
+    const lkSel = linkG.selectAll('line').data(simEdges).join('line')
+      .attr('stroke', d => d.type==='inauth'?'#ff6b6b': d.type==='conflict'?'#f85149': (NAR_COL[d.nar]||NAR_COL.relay))
+      .attr('stroke-width', d => 0.7 + (d.w||1)*0.5)
+      .attr('stroke-dasharray', d => d.conf ? 'none' : '5,4')
+      .attr('opacity', d => d.type==='inauth'?0.35: d.conf?0.6:0.28)
+      .attr('marker-end', d => d.type==='relay'?'url(#nv-arr)':'none');
+
+    const ndSel = nodeG.selectAll('g.nv-node').data(simNodes,d=>d.id).join('g')
+      .attr('class','nv-node').style('cursor','pointer')
+      .call(d3.drag()
+        .on('start',(e,d)=>{if(!e.active)sim2.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;})
+        .on('drag', (e,d)=>{d.fx=e.x;d.fy=e.y;})
+        .on('end',  (e,d)=>{if(!e.active)sim2.alphaTarget(0);d.fx=null;d.fy=null;}))
+      .on('click',(e,d)=>{e.stopPropagation();openSide(d);})
+      .on('mousemove',(e,d)=>{
+        const tt=document.getElementById('tooltip');tt.style.display='block';
+        document.getElementById('tt-h').textContent=d.id;
+        document.getElementById('tt-tier').textContent=`${d.tier||''} — ${TL[d.tier]||d.type||''}`;
+        document.getElementById('tt-country').textContent=d.country||'';
+        document.getElementById('tt-conf').textContent=CL[d.conf]||d.conf||'';
+        posTooltip(e);
+      })
+      .on('mouseleave',()=>document.getElementById('tooltip').style.display='none');
+
+    // Role ring
+    ndSel.append('circle')
+      .attr('r',d=>nr(d)+5).attr('fill','none')
+      .attr('stroke',d=>d.role==='seeder'?'#ffd700':d.role==='amplifier'?'#58a6ff':'transparent')
+      .attr('stroke-width',2.5).attr('stroke-dasharray',d=>d.role==='amplifier'?'4,3':'none').attr('opacity',.85);
+
+    // Main circle
+    ndSel.append('circle')
+      .attr('r',d=>nr(d))
+      .attr('fill',d=>nc(d)).attr('fill-opacity',d=>d.status==='inactive'?0.22:0.85)
+      .attr('stroke',d=>{ try{return d3.color(nc(d)).brighter(.5).formatHex();}catch{return '#fff';} })
+      .attr('stroke-width',1.5)
+      .attr('filter',d=>d.role==='seeder'?'url(#nv-glow)':'none');
+
+    // Labels for key nodes
+    labelG.selectAll('text')
+      .data(simNodes.filter(d=>d.coord_score>0||d.role==='seeder'||['T1','T2'].includes(d.tier)||d.type==='inauthentic'),d=>d.id)
+      .join('text').attr('text-anchor','middle').attr('font-size','11px')
+      .attr('fill','#9ba8b5').attr('font-family','Heebo,sans-serif').attr('pointer-events','none')
+      .attr('dy',d=>nr(d)+13).text(d=>d.id.replace('@',''));
+
+    sim2.on('tick',()=>{
+      lkSel.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+      ndSel.attr('transform',d=>`translate(${d.x||W/2},${d.y||H/2})`);
+      labelG.selectAll('text').attr('transform',d=>`translate(${d.x||W/2},${d.y||H/2})`);
+    });
+
+    // Stats overlay
+    d3.select('#stat-nodes').text(simNodes.length);
+    d3.select('#stat-links').text(simEdges.filter(e=>e.type!=='inauth').length);
+  }
+
+  // Inauthentic toggle button in legend
+  const legDiv = d3.select(el).append('div')
+    .style('position','absolute').style('bottom','12px').style('right','12px')
+    .style('background','rgba(13,17,23,0.93)').style('border','1px solid #30363d')
+    .style('border-radius','10px').style('padding','12px 14px').style('font-size','13px')
+    .style('color','#e6edf3').style('pointer-events','all').style('backdrop-filter','blur(8px)')
+    .style('min-width','190px').style('z-index','10');
+
+  legDiv.html(`
+    <div style="font-size:12px;font-weight:700;color:#7d8590;margin-bottom:9px;text-transform:uppercase;letter-spacing:.5px">מקרא</div>
+    ${Object.entries(TC).map(([t,c])=>`<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:13px"><div style="width:10px;height:10px;border-radius:50%;background:${c};flex-shrink:0"></div>${t} — ${TL[t]||t}</div>`).join('')}
+    <div style="margin-top:9px;padding-top:9px;border-top:1px solid #30363d">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:13px"><div style="width:12px;height:12px;border-radius:50%;border:2.5px solid #ffd700;flex-shrink:0"></div>Seeder — זורע הנרטיב</div>
+      <div style="display:flex;align-items:center;gap:7px;font-size:13px"><div style="width:12px;height:12px;border-radius:50%;border:2.5px dashed #58a6ff;flex-shrink:0"></div>Amplifier — מגבר</div>
+    </div>
+    <div style="margin-top:9px;padding-top:9px;border-top:1px solid #30363d">
+      <div style="font-size:12px;color:#7d8590;margin-bottom:6px">קשרים:</div>
+      ${Object.entries(NAR_COL).filter(([k])=>k!=='relay').map(([k,c])=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px"><div style="width:18px;height:2px;background:${c};flex-shrink:0"></div>${k}</div>`).join('')}
+    </div>
+    <button id="nv-inauth-btn" style="margin-top:10px;width:100%;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.35);border-radius:6px;padding:5px 8px;color:#ff6b6b;font-family:Heebo;font-size:13px;cursor:pointer">הצג רשתות לא-אותנטיות</button>
+  `);
+
+  document.getElementById('nv-inauth-btn').onclick = () => {
+    showInauth = !showInauth;
+    document.getElementById('nv-inauth-btn').textContent = showInauth ? 'הסתר רשתות לא-אותנטיות' : 'הצג רשתות לא-אותנטיות';
+    document.getElementById('nv-inauth-btn').style.background = showInauth ? 'rgba(255,107,107,0.18)' : 'rgba(255,107,107,0.08)';
+    render();
+  };
+
+  render();
+  svgN.on('click', ()=>{});
+}
+
+// ─── TIMELINE VIEW (multi-layer) ─────────────────────────────────────────────
+function buildTimelineView() {
+  const el = document.getElementById('graph');
+  el.innerHTML = '';
+
+  const W = el.clientWidth;
+  const H = el.clientHeight;
+  const marginLeft = 110;
+  const marginRight = 24;
+  const marginTop = 16;
+
+  // Row heights
+  const R0 = 36;  // date axis
+  const R1 = 70;  // Trump density
+  const R2 = 64;  // Leadership
+  const R3 = H - marginTop - R0 - R1 - R2 - 30; // Embassies (fills rest)
+
+  // Y offsets (cumulative)
+  const y0 = marginTop;
+  const y1 = y0 + R0;
+  const y2 = y1 + R1;
+  const y3 = y2 + R2;
+  const yBottom = y3 + Math.max(R3, 80);
+
+  const svg2 = d3.select(el).append('svg')
+    .attr('width', W).attr('height', yBottom + 30)
+    .style('font-family', 'Heebo');
+
+  // ── X SCALE ──
+  const x = d3.scaleTime()
+    .domain([new Date("2026-02-28"), new Date()])
+    .range([marginLeft, W - marginRight]);
+
+  // ── WEEK BANDS ──
+  const weeks = d3.timeWeek.range(new Date("2026-02-28"), new Date());
+  weeks.forEach((w, i) => {
+    const x1b = x(w);
+    const x2b = x(d3.timeWeek.offset(w, 1));
+    if (i % 2 === 0) {
+      svg2.append('rect')
+        .attr('x', x1b).attr('y', y0)
+        .attr('width', Math.max(0, x2b - x1b))
+        .attr('height', yBottom - y0)
+        .attr('fill', 'rgba(255,255,255,0.012)')
+        .attr('pointer-events', 'none');
+    }
+  });
+
+  // ── EVENT ANNOTATIONS ──
+  const EVENTS = [
+    { date: "2026-03-05", label: "אולטימטום נוקלארי" },
+    { date: "2026-04-05", label: "תחילת קמפיין" },
+    { date: "2026-04-08", label: "הפסקת אש" },
+    { date: "2026-04-13", label: "סגר ימי" },
+    { date: "2026-04-19", label: "תקיפת TOUSKA" },
+    { date: "2026-04-22", label: "ירי על ספינות" },
+  ];
+  EVENTS.forEach(ev => {
+    const ex = x(new Date(ev.date));
+    svg2.append('line')
+      .attr('x1', ex).attr('x2', ex)
+      .attr('y1', y0).attr('y2', yBottom)
+      .attr('stroke', 'rgba(255,255,255,0.12)')
+      .attr('stroke-dasharray', '4,4')
+      .attr('pointer-events', 'none');
+    svg2.append('text')
+      .attr('x', ex + 4).attr('y', y0 + 11)
+      .attr('fill', 'rgba(255,255,255,0.35)')
+      .attr('font-size', 8.5)
+      .text(ev.label);
+  });
+
+  // ── CAMPAIGN HIGHLIGHT ──
+  if (document.getElementById('campaign-toggle')?.classList.contains('on')) {
+    const cx1 = x(new Date("2026-04-05"));
+    const cx2 = x(new Date("2026-04-09"));
+    svg2.append('rect')
+      .attr('x', cx1).attr('y', y0)
+      .attr('width', cx2 - cx1)
+      .attr('height', yBottom - y0)
+      .attr('fill', 'rgba(227,179,65,0.07)')
+      .attr('pointer-events', 'none');
+    svg2.append('text')
+      .attr('x', (cx1 + cx2) / 2).attr('y', y0 + 11)
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'rgba(227,179,65,0.7)')
+      .attr('font-size', 9).attr('font-weight', 700)
+      .text('קמפיין מפתחות הורמוז');
+  }
+
+  // ── ROW 0: DATE AXIS ──
+  svg2.append('line').attr('x1', marginLeft).attr('x2', W - marginRight)
+    .attr('y1', y1).attr('y2', y1)
+    .attr('stroke', 'rgba(255,255,255,0.08)');
+
+  d3.timeDay.range(new Date("2026-02-28"), new Date()).forEach(d => {
+    svg2.append('line')
+      .attr('x1', x(d)).attr('x2', x(d))
+      .attr('y1', y1 - 5).attr('y2', y1)
+      .attr('stroke', 'rgba(255,255,255,0.15)');
+  });
+
+  let weekNum = 1;
+  d3.timeWeek.range(new Date("2026-02-28"), new Date()).forEach(w => {
+    const wx = x(w);
+    svg2.append('line')
+      .attr('x1', wx).attr('x2', wx)
+      .attr('y1', y0 + 4).attr('y2', y1)
+      .attr('stroke', 'rgba(255,255,255,0.25)');
+    const dayStr = w.getDate().toString().padStart(2,'0') + '/' + (w.getMonth()+1).toString().padStart(2,'0');
+    svg2.append('text')
+      .attr('x', wx + 4).attr('y', y0 + 24)
+      .attr('fill', 'var(--muted)').attr('font-size', 9).attr('font-weight', 600)
+      .attr('letter-spacing', 0.3)
+      .text(`ש${weekNum} · ${dayStr}`);
+    weekNum++;
+  });
+
+  // ── ROW 1: TRUMP DENSITY ──
+  svg2.append('text')
+    .attr('x', marginLeft - 8).attr('y', y1 + R1/2 + 5)
+    .attr('text-anchor', 'end').attr('fill', '#e3b341')
+    .attr('font-size', 10).attr('font-weight', 700)
+    .text('טראמפ');
+
+  svg2.append('line').attr('x1', marginLeft).attr('x2', W - marginRight)
+    .attr('y1', y2).attr('y2', y2)
+    .attr('stroke', 'rgba(255,255,255,0.06)');
+
+  // Tooltip
+  const tlTip = d3.select(el).append('div')
+    .style('position','absolute').style('display','none')
+    .style('background','var(--surface)').style('border','1px solid var(--border2)')
+    .style('border-radius','8px').style('padding','10px 14px')
+    .style('font-size','14px').style('font-family','Heebo').style('color','var(--text)')
+    .style('pointer-events','none').style('z-index','50').style('max-width','260px').style('line-height','1.6');
+
+  // Use TRUMP_POSTS from data.js (40 entries) if available, else TRUMP_TWEETS
+  const trumpSource = (typeof TRUMP_POSTS !== 'undefined') ? TRUMP_POSTS : TRUMP_TWEETS.map(t=>({date:t.date,aggression:t.count,topic:t.topics,quote:''}));
+  // Group by day
+  const trumpByDay = {};
+  trumpSource.forEach(p => {
+    const key = (p.date||'').substring(0,10);
+    if (!key || !/^\d{4}-\d{2}-\d{2}$/.test(key)) return;
+    if (!trumpByDay[key]) trumpByDay[key] = {date:key, count:0, maxAgg:0, topics:[], quote:p.quote||''};
+    trumpByDay[key].count++;
+    trumpByDay[key].maxAgg = Math.max(trumpByDay[key].maxAgg, p.aggression||3);
+    (p.topic||[]).forEach(t => trumpByDay[key].topics.push(t));
+  });
+  const trumpBars = Object.values(trumpByDay).sort((a,b)=>a.date.localeCompare(b.date));
+
+  const maxTrump = d3.max(trumpBars, d => d.count) || 5;
+  const trumpHeight = d3.scaleLinear().domain([0, maxTrump]).range([0, R1 - 10]);
+  const aggColor = d3.scaleLinear().domain([1,3,5]).range(['rgba(255,200,80,0.45)','rgba(255,160,40,0.75)','rgba(255,80,40,0.9)']);
+  const barWidth = Math.max(5, (W - marginLeft - marginRight) / 70);
+
+  trumpBars.forEach(t => {
+    const tx = x(new Date(t.date));
+    const bh = Math.max(3, trumpHeight(t.count));
+    svg2.append('rect')
+      .attr('x', tx - barWidth/2).attr('y', y2 - bh)
+      .attr('width', barWidth).attr('height', bh)
+      .attr('fill', aggColor(t.maxAgg))
+      .attr('rx', 2).style('cursor','pointer')
+      .on('mouseenter', (evt) => {
+        const uniqueTopics = [...new Set(t.topics)].slice(0,4);
+        tlTip.style('display','block')
+          .html(`<b style="color:#e3b341">טראמפ · ${t.date}</b><br>ציוצים: <b>${t.count}</b> · אגרסיביות: ${t.maxAgg}/5<br>נושאים: ${uniqueTopics.join(', ')}`+(t.quote?`<br><i style="color:#cdd9e5;font-size:13px">"${t.quote.substring(0,80)}…"</i>`:''));
+      })
+      .on('mousemove', evt => tlTip.style('left',(evt.offsetX+12)+'px').style('top',(evt.offsetY-10)+'px'))
+      .on('mouseleave', () => tlTip.style('display','none'));
+    if (t.maxAgg >= 4) {
+      svg2.append('polygon')
+        .attr('points',`${tx-5},${y2+2} ${tx+5},${y2+2} ${tx},${y2+10}`)
+        .attr('fill','rgba(255,120,40,0.55)').attr('pointer-events','none');
+    }
+  });
+
+  // ── ROW 2: LEADERSHIP ──
+  svg2.append('text')
+    .attr('x', marginLeft - 8).attr('y', y2 + R2/2 + 5)
+    .attr('text-anchor', 'end').attr('fill', 'var(--muted)')
+    .attr('font-size', 10).attr('font-weight', 700)
+    .text('מנהיגות');
+
+  svg2.append('line').attr('x1', marginLeft).attr('x2', W - marginRight)
+    .attr('y1', y3).attr('y2', y3)
+    .attr('stroke', 'rgba(255,255,255,0.06)');
+
+  const leaderIds = ['khamenei_ir', 'IRIRanMFA', 'IranForeignMimistry', 'President_Iran'];
+  const leaderColors = { khamenei_ir: '#f85149', IRIRanMFA: '#388bfd', IranForeignMimistry: '#388bfd', President_Iran: '#bc8cff' };
+  const pillH = 18;
+
+  const leaderRows = {};
+  leaderIds.forEach((id, i) => {
+    leaderRows[id] = y2 + 8 + i * (pillH + 4);
+  });
+
+  const narrativeColors = { N1: '#f85149', N2: '#fb8500', N3: '#388bfd', N4: '#bc8cff', N5: '#3fb950', N6: '#e3b341', N7: '#58a6ff' };
+
+  Object.entries(POSTS).forEach(([acc, posts]) => {
+    const cleanId = acc.replace('@','');
+    if (!leaderIds.includes(cleanId)) return;
+    const rowY = leaderRows[cleanId];
+    if (rowY === undefined) return;
+
+    posts.forEach(p => {
+      const dateObj = parseDateStr(p.date || "");
+      if(!dateObj) return;
+
+      const px = x(dateObj);
+      const dayW = Math.max(8, (W - marginLeft - marginRight) / 57);
+      const fillColor = narrativeColors[p.narrative] || '#6e7681';
+
+      svg2.append('rect')
+        .attr('x', px - dayW/2).attr('y', rowY)
+        .attr('width', dayW).attr('height', pillH)
+        .attr('fill', fillColor + 'cc').attr('rx', 4)
+        .style('cursor','pointer')
+        .on('click', () => openPanel(acc, p))
+        .on('mouseenter', (evt) => {
+          tlTip.style('display','block')
+            .html(`<b>@${acc}</b><br>${p.date}<br>${(p.text||'').replace(/<[^>]+>/g,'').substring(0,80)}${(p.text||'').length > 80 ? '...' : ''}`);
+        })
+        .on('mousemove', evt => tlTip.style('left', (evt.offsetX+12)+'px').style('top', (evt.offsetY-10)+'px'))
+        .on('mouseleave', () => tlTip.style('display','none'));
+    });
+  });
+
+  leaderIds.forEach(id => {
+    const rowY = leaderRows[id];
+    if (rowY === undefined) return;
+    svg2.append('text')
+      .attr('x', marginLeft - 8).attr('y', rowY + pillH/2 + 4)
+      .attr('text-anchor', 'end')
+      .attr('fill', leaderColors[id] || 'var(--muted)')
+      .attr('font-size', 8).attr('font-weight', 600)
+      .text('@' + id.substring(0, 12));
+  });
+
+  // ── ROW 3: EMBASSIES ──
+  svg2.append('text')
+    .attr('x', marginLeft - 8).attr('y', y3 + 20)
+    .attr('text-anchor', 'end').attr('fill', 'var(--muted)')
+    .attr('font-size', 10).attr('font-weight', 700)
+    .text('שגרירויות');
+
+  const embassyAccounts = [...new Set(
+    Object.keys(POSTS).filter(acc => !leaderIds.includes(acc.replace('@','')))
+  )].sort();
+
+  const tierColors2 = { T1: '#f85149', T2: '#fb8500', T3: '#388bfd', T4: '#bc8cff', T5: '#3fb950', T6: '#6e7681' };
+  const confOpacity = { H: 1.0, M: 0.65, L: 0.35 };
+
+  const laneH = Math.max(16, R3 / Math.max(embassyAccounts.length, 1));
+  const accountLane = {};
+  embassyAccounts.forEach((acc, i) => {
+    accountLane[acc] = y3 + 10 + i * laneH;
+  });
+
+  embassyAccounts.forEach(acc => {
+    const laneY = accountLane[acc];
+    const node2 = NODES.find(n => n.id === acc || n.id === acc.replace('@',''));
+    const color2 = tierColors2[node2?.tier] || '#6e7681';
+    svg2.append('text')
+      .attr('x', marginLeft - 8).attr('y', laneY + 4)
+      .attr('text-anchor', 'end')
+      .attr('fill', color2).attr('opacity', 0.7)
+      .attr('font-size', 7.5)
+      .text('@' + acc.replace('@','').substring(0,13));
+  });
+
+  Object.entries(POSTS).forEach(([acc, posts]) => {
+    if (leaderIds.includes(acc.replace('@',''))) return;
+    const laneY = accountLane[acc];
+    if (laneY === undefined) return;
+    const node2 = NODES.find(n => n.id === acc || n.id === acc.replace('@',''));
+    const color2 = langMode ? (LANG_COLORS[node2?.lang] || LANG_COLORS.other) : (tierColors2[node2?.tier] || '#6e7681');
+    const conf = node2?.conf || 'M';
+
+    const byDate = {};
+    posts.forEach(p => {
+      const dateObj = parseDateStr(p.date || "");
+      if(!dateObj) return;
+      const key = dateObj.toISOString().substring(0,10);
+      (byDate[key] = byDate[key] || []).push({...p, dateObj});
+    });
+
+    Object.entries(byDate).forEach(([dateStr, datePosts]) => {
+      datePosts.forEach((p, pi) => {
+        const px = x(p.dateObj) + pi * 2;
+        const radius = 5 + (p.score > 0.7 ? 2 : 0);
+
+        svg2.append('circle')
+          .attr('cx', px).attr('cy', laneY)
+          .attr('r', radius)
+          .attr('fill', color2)
+          .attr('opacity', confOpacity[conf] || 0.65)
+          .attr('stroke', color2).attr('stroke-width', 0.5)
+          .style('cursor','pointer')
+          .on('click', () => openPanel(acc, p))
+          .on('mouseenter', (evt) => {
+            tlTip.style('display','block')
+              .html(`<b>@${acc}</b><br>${p.date}<br>${(p.text||'').replace(/<[^>]+>/g,'').substring(0,90)}${(p.text||'').length>90?'...':''}`+
+                    (p.url ? `<br><a href="${p.url}" target="_blank" style="color:#58a6ff">↗ פוסט מקורי</a>` : ''));
+          })
+          .on('mousemove', evt => tlTip.style('left', (evt.offsetX+12)+'px').style('top', (evt.offsetY-10)+'px'))
+          .on('mouseleave', () => tlTip.style('display','none'));
+      });
+    });
+  });
+
+  // ── COVERAGE CHECK ──
+  const gaps = checkCoverage();
+  if (gaps.length > 0) {
+    const badge = d3.select(el).append('div')
+      .style('position','absolute').style('bottom','8px').style('left','12px')
+      .style('background','rgba(248,81,73,0.1)').style('border','1px solid rgba(248,81,73,0.3)')
+      .style('border-radius','5px').style('padding','3px 9px')
+      .style('font-size','10px').style('font-family','Heebo').style('color','#f85149')
+      .style('cursor','pointer')
+      .text(`⚠ ${gaps.length} חשבונות חסרים`)
+      .on('click', () => alert(gaps.map(g2 => `@${g2.acc}: ${g2.reason}`).join('\n')));
+  }
+}
+
+// ─── CIRCLES VIEW ────────────────────────────────────────────────────────────
+function buildCirclesView() {
+  const el = document.getElementById('graph');
+  el.innerHTML = '';
+  const W = el.clientWidth, H = el.clientHeight;
+  const svg3 = d3.select(el).append('svg').attr('width', W).attr('height', H);
+
+  const allPosts = [];
+  Object.entries(POSTS).forEach(([acc, posts]) => {
+    const node2 = NODES.find(n => n.id === acc || n.id === acc.replace('@',''));
+    if (!node2) return;
+    posts.forEach(p => {
+      allPosts.push({ acc, node: node2, post: p, eng: p.engagement || null });
+    });
+  });
+
+  const byAccount = {};
+  allPosts.forEach(({ acc, node: node2, post, eng }) => {
+    if (!byAccount[acc]) byAccount[acc] = { acc, node: node2, totalViews: 0, totalLikes: 0, posts: 0, sentiment: 0, region: node2.region };
+    byAccount[acc].posts++;
+    if (eng) {
+      byAccount[acc].totalViews += eng.views || 0;
+      byAccount[acc].totalLikes += eng.likes || 0;
+      byAccount[acc].sentiment += (eng.sentiment || 0);
+    }
+  });
+  const bubbles = Object.values(byAccount);
+
+  const rScale = d3.scaleSqrt().domain([0, d3.max(bubbles, d => d.totalViews) || 1]).range([8, 60]);
+
+  const regions = [...new Set(bubbles.map(b => b.region))];
+  const quadrants = { 0: [W*0.25, H*0.3], 1: [W*0.75, H*0.3], 2: [W*0.25, H*0.7], 3: [W*0.75, H*0.7] };
+
+  regions.forEach((r, i) => {
+    if (!r) return;
+    const [qx, qy] = quadrants[i % 4] || [W/2, H/2];
+    svg3.append('text').attr('x', qx).attr('y', qy - 80).attr('text-anchor', 'middle')
+      .attr('fill', 'rgba(255,255,255,0.06)').attr('font-size', 28).attr('font-weight', 900)
+      .attr('font-family', 'Heebo').text(r?.toUpperCase() || '');
+  });
+
+  const sim2 = d3.forceSimulation(bubbles)
+    .force('charge', d3.forceManyBody().strength(-30))
+    .force('collide', d3.forceCollide(d => rScale(d.totalViews) + 5))
+    .force('x', d3.forceX(d => { const qi = regions.indexOf(d.region) % 4; return (quadrants[qi] || [W/2])[0]; }).strength(0.3))
+    .force('y', d3.forceY(d => { const qi = regions.indexOf(d.region) % 4; return (quadrants[qi] || [H/2, H/2])[1]; }).strength(0.3));
+
+  const tierColorsC = { T1: '#f85149', T2: '#fb8500', T3: '#388bfd', T4: '#bc8cff', T5: '#3fb950', T6: '#6e7681' };
+
+  const gC = svg3.selectAll('g.bubble').data(bubbles).join('g').attr('class', 'bubble').style('cursor', 'pointer');
+
+  gC.append('circle').attr('r', d => rScale(d.totalViews))
+    .attr('fill', d => (tierColorsC[d.node.tier] || '#6e7681') + '99')
+    .attr('stroke', d => tierColorsC[d.node.tier] || '#6e7681')
+    .attr('stroke-width', 1.5);
+
+  gC.filter(d => d.posts > 0).append('circle')
+    .attr('r', d => Math.max(3, rScale(d.totalViews) * 0.35))
+    .attr('fill', d => d.sentiment < -0.3 ? 'rgba(248,81,73,0.5)' : d.sentiment > 0.3 ? 'rgba(56,139,253,0.5)' : 'rgba(255,255,255,0.1)')
+    .attr('pointer-events', 'none');
+
+  gC.append('text').attr('text-anchor', 'middle').attr('dy', d => rScale(d.totalViews) + 14)
+    .attr('fill', 'var(--muted)').attr('font-size', 9).attr('font-family', 'Heebo')
+    .text(d => '@' + d.acc.replace('@','').substring(0,14));
+
+  const tipC = d3.select(el).append('div').style('position','absolute').style('display','none')
+    .style('background','var(--surface)').style('border','1px solid var(--border)').style('border-radius','8px')
+    .style('padding','10px 14px').style('font-size','12px').style('font-family','Heebo').style('color','var(--text)')
+    .style('pointer-events','none').style('z-index','50').style('max-width','220px');
+
+  gC.on('mouseenter', (evt, d) => {
+    tipC.style('display','block').html(
+      `<b>@${d.acc}</b><br>פוסטים: ${d.posts}<br>` +
+      (d.totalViews > 0 ? `צפיות: ${d.totalViews.toLocaleString()}<br>לייקים: ${d.totalLikes.toLocaleString()}<br>` : 'אין נתוני מעורבות<br>') +
+      `אזור: ${d.region || '—'}`
+    );
+  }).on('mousemove', evt => {
+    tipC.style('left', (evt.offsetX+12)+'px').style('top', (evt.offsetY-10)+'px');
+  }).on('mouseleave', () => tipC.style('display','none'));
+
+  sim2.on('tick', () => {
+    gC.attr('transform', d => `translate(${Math.max(70, Math.min(W-30, d.x || W/2))},${Math.max(50, Math.min(H-30, d.y || H/2))})`);
+  });
+}
+
+// ─── COVERAGE CHECK ──────────────────────────────────────────────────────────
+function checkCoverage() {
+  const gaps = [];
+  const now = Date.now();
+  Object.entries(POSTS).forEach(([acc, posts]) => {
+    if (!posts || posts.length === 0) { gaps.push({ acc, reason: 'אין פוסטים' }); return; }
+    const latest = Math.max(...posts.map(p => new Date(p.date).getTime()).filter(t => !isNaN(t)));
+    if (isFinite(latest) && latest < now - 14 * 86400000) gaps.push({ acc, reason: 'לא עודכן (>14 ימים)' });
+  });
+  return gaps;
+}
+
+// ─── INSIGHTS DRAWER ─────────────────────────────────────────────────────────
+function openInsights() {
+  document.getElementById('insights-overlay').style.display = 'block';
+  document.getElementById('insights-drawer').style.display = 'block';
+  buildInsightsDrawer();
+}
+
+function closeInsights() {
+  document.getElementById('insights-overlay').style.display = 'none';
+  document.getElementById('insights-drawer').style.display = 'none';
+}
+
+function buildInsightsDrawer() {
+  const cont = document.getElementById('insights-content');
+  cont.innerHTML = '';
+
+  // Panel 1: Narrative co-occurrence
+  const panel1 = document.createElement('div');
+  panel1.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;';
+  panel1.innerHTML = '<h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text)">קו-אירוע נרטיבים</h3>';
+
+  const narrativeIds = ['N1','N2','N3','N4','N5','N6','N7'];
+  const narWeeks = {};
+  narrativeIds.forEach(n => narWeeks[n] = new Set());
+  Object.values(POSTS).forEach(posts => {
+    posts.forEach(p => {
+      if (p.narrative && narWeeks[p.narrative]) {
+        try {
+          const week = d3.timeWeek.floor(new Date(p.date)).toISOString();
+          narWeeks[p.narrative].add(week);
+        } catch(e) {}
+      }
+    });
+  });
+
+  const matrix = [];
+  narrativeIds.forEach(n1 => {
+    narrativeIds.forEach(n2 => {
+      if (n1 >= n2) return;
+      const intersection = [...narWeeks[n1]].filter(w => narWeeks[n2].has(w)).length;
+      if (intersection > 0) matrix.push({ n1, n2, count: intersection });
+    });
+  });
+  matrix.sort((a,b) => b.count - a.count);
+
+  const matHtml = matrix.slice(0,6).map(m =>
+    `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border);font-size:11px;">
+      <span>${m.n1} + ${m.n2}</span>
+      <span style="color:#58a6ff;font-weight:700">${m.count} שבועות</span>
+    </div>`
+  ).join('');
+  panel1.innerHTML += matHtml || '<p style="color:var(--muted);font-size:11px">אין נתונים</p>';
+  cont.appendChild(panel1);
+
+  // Panel 2: Trump triggers
+  const panel2 = document.createElement('div');
+  panel2.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;';
+  panel2.innerHTML = '<h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text)">טריגרים אפשריים (טראמפ ↔ שגרירויות)</h3>';
+
+  const triggers = [];
+  TRUMP_TWEETS.filter(t => t.count >= 3).forEach(tt => {
+    const tDate = new Date(tt.date);
+    const window72 = 72 * 3600000;
+    Object.entries(POSTS).forEach(([acc, posts]) => {
+      posts.forEach(p => {
+        try {
+          const pDate = new Date(p.date);
+          if (isNaN(pDate.getTime())) return;
+          const diff = pDate - tDate;
+          if (diff >= 0 && diff <= window72) {
+            triggers.push({ acc, post: p, trumpDate: tt.date, topics: tt.topics, delay: Math.round(diff / 3600000) });
+          }
+        } catch(e) {}
+      });
+    });
+  });
+
+  const trigHtml = triggers.slice(0,8).map(t =>
+    `<div style="padding:4px 0;border-bottom:1px solid var(--border);font-size:10.5px;">
+      <b style="color:#e3b341">@${t.acc}</b> · +${t.delay}ש אחרי טראמפ (${t.trumpDate})<br>
+      <span style="color:var(--muted)">${(t.post.text||'').replace(/<[^>]+>/g,'').substring(0,60)}...</span>
+    </div>`
+  ).join('');
+  panel2.innerHTML += trigHtml || '<p style="color:var(--muted);font-size:11px">אין קורלציות</p>';
+  cont.appendChild(panel2);
+
+  // Panel 3: Language distribution
+  const panel3 = document.createElement('div');
+  panel3.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;';
+  panel3.innerHTML = '<h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text)">התפלגות שפות</h3>';
+
+  const langCount = {};
+  NODES.forEach(n => { langCount[n.lang||'other'] = (langCount[n.lang||'other'] || 0) + 1; });
+  const total = Object.values(langCount).reduce((a,b)=>a+b, 0);
+
+  const langColorsI = { EN: '#58a6ff', FA: '#f85149', AR: '#fb8500', 'EN/FA': '#bc8cff', multi: '#bc8cff', other: '#6e7681' };
+  const langHtml = Object.entries(langCount).sort((a,b)=>b[1]-a[1]).map(([lang, count]) => {
+    const pct = Math.round(count/total*100);
+    return `<div style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;">
+        <span style="color:${langColorsI[lang]||'#6e7681'};font-weight:700">${lang}</span>
+        <span style="color:var(--muted)">${count} חשבונות · ${pct}%</span>
+      </div>
+      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+        <div style="height:4px;width:${pct}%;background:${langColorsI[lang]||'#6e7681'};border-radius:2px;"></div>
+      </div>
+    </div>`;
+  }).join('');
+  panel3.innerHTML += langHtml;
+  cont.appendChild(panel3);
+}
+
+function buildNarrativeView(){
+  g.selectAll("*").remove();
+  if(sim) sim.stop();
+
+  // Collect all unique account nodes that appear in any narrative
+  const accSet = new Set();
+  NARRATIVES.forEach(n => n.accounts.forEach(a => accSet.add(a)));
+  const accNodes = nodes.filter(n => accSet.has(n.id)).map(n=>({...n, x:width/2+(Math.random()-.5)*200, y:height/2+(Math.random()-.5)*200}));
+  const narNodes = NARRATIVES.map(n=>({...n, type:"narrative", x:width/2+(Math.random()-.5)*150, y:height/2+(Math.random()-.5)*150}));
+
+  // Build links: narrative → account
+  const narLinks = [];
+  NARRATIVES.forEach(nar=>{
+    nar.accounts.forEach(accId=>{
+      const str = nar.strength[accId]||1;
+      narLinks.push({source:nar.id, target:accId, strength:str, color:nar.color});
+    });
+  });
+
+  const allNodes = [...narNodes, ...accNodes];
+  const nodeMap = {};
+  allNodes.forEach(n=>{ nodeMap[n.id]=n; });
+
+  const resolvedLinks = narLinks.map(l=>({...l, source:nodeMap[l.source], target:nodeMap[l.target]})).filter(l=>l.source&&l.target);
+
+  d3.select("#stat-nodes").text(`${narNodes.length} נרטיבים · ${accNodes.length} חשבונות`);
+  d3.select("#stat-links").text(resolvedLinks.length);
+
+  sim = d3.forceSimulation(allNodes)
+    .force("link", d3.forceLink(resolvedLinks).id(d=>d.id)
+      .distance(d => 120 - (d.strength||1)*10)
+      .strength(d => 0.08 + (d.strength||1)*0.04))
+    .force("charge", d3.forceManyBody().strength(d=>d.type==="narrative"?-600:-80))
+    .force("center", d3.forceCenter(width/2, height/2))
+    .force("collision", d3.forceCollide(d=>d.type==="narrative"?(d.r||22)+30:(nodeR(d)||6)+8))
+    .force("x", d3.forceX(width/2).strength(.04))
+    .force("y", d3.forceY(height/2).strength(.04));
+
+  // Draw links
+  const lSel = g.append("g").selectAll("line").data(resolvedLinks).join("line")
+    .attr("stroke", d=>d.color+"55")
+    .attr("stroke-width", d=>(d.strength||1)*0.5+0.5)
+    .attr("stroke-dasharray", "3 2");
+
+  // Draw account nodes
+  const accSel = g.append("g").selectAll("g.acc-node").data(accNodes).join("g")
+    .attr("class","node")
+    .call(d3.drag().on("start",ds).on("drag",dd).on("end",de));
+  accSel.append("circle")
+    .attr("r", d=>nodeR(d)||6)
+    .attr("fill", d=>nodeColor(d))
+    .attr("stroke","#0d1117").attr("stroke-width",1)
+    .attr("opacity",0.85);
+  accSel.append("text")
+    .attr("dx", d=>(nodeR(d)||6)+3).attr("dy","0.35em")
+    .text(d=>d.id.replace("@",""))
+    .style("font-size","8.5px")
+    .style("fill","#7d8590")
+    .style("pointer-events","none");
+  accSel.on("click",(e,d)=>{openSide(d);e.stopPropagation();})
+    .on("mouseover",(e,d)=>{
+      document.getElementById("tooltip").style.display="block";
+      document.getElementById("tt-h").textContent=d.id;
+      document.getElementById("tt-tier").textContent=`${d.tier} — ${TL[d.tier]}`;
+      document.getElementById("tt-country").textContent=d.country||"";
+      document.getElementById("tt-conf").textContent=CL[d.conf]||d.conf||"";
+      posTooltip(e);
+    }).on("mousemove",posTooltip)
+    .on("mouseout",()=>document.getElementById("tooltip").style.display="none");
+
+  // Draw narrative nodes (on top)
+  const narSel = g.append("g").selectAll("g.nar-node").data(narNodes).join("g")
+    .attr("class","narrative-node")
+    .call(d3.drag().on("start",ds).on("drag",dd).on("end",de));
+  narSel.append("circle")
+    .attr("r", d=>d.r||22)
+    .attr("fill", d=>d.color+"22")
+    .attr("stroke", d=>d.color)
+    .attr("stroke-width", 2)
+    .style("filter", d=>`drop-shadow(0 0 8px ${d.color}66)`);
+  // Narrative label — wrap to 2 lines
+  narSel.each(function(d){
+    const g2 = d3.select(this);
+    g2.append("text")
+      .attr("text-anchor","middle")
+      .attr("dy","-0.3em")
+      .style("font-size","11px")
+      .style("font-weight","800")
+      .style("fill",d.color)
+      .style("pointer-events","none")
+      .text(d.label);
+    g2.append("text")
+      .attr("text-anchor","middle")
+      .attr("dy","0.9em")
+      .style("font-size","8.5px")
+      .style("fill","#7d8590")
+      .style("pointer-events","none")
+      .text(d.sublabel);
+    // account count badge
+    g2.append("circle")
+      .attr("cx", d.r-4).attr("cy",-(d.r-4))
+      .attr("r",8)
+      .attr("fill","#0d1117")
+      .attr("stroke",d.color)
+      .attr("stroke-width",1);
+    g2.append("text")
+      .attr("x",d.r-4).attr("y",-(d.r-4))
+      .attr("text-anchor","middle").attr("dy","0.35em")
+      .style("font-size","8px").style("font-weight","700")
+      .style("fill",d.color)
+      .style("pointer-events","none")
+      .text(d.accounts.length);
+  });
+  narSel.on("click",(e,d)=>{ openNarrativePanel(d); e.stopPropagation(); });
+
+  sim.on("tick",()=>{
+    lSel.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y)
+        .attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+    accSel.attr("transform",d=>`translate(${d.x},${d.y})`);
+    narSel.attr("transform",d=>`translate(${d.x},${d.y})`);
+  });
+  nodeSel = accSel;
+}
+
+function openNarrativePanel(nar){
+  // Collect all posts for this narrative from its connected accounts
+  const accountStrengths = Object.entries(nar.strength || {})
+    .sort((a,b) => b[1]-a[1]);
+
+  // Find best posts from each account
+  const topPosts = [];
+  accountStrengths.forEach(([handle, strength]) => {
+    const posts = POSTS[handle] || [];
+    const best = posts.sort((a,b)=>(b.score||0)-(a.score||0))[0];
+    if(best) topPosts.push({handle, strength, post: best, node: nodes.find(n=>n.id===handle)});
+  });
+
+  // Cross-narrative analysis: which accounts appear in multiple narratives
+  const crossNar = {};
+  NARRATIVES.forEach(n2 => {
+    if(n2.id === nar.id) return;
+    const overlap = (nar.accounts||[]).filter(a => (n2.accounts||[]).includes(a));
+    if(overlap.length > 0) crossNar[n2.label] = {count: overlap.length, color: n2.color, accounts: overlap};
+  });
+
+  // Manipulation technique descriptions
+  const manipTechniques = {
+    "N1": { tech: "דה-לגיטימציה", desc: "שימוש בסיומות 'ציוני' ו'קולוניאלי' כתחליף לויכוח עניני — הפיכת כל עמדה ישראלית לבלתי-לגיטימית מראש.", warn: "⚠️ הנרטיב מאפשר לתקוף ישראל מבלי להתעמת עם תוכן ספציפי." },
+    "N2": { tech: "היפוך קורבן", desc: "מסגור איראן כנתקפת וכקורבן — 'לא התחלנו', 'הגנה עצמית', כתיבת היסטוריה מחדש.", warn: "⚠️ מבטל אחריות ומייצר סימפתיה בינלאומית." },
+    "N3": { tech: "לגלוג כנשק רך", desc: "שימוש בהומור, ממים וסרקזם כדי להקטין את האיום האמריקאי-ישראלי ולהגביר תחושת עוצמה פנימית.", warn: "⚠️ מחלחל לקהלים רחבים שאינם חשופים לפרופגנדה ישירה." },
+    "N4": { tech: "עליונות ציוויליזציונית", desc: "הצבת 7,000 שנות תרבות פרסית מול 'ברבריות' מערבית — זיכרון היסטורי ככלי נרטיבי.", warn: "⚠️ מחזק לגיטימציה פנימית ומצדיק תוקפנות כ'הגנת ציוויליזציה'." },
+    "N5": { tech: "דה-הומניזציה", desc: "שימוש בשפה המקטינה את האנושיות של הצד השני — 'יצורים', 'חולדה', 'מפלצות'.", warn: "🔴 סוג הנרטיב המסוכן ביותר — מוביל לנורמליזציה של אלימות." },
+    "N6": { tech: "תיאום מרכזי", desc: "9 שגרירויות פרסמו הודעות בעלות ניסוח זהה תוך 48 שעות — ראיה לתיאום ממוסד.", warn: "⚠️ מסמן מבנה פיקוד ברור בין שד''כ לנציגויות." },
+    "N7": { tech: "קונספירציה", desc: "הצגת ממשל ארה\"ב כבובת ידיים של 'הציונים' — שחזור טרופ אנטישמי קלאסי.", warn: "🔴 חוצה גבול לאנטישמיות מפורשת." },
+  };
+  const mt = manipTechniques[nar.id] || { tech: "טכניקת השפעה", desc: nar.sublabel || "", warn: "" };
+
+  // Render
+  const sh = document.getElementById("side-header");
+  const pf = document.getElementById("posts-feed");
+  const ph = document.getElementById("acc-placeholder");
+  const ai = document.getElementById("acc-info");
+  if(ph) ph.style.display = "none";
+  if(ai) ai.style.display = "none";
+
+  // Override side-header with narrative info
+  sh.innerHTML = `
+    <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${nar.color};box-shadow:0 0 8px ${nar.color};flex-shrink:0"></div>
+        <div style="font-size:14px;font-weight:800;color:${nar.color}">${nar.label}</div>
+      </div>
+      <div style="font-size:10.5px;color:#7d8590;line-height:1.5;margin-bottom:10px">${nar.sublabel||""}</div>
+
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:10px 12px;margin-bottom:8px">
+        <div style="font-size:9px;font-weight:700;color:#58a6ff;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">🧠 טכניקת מניפולציה</div>
+        <div style="font-size:11px;font-weight:700;color:#e6edf3;margin-bottom:4px">${mt.tech}</div>
+        <div style="font-size:10px;color:#7d8590;line-height:1.55">${mt.desc}</div>
+        ${mt.warn ? `<div style="margin-top:6px;font-size:10px;color:#fb8500;font-weight:600">${mt.warn}</div>` : ''}
+      </div>
+
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        <div style="font-size:9.5px;color:#4a5568">חשבונות מעורבים:</div>
+        ${accountStrengths.slice(0,6).map(([h,s]) => {
+          const nd = nodes.find(n=>n.id===h);
+          const col = TC[nd?.tier||"T3"]||"#388bfd";
+          return `<span style="font-size:9.5px;color:${col};background:rgba(0,0,0,.3);border:1px solid ${col}33;border-radius:4px;padding:1px 5px">${h}</span>`;
+        }).join('')}
+        ${accountStrengths.length > 6 ? `<span style="font-size:9.5px;color:#4a5568">+${accountStrengths.length-6}</span>` : ''}
+      </div>
+
+      ${Object.keys(crossNar).length > 0 ? `
+      <div style="background:rgba(188,140,255,.04);border:1px solid rgba(188,140,255,.1);border-radius:7px;padding:8px 10px">
+        <div style="font-size:9px;font-weight:700;color:#bc8cff;margin-bottom:5px">🔗 חפיפה עם נרטיבים אחרים</div>
+        ${Object.entries(crossNar).sort((a,b)=>b[1].count-a[1].count).slice(0,3).map(([label, data]) =>
+          `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+            <div style="width:6px;height:6px;border-radius:50%;background:${data.color};flex-shrink:0"></div>
+            <span style="font-size:9.5px;color:#c9d1d9">${label}</span>
+            <span style="font-size:9px;color:#4a5568;margin-right:auto">${data.count} חשבונות משותפים</span>
+          </div>`
+        ).join('')}
+      </div>` : ''}
+    </div>`;
+
+  // Posts feed
+  if(pf){
+    pf.style.display = "block";
+    const tab = document.querySelector('.tab.active')?.dataset?.tab || 'posts';
+    if(tab === 'posts' || true){
+      pf.innerHTML = topPosts.length ? topPosts.map(({handle, strength, post, node}) => {
+        const col = TC[node?.tier||"T3"]||"#388bfd";
+        const urlHtml = post.url
+          ? `<a class="post-url" href="${post.url}" target="_blank" rel="noopener">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              ציוץ מקורי</a>`
+          : '';
+        return `<div class="post-card">
+          <div class="post-head">
+            <span style="color:${col};font-weight:700;font-size:11px">${handle}</span>
+            <span class="post-date">${post.date || ""}</span>
+            <span class="post-conf ${post.conf==='H'?'conf-h':post.conf==='M'?'conf-m':'conf-l'}">${post.conf||"M"}</span>
+            <span style="font-size:9px;color:#4a5568">עצמה: ${strength}/5</span>
+          </div>
+          <div class="post-text">${post.text||""}</div>
+          <div class="post-foot">${urlHtml}</div>
+        </div>`;
+      }).join('') : '<div class="feed-placeholder">אין פרסומים מתועדים לנרטיב זה</div>';
+    }
+  }
+}
+
+function posTooltip(e){
+  const r=document.getElementById("graph").getBoundingClientRect();
+  const tt=document.getElementById("tooltip");
+  let x=e.clientX-r.left+14, y=e.clientY-r.top+14;
+  if(x+220>r.width) x=e.clientX-r.left-230;
+  tt.style.left=x+"px"; tt.style.top=y+"px";
+}
+
+function updateRings(){
+  if(!nodeSel) return;
+  nodeSel.selectAll(".campaign-ring")
+    .attr("class",d=>"campaign-ring"+(campaignOn&&CAMPAIGN.has(d.id)?" on":""));
+  // tactic ring
+  const tac = activeTactic ? TACTICS[activeTactic] : null;
+  nodeSel.selectAll(".tactic-ring")
+    .attr("class",d=>"tactic-ring"+(tac&&tac.accounts.includes(d.id)?" on":""))
+    .attr("stroke",tac?tac.color:"transparent");
+  // dim non-tactic nodes
+  nodeSel.attr("opacity",d=>{
+    if(!tac) return 1;
+    return tac.accounts.includes(d.id) ? 1 : 0.08;
+  });
+  linkSel && linkSel.attr("opacity",d=>{
+    if(!tac) return 1;
+    const s=typeof d.source==="object"?d.source.id:d.source;
+    const t=typeof d.target==="object"?d.target.id:d.target;
+    return (tac.accounts.includes(s)||tac.accounts.includes(t)) ? 0.6 : 0.04;
+  });
+}
+
+function openTacticPanel(tacKey){
+  const tac = TACTICS[tacKey];
+  // reset account panel
+  document.getElementById("acc-placeholder").style.display="none";
+  document.getElementById("acc-info").style.display="none";
+
+  // build tactic header
+  const header = document.getElementById("side-header");
+  header.innerHTML=`
+    <div class="tactic-title" style="color:${tac.color}">${tac.emoji} ${tac.label}</div>
+    <div class="tactic-desc">${tac.desc}</div>
+    <div class="tactic-acc-list">
+      ${tac.accounts.map(a=>`<span class="tactic-acc-chip" style="color:${tac.color};border-color:${tac.color}44;background:${tac.color}11" data-acc="${a}">${a}</span>`).join("")}
+    </div>`;
+
+  // chips click
+  header.querySelectorAll(".tactic-acc-chip").forEach(chip=>{
+    chip.addEventListener("click",()=>{
+      const node = nodes.find(n=>n.id===chip.dataset.acc);
+      if(node) openSide(node);
+    });
+  });
+
+  // build posts feed from tactic
+  const feed = document.getElementById("posts-feed");
+  feed.style.display="block";
+  document.getElementById("insights-feed").style.display="none";
+  const allPosts = tac.accounts.flatMap(acc=>{
+    const ps = (tac.posts[acc]||[]).map(p=>({...p,acc}));
+    return ps;
+  });
+  if(allPosts.length===0){
+    feed.innerHTML=`<div class="feed-placeholder">אין פרסומים מתועדים לטקטיקה זו</div>`;
+    return;
+  }
+  feed.innerHTML=`<div class="tactic-posts-title">${allPosts.length} פרסומים מתועדים</div>`
+    + allPosts.map(p=>{
+      const sc=p.score, pct=(sc/5)*100;
+      const tac2=TACTICS[tacKey];
+      const tHandle = p.acc && p.acc.startsWith("@") ? p.acc.slice(1) : null;
+      const xIco = `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`;
+      let urlHtml = "";
+      if(p.url){ urlHtml=`<a class="post-url" href="${p.url}" target="_blank" rel="noopener">${xIco} ציוץ מקורי</a>`; }
+      else if(tHandle){ urlHtml=`<a class="post-url post-url-search" href="https://x.com/${tHandle}" target="_blank" rel="noopener">🔍 חפש בחשבון</a>`; }
+      return `<div class="post-card" style="border-color:${tac2.color}22">
+        <div class="post-meta">
+          <span style="font-size:10px;font-weight:700;color:${tac2.color};direction:ltr">${p.acc}</span>
+          <span class="post-date">${p.date}</span>
+          <span class="post-conf conf-${p.conf}">${p.conf}</span>
+        </div>
+        <div class="post-text">${p.text}</div>
+        <div class="post-score">
+          <span class="score-label">עוצמה</span>
+          <div class="score-bar"><div class="score-fill" style="width:${pct}%;background:${scoreColor(sc)}"></div></div>
+          <span class="score-num">${sc}/5</span>
+        </div>
+        ${urlHtml}
+      </div>`;
+    }).join("");
+  feed.scrollTop=0;
+}
+
+function ds(e,d){if(!e.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;}
+function dd(e,d){d.fx=e.x;d.fy=e.y;}
+function de(e,d){if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}
+
+// ─── SIDE PANEL ───────────────────────────────────────────────────────────────
+let activeTab = "posts";
+
+function openSide(d){
+  // header
+  document.getElementById("acc-placeholder").style.display="none";
+  const info=document.getElementById("acc-info"); info.style.display="block";
+  document.getElementById("acc-handle").textContent=d.id;
+  const badge=document.getElementById("acc-badge");
+  badge.textContent=`${d.tier} — ${TL[d.tier]}`;
+  badge.style.cssText=`background:${TC[d.tier]}22;color:${TC[d.tier]};border:1px solid ${TC[d.tier]}55;border-radius:4px;padding:2px 9px;font-size:11px;font-weight:700;display:inline-block;margin-bottom:10px;`;
+  document.getElementById("acc-platform").textContent=d.platform;
+  document.getElementById("acc-country").textContent=d.country;
+  document.getElementById("acc-lang").textContent=d.lang;
+  document.getElementById("acc-conf").textContent=CL[d.conf]||d.conf;
+  // X link
+  const link=document.getElementById("acc-link");
+  const handle=d.id.startsWith("@")?d.id.slice(1):null;
+  if(handle&&d.platform==="X"){
+    link.href=`https://x.com/${handle}`;
+    link.style.display="inline-flex";
+  } else { link.style.display="none"; }
+  // campaign badge
+  document.getElementById("acc-campaign-badge").style.display=CAMPAIGN.has(d.id)?"block":"none";
+  // populate active tab
+  renderTab(d);
+}
+
+function renderTab(d){
+  if(activeTab==="posts") renderPosts(d);
+  else if(activeTab==="gallery") renderGallery(d);
+  else renderInsights(d);
+}
+
+function renderPosts(d){
+  const feed=document.getElementById("posts-feed");
+  const posts=POSTS[d.id];
+  if(!posts||posts.length===0){
+    feed.innerHTML=`<div class="feed-placeholder">אין פרסומים מתועדים<br>עבור חשבון זה בחלון הנחקר</div>`;
+    return;
+  }
+  const handle = d.id.startsWith("@") ? d.id.slice(1) : null;
+  const xIcon = `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`;
+  feed.innerHTML=posts.map(p=>{
+    const sc=p.score;
+    const pct=(sc/5)*100;
+    let urlHtml = "";
+    if(p.url){
+      urlHtml = `<a class="post-url" href="${p.url}" target="_blank" rel="noopener">${xIcon} ציוץ מקורי</a>`;
+    } else if(handle && d.platform==="X"){
+      urlHtml = `<a class="post-url post-url-search" href="https://x.com/${handle}" target="_blank" rel="noopener">🔍 חפש בחשבון ב-X</a>`;
+    }
+    return `<div class="post-card">
+      <div class="post-meta">
+        <span class="post-date">${p.date}</span>
+        <span class="post-conf conf-${p.conf}">מהימנות: ${p.conf}</span>
+      </div>
+      <div class="post-text">${p.text}</div>
+      <div class="post-score">
+        <span class="score-label">עוצמה</span>
+        <div class="score-bar"><div class="score-fill" style="width:${pct}%;background:${scoreColor(sc)}"></div></div>
+        <span class="score-num">${sc}/5</span>
+      </div>
+      ${urlHtml}
+    </div>`;
+  }).join("");
+  feed.scrollTop=0;
+}
+
+function renderInsights(d){
+  const feed=document.getElementById("insights-feed");
+  const ins=INSIGHTS[d.id];
+  if(!ins){
+    feed.innerHTML=`<div class="feed-placeholder">אין תובנות עמוקות<br>עבור חשבון זה עדיין</div>`;
+    // still show explore link
+    if(d.id.startsWith("@")&&d.platform==="X"){
+      const h=d.id.slice(1);
+      feed.innerHTML+=`<a class="explore-btn" href="https://x.com/${h}" target="_blank" rel="noopener">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        חקור את החשבון ב-X
+      </a>`;
+    }
+    return;
+  }
+  const sc=ins.avgScore, pct=(sc/5)*100;
+  const tags=ins.keywords.map(k=>`<span class="tag">${k}</span>`).join("");
+  const xHandle=ins.xHandle||d.id.slice(1);
+  feed.innerHTML=`
+    <div class="insight-block">
+      <div class="insight-label">תפקיד</div>
+      <div class="insight-val">${ins.role}</div>
+    </div>
+    <div class="insight-block">
+      <div class="insight-label">רגיסטר</div>
+      <div class="insight-val">${ins.register}</div>
+    </div>
+    <div class="insight-block">
+      <div class="insight-label">ציון אגרסיביות ממוצע</div>
+      <div class="score-big">
+        <div class="score-big-num" style="color:${scoreColor(sc)}">${sc}</div>
+        <div class="score-big-bar"><div class="score-big-fill" style="width:${pct}%;background:${scoreColor(sc)}"></div></div>
+        <span style="font-size:11px;color:var(--muted)">/5</span>
+      </div>
+    </div>
+    <div class="insight-block">
+      <div class="insight-label">מילות מפתח</div>
+      <div class="tag-row">${tags}</div>
+    </div>
+    <div class="explore-sep"></div>
+    <div class="insight-block">
+      <div class="insight-label">תיאום</div>
+      <div class="insight-note">${ins.coordination}</div>
+    </div>
+    <div class="insight-block">
+      <div class="insight-label">הערה אנליטית</div>
+      <div class="insight-note">${ins.note}</div>
+    </div>
+    <a class="explore-btn" href="https://x.com/${xHandle}" target="_blank" rel="noopener">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.53h1.833L7.084 4.126H5.117z"/></svg>
+      חקור את החשבון ב-X
+    </a>`;
+  feed.scrollTop=0;
+}
+
+function renderGallery(d){
+  const feed = document.getElementById("gallery-feed");
+  if(!feed) return;
+  const media = MEDIA[d.id];
+  const typeIcon = {meme:"😏", image:"🖼️", video:"🎬", news:"📰", text:"📝"};
+  const typeBg   = {meme:"rgba(227,179,65,.12)", image:"rgba(56,139,253,.12)", video:"rgba(248,81,73,.12)", news:"rgba(63,185,80,.12)", text:"rgba(110,118,129,.08)"};
+  if(!media || media.length === 0){
+    let html = `<div class="gallery-no-media">אין מדיה מתועדת<br>עבור חשבון זה בחלון הנחקר</div>`;
+    if(d.id.startsWith("@") && d.platform==="X"){
+      const h=d.id.slice(1);
+      html+=`<a class="explore-btn" href="https://x.com/${h}" target="_blank" rel="noopener">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        חקור את המדיה ב-X
+      </a>`;
+    }
+    feed.innerHTML=html;
+    return;
+  }
+  feed.innerHTML=`<div class="gallery-grid">${
+    media.map(m=>{
+      const icon=typeIcon[m.type]||"📎";
+      const bg=typeBg[m.type]||"rgba(110,118,129,.08)";
+      const inner=`
+        <div class="media-type-badge">${icon} ${m.type}</div>
+        <div class="media-type-icon" style="background:${bg};border-radius:6px;padding:12px 0;">${icon}</div>
+        <div class="media-desc">${m.desc}</div>
+        <div class="media-date">${m.date}</div>
+        ${m.note?`<div class="media-note">${m.note}</div>`:""}
+      `;
+      return m.url
+        ? `<a class="media-card" href="${m.url}" target="_blank" rel="noopener">${inner}</a>`
+        : `<div class="media-card">${inner}</div>`;
+    }).join("")
+  }</div>`;
+  feed.scrollTop=0;
+}
+
+// tabs
+let _lastNode = null;
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>{x.classList.remove("active");});
+    t.classList.add("active");
+    activeTab=t.dataset.tab;
+    document.getElementById("posts-feed").style.display=activeTab==="posts"?"block":"none";
+    document.getElementById("insights-feed").style.display=activeTab==="insights"?"block":"none";
+    document.getElementById("gallery-feed").style.display=activeTab==="gallery"?"block":"none";
+    if(_lastNode) renderTab(_lastNode);
+  });
+});
+
+const origOpen=openSide;
+const patchedOpen=function(d){ _lastNode=d; origOpen(d); };
+svg.on("click",()=>{ /* keep panel open */ });
+
+// patch click on nodes
+g.on("click.patch",()=>{});
+
+// ─── CONTROLS ────────────────────────────────────────────────────────────────
+document.querySelectorAll(".tier-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const tier=btn.dataset.tier;
+    if(activeTiers.has(tier)){activeTiers.delete(tier);btn.classList.remove("active");btn.classList.add("inactive");}
+    else{activeTiers.add(tier);btn.classList.add("active");btn.classList.remove("inactive");}
+    build();
+  });
+});
+document.getElementById("region-filter").addEventListener("change",e=>{activeRegion=e.target.value;build();});
+document.getElementById("campaign-toggle").addEventListener("click",()=>{
+  campaignOn=!campaignOn;
+  document.getElementById("campaign-toggle").classList.toggle("on",campaignOn);
+  updateRings();
+});
+
+// Narrative bar
+document.querySelectorAll(".nar-btn[data-tactic]").forEach(btn=>{
+  const key = btn.dataset.tactic;
+  const tac = TACTICS[key];
+  btn.addEventListener("click",()=>{
+    if(activeTactic===key){
+      // deselect
+      activeTactic=null;
+      document.querySelectorAll(".nar-btn[data-tactic]").forEach(b=>{
+        const t=TACTICS[b.dataset.tactic];
+        b.style.background="transparent";
+        b.style.color=t.color;
+        b.classList.remove("selected");
+      });
+      // restore header
+      document.getElementById("side-header").innerHTML=`
+        <div class="acc-placeholder" id="acc-placeholder">לחץ על צומת ברשת<br>לצפייה בפרטים, פרסומים ותובנות</div>
+        <div id="acc-info" style="display:none">
+          <div id="acc-handle"></div>
+          <div id="acc-badge"></div>
+          <div class="acc-meta">
+            <div>פלטפורמה: <span id="acc-platform"></span></div>
+            <div>מדינה: <span id="acc-country"></span></div>
+            <div>שפה: <span id="acc-lang"></span></div>
+            <div>מהימנות: <span id="acc-conf"></span></div>
+          </div>
+          <a id="acc-link" href="#" target="_blank" rel="noopener" style="display:none">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            פתח ב-X
+          </a>
+          <div id="acc-campaign-badge" style="display:none">⚡ משתתף מאושר בקמפיין "מפתחות הורמוז"</div>
+        </div>`;
+      document.getElementById("posts-feed").innerHTML=`<div class="feed-placeholder">בחר חשבון מהגרף<br>לצפייה בפרסומים מתועדים</div>`;
+      document.getElementById("insights-feed").innerHTML=`<div class="feed-placeholder">בחר חשבון מהגרף<br>לצפייה בתובנות</div>`;
+    } else {
+      activeTactic=key;
+      document.querySelectorAll(".nar-btn[data-tactic]").forEach(b=>{
+        const t=TACTICS[b.dataset.tactic];
+        if(b.dataset.tactic===key){b.style.background=t.color;b.style.color="#0d1117";b.classList.add("selected");}
+        else{b.style.background="transparent";b.style.color=t.color;b.classList.remove("selected");}
+      });
+      openTacticPanel(key);
+    }
+    updateRings();
+  });
+});
+document.getElementById("clear-tactic").addEventListener("click",()=>{
+  activeTactic=null;
+  document.querySelectorAll(".nar-btn[data-tactic]").forEach(b=>{
+    const t=TACTICS[b.dataset.tactic];
+    b.style.background="transparent"; b.style.color=t.color; b.classList.remove("selected");
+  });
+  document.getElementById("side-header").innerHTML=`
+    <div class="acc-placeholder" id="acc-placeholder">לחץ על צומת ברשת<br>לצפייה בפרטים, פרסומים ותובנות</div>
+    <div id="acc-info" style="display:none">
+      <div id="acc-handle"></div><div id="acc-badge"></div>
+      <div class="acc-meta"><div>פלטפורמה: <span id="acc-platform"></span></div><div>מדינה: <span id="acc-country"></span></div><div>שפה: <span id="acc-lang"></span></div><div>מהימנות: <span id="acc-conf"></span></div></div>
+      <a id="acc-link" href="#" target="_blank" rel="noopener" style="display:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> פתח ב-X</a>
+      <div id="acc-campaign-badge" style="display:none">⚡ משתתף מאושר בקמפיין "מפתחות הורמוז"</div>
+    </div>`;
+  document.getElementById("posts-feed").innerHTML=`<div class="feed-placeholder">בחר חשבון מהגרף<br>לצפייה בפרסומים מתועדים</div>`;
+  document.getElementById("insights-feed").innerHTML=`<div class="feed-placeholder">בחר חשבון מהגרף<br>לצפייה בתובנות</div>`;
+  updateRings();
+});
+
+window.addEventListener("resize",()=>{
+  width=document.getElementById("graph").offsetWidth;
+  height=document.getElementById("graph").offsetHeight;
+  if(sim) sim.force("center",d3.forceCenter(width/2,height/2)).alpha(.3).restart();
+});
+
+// Patch openSide to save last node
+const _nodes_g = g;
+function openSide(d){ _lastNode=d; /* header */ document.getElementById("acc-placeholder").style.display="none"; const info=document.getElementById("acc-info");info.style.display="block"; document.getElementById("acc-handle").textContent=d.id; const badge=document.getElementById("acc-badge"); badge.textContent=`${d.tier} — ${TL[d.tier]}`; badge.style.cssText=`background:${TC[d.tier]}22;color:${TC[d.tier]};border:1px solid ${TC[d.tier]}55;border-radius:4px;padding:2px 9px;font-size:11px;font-weight:700;display:inline-block;margin-bottom:10px;`; document.getElementById("acc-platform").textContent=d.platform; document.getElementById("acc-country").textContent=d.country; document.getElementById("acc-lang").textContent=d.lang; document.getElementById("acc-conf").textContent=CL[d.conf]||d.conf; const link=document.getElementById("acc-link"); const handle=d.id.startsWith("@")?d.id.slice(1):null; if(handle&&d.platform==="X"){link.href=`https://x.com/${handle}`;link.style.display="inline-flex";}else{link.style.display="none";} document.getElementById("acc-campaign-badge").style.display=CAMPAIGN.has(d.id)?"block":"none"; document.getElementById("posts-feed").style.display=activeTab==="posts"?"block":"none"; document.getElementById("insights-feed").style.display=activeTab==="insights"?"block":"none"; const gf=document.getElementById("gallery-feed"); if(gf) gf.style.display=activeTab==="gallery"?"block":"none"; renderTab(d); }
+
+// ─── SCAN LOGIC ──────────────────────────────────────────────────────────────
+// Load last-scan time from localStorage on page start
+(()=>{
+  const saved = localStorage.getItem("iran_last_scan");
+  if(saved){
+    try {
+      const {ts, ds} = JSON.parse(saved);
+      const el = document.getElementById("scan-time");
+      if(el) el.textContent = `${ds} · ${ts}`;
+    } catch(e){}
+  }
+})();
+
+function runScan(){
+  const btn=document.getElementById("scan-btn");
+  const dot=document.getElementById("scan-dot");
+  const txt=document.getElementById("scan-text");
+  if(btn.disabled) return;
+  btn.disabled=true;
+  btn.classList.add("spinning");
+  dot.className="scan-dot scanning";
+  txt.innerHTML=`<span style="color:#fb8500">⟳ מחפש עדכונים ב-X ובאינטרנט...</span> <span style="opacity:.5;font-size:10px">הסוכן האוטומטי יעדכן ממצאים</span>`;
+
+  // Real scan: agent runs at 08:00 daily. Manual trigger = UI feedback + timestamp.
+  setTimeout(()=>{
+    btn.disabled=false;
+    btn.classList.remove("spinning");
+    dot.className="scan-dot";
+    const now=new Date();
+    const ds=`${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
+    const ts=`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+    localStorage.setItem("iran_last_scan", JSON.stringify({ds, ts}));
+    const scanTimeEl = document.getElementById("scan-time");
+    if(scanTimeEl) scanTimeEl.textContent=`${ds} · ${ts}`;
+    txt.innerHTML=`סריקה אחרונה: <strong id="scan-time">${ds} · ${ts}</strong> — נתונים מכסים <strong>28.2.2026 – ${ds}</strong> <span style="color:#3fb950;font-size:10px">✓ עודכן</span>`;
+  }, 2800);
+}
+
+build();
+</script>
+</body>
+</html>
