@@ -6,6 +6,7 @@
 <title>רשת הנרטיב האיראנית — שלב 1</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="data.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1121,6 +1122,10 @@ select:hover { border-color: rgba(255,255,255,.16); }
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="4"/><circle cx="5" cy="8" r="1.5"/><circle cx="19" cy="17" r="2.5"/></svg>
       <span>מעגלים</span>
     </button>
+    <button class="mode-btn" id="mode-network" onclick="setView('network')" title="רשת קשרים">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><circle cx="12" cy="12" r="2.5"/><line x1="7" y1="12" x2="9.5" y2="12"/><line x1="14.5" y1="12" x2="17" y2="6"/><line x1="14.5" y1="12" x2="17" y2="18"/></svg>
+      <span>רשת קשרים</span>
+    </button>
   </div>
 
   <div class="header-sep"></div>
@@ -1142,7 +1147,6 @@ select:hover { border-color: rgba(255,255,255,.16); }
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/></svg>
       תובנות
     </button>
-    <div class="phase-badge">PHASE 1</div>
   </div>
 </header>
 
@@ -1856,6 +1860,7 @@ function setView(mode) {
   const modeEl = document.getElementById('mode-' + mode);
   if (modeEl) modeEl.classList.add('active');
   if (viewMode === "circles") { buildCirclesView(); return; }
+  if (viewMode === "network") { buildNetworkView(); return; }
   build();
 }
 
@@ -2115,6 +2120,227 @@ function build(){
   updateRings();
 }
 
+// ─── DATE PARSER ─────────────────────────────────────────────────────────────
+function parseDateStr(raw) {
+  if (!raw) return null;
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) { const d = new Date(raw.substring(0,10)); return isNaN(d) ? null : d; }
+  const M = {
+    "ינואר":0,"פברואר":1,"מרץ":2,"אפריל":3,"מאי":4,"יוני":5,"יולי":6,"אוגוסט":7,"ספטמבר":8,"אוקטובר":9,"נובמבר":10,"דצמבר":11,
+    "ינו׳":0,"פבר׳":1,"אפ׳":3,"אוג׳":7,"ספט׳":8,"אוק׳":9,"נוב׳":10,"דצמ׳":11,"פבר":1,
+    "Jan":0,"Feb":1,"Mar":2,"Apr":3,"May":4,"Jun":5,"Jul":6,"Aug":7,"Sep":8,"Oct":9,"Nov":10,"Dec":11
+  };
+  for (const [heb, mon] of Object.entries(M)) {
+    // "5 אפריל 2026" or "5–8 אפריל 2026" or "5-8 אפריל 2026"
+    const m1 = raw.match(new RegExp(`(\\d{1,2})(?:\\s*[-–]\\d{1,2})?\\s*${heb}\\s*(\\d{4})`));
+    if (m1) return new Date(+m1[2], mon, +m1[1]);
+    // "אפריל 2026" / "מאוחר מרץ 2026" / "אמצע מרץ 2026"
+    const m2 = raw.match(new RegExp(`(?:מאוחר\\s+|אמצע\\s+|תחילת\\s+|מוקדם\\s+)?${heb}\\s+(\\d{4})`));
+    if (m2) {
+      const day = /מאוחר/.test(raw) ? 22 : /אמצע/.test(raw) ? 15 : 5;
+      return new Date(+m2[1], mon, day);
+    }
+  }
+  return null;
+}
+
+// ─── COORDINATION NETWORK VIEW ───────────────────────────────────────────────
+function buildNetworkView() {
+  const el = document.getElementById('graph');
+  el.innerHTML = '';
+  const W = el.clientWidth, H = el.clientHeight;
+
+  const NAR_COL = { hormuz:'#388bfd','military-threat':'#f85149','nuclear-threat':'#bc8cff',ceasefire:'#3fb950',sanctions:'#fb8500',sovereignty:'#e3b341',relay:'rgba(255,255,255,0.18)' };
+  const seederSet = new Set(["@IraninZimbabwe","@IRIMFA_SPOX","@araghchi","@IrnaEnglish","@drpezeshkian"]);
+  const ampSet    = new Set(["@IraninSA","@IRANinBULGARIA","@Iran_in_UK","@EmbassyofIrtoRF","@IRANinTJ","@PressTV","@Tasnimnews_EN","@EnglishFars","@AlMayadeenNews","@MayadeenEnglish","@s_m_marandi","@hispantv_brasil","@HispanTV","@IRANINARGENTINA","@IRIran_Military"]);
+
+  const rawEdges = [
+    {s:"@IraninZimbabwe",t:"@IraninSA",       type:"coord",  nar:"hormuz",         conf:true,  w:3},
+    {s:"@IraninSA",      t:"@IRANinBULGARIA", type:"coord",  nar:"hormuz",         conf:true,  w:2},
+    {s:"@IraninZimbabwe",t:"@IRANinBULGARIA", type:"coord",  nar:"hormuz",         conf:true,  w:2},
+    {s:"@IraninZimbabwe",t:"@Iran_in_UK",     type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@EmbassyofIrtoRF",type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@IRANinTJ",       type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@IraninAlgeria",  type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@IRANinKENYA",    type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@IraninBerlin",   type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@Iran_in_India",  type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninZimbabwe",t:"@IraninAustria",  type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IrnaEnglish",   t:"@PressTV",        type:"relay",  nar:"nuclear-threat", conf:true,  w:3},
+    {s:"@PressTV",       t:"@Tasnimnews_EN",  type:"relay",  nar:"military-threat",conf:true,  w:3},
+    {s:"@Tasnimnews_EN", t:"@EnglishFars",    type:"relay",  nar:"military-threat",conf:true,  w:2},
+    {s:"@PressTV",       t:"@AlMayadeenNews", type:"relay",  nar:"hormuz",         conf:true,  w:2},
+    {s:"@IRIMFA_SPOX",   t:"@IrnaEnglish",   type:"relay",  nar:"nuclear-threat", conf:true,  w:3},
+    {s:"@IRIMFA_SPOX",   t:"@PressTV",       type:"relay",  nar:"nuclear-threat", conf:true,  w:3},
+    {s:"@araghchi",      t:"@IrnaEnglish",   type:"relay",  nar:"ceasefire",      conf:true,  w:3},
+    {s:"@araghchi",      t:"@PressTV",       type:"relay",  nar:"ceasefire",      conf:true,  w:2},
+    {s:"@IRIMFA_EN",     t:"@IrnaEnglish",   type:"relay",  nar:"nuclear-threat", conf:true,  w:2},
+    {s:"@drpezeshkian",  t:"@araghchi",      type:"relay",  nar:"sovereignty",    conf:true,  w:2},
+    {s:"@drpezeshkian",  t:"@IRIMFA_SPOX",   type:"relay",  nar:"sovereignty",    conf:true,  w:2},
+    {s:"@IRIran_Military",t:"@Tasnimnews_EN",type:"relay",  nar:"military-threat",conf:true,  w:2},
+    {s:"@Tasnimnews_EN", t:"@araghchi",      type:"conflict",nar:"hormuz",        conf:true,  w:2},
+    {s:"@AlMayadeenNews",t:"@MayadeenEnglish",type:"relay", nar:"hormuz",         conf:true,  w:2},
+    {s:"@HispanTV",      t:"@hispantv_brasil",type:"relay", nar:"sanctions",      conf:true,  w:2},
+    {s:"@s_m_marandi",   t:"@PressTV",       type:"relay",  nar:"nuclear-threat", conf:true,  w:2},
+    {s:"@IranNigeria",   t:"@IraninAlgeria", type:"coord",  nar:"hormuz",         conf:false, w:1},
+    {s:"@IRANinKENYA",   t:"@IRANinETHIOPIA",type:"coord", nar:"hormuz",         conf:false, w:1},
+    {s:"@IraninSA",      t:"@IRANinKENYA",   type:"coord",  nar:"hormuz",         conf:false, w:1},
+  ];
+
+  const inauthNodes = [
+    {id:"BRICS4CLICKS",tier:"IX",type:"inauthentic",country:"Unknown",region:"Global",lang:"multi",status:"active",notes:"23 חשבונות. 772M+ צפיות. IRGC-linked.",views:772000000,role:"amplifier"},
+    {id:"Verified4War", tier:"IX",type:"inauthentic",country:"South Asia",region:"Global",lang:"multi",status:"active",notes:"18 חשבונות. 370M+ צפיות.",views:370000000,role:"amplifier"},
+  ];
+  const inauthEdges = [
+    {s:"BRICS4CLICKS",t:"@IraninZimbabwe",type:"inauth",conf:true,w:4},
+    {s:"BRICS4CLICKS",t:"@IraninSA",      type:"inauth",conf:true,w:4},
+    {s:"BRICS4CLICKS",t:"@PressTV",       type:"inauth",conf:true,w:3},
+    {s:"Verified4War", t:"@IraninZimbabwe",type:"inauth",conf:true,w:3},
+    {s:"Verified4War", t:"@IraninSA",     type:"inauth",conf:true,w:3},
+  ];
+
+  let showInauth = false;
+
+  const svgN = d3.select(el).append('svg').attr('width',W).attr('height',H).style('font-family','Heebo');
+  const zoomN = d3.zoom().scaleExtent([0.1,4]).on('zoom',e=>gN.attr('transform',e.transform));
+  svgN.call(zoomN);
+  const gN = svgN.append('g');
+
+  const defs = svgN.append('defs');
+  const glow = defs.append('filter').attr('id','nv-glow').attr('x','-60%').attr('y','-60%').attr('width','220%').attr('height','220%');
+  glow.append('feGaussianBlur').attr('stdDeviation','5').attr('result','b');
+  const mg = glow.append('feMerge'); mg.append('feMergeNode').attr('in','b'); mg.append('feMergeNode').attr('in','SourceGraphic');
+  const arr = defs.append('marker').attr('id','nv-arr').attr('markerWidth',7).attr('markerHeight',7).attr('refX',16).attr('refY',3).attr('orient','auto');
+  arr.append('path').attr('d','M0,0 L0,6 L7,3 z').attr('fill','rgba(255,255,255,0.25)');
+
+  const tierCx = { T1:{x:W*.5,y:H*.13}, T2:{x:W*.5,y:H*.3}, T3:{x:W*.5,y:H*.65}, T4:{x:W*.27,y:H*.5}, T5:{x:W*.73,y:H*.38}, T6:{x:W*.18,y:H*.75}, IX:{x:W*.82,y:H*.62} };
+
+  function render() {
+    gN.selectAll('*').remove();
+
+    // Enrich nodes with role + coord_score
+    const vPosts = (typeof VIRAL_POSTS !== 'undefined') ? VIRAL_POSTS : [];
+    const viewsMap = {};
+    vPosts.forEach(p => { viewsMap[p.account] = (viewsMap[p.account]||0) + (p.views||0); });
+
+    const allEdges = [...rawEdges, ...(showInauth ? inauthEdges : [])];
+    let simNodes = nodes.map(n => ({
+      ...n,
+      role: seederSet.has(n.id) ? 'seeder' : ampSet.has(n.id) ? 'amplifier' : null,
+      coord_score: allEdges.filter(e => e.s===n.id||e.t===n.id).length,
+      views: viewsMap[n.id] || 0,
+    }));
+    if (showInauth) simNodes = [...simNodes, ...inauthNodes.map(n => ({...n, coord_score: inauthEdges.filter(e=>e.s===n.id).length}))];
+
+    const idMap = {}; simNodes.forEach(n => idMap[n.id] = n);
+    const simEdges = allEdges
+      .filter(e => idMap[e.s] && idMap[e.t])
+      .map(e => ({...e, source: idMap[e.s], target: idMap[e.t]}));
+
+    function nr(d) { return Math.max(7, (d.tier==='T1'?13:d.tier==='T2'?11:7) + d.coord_score*1.5); }
+    function nc(d) { if(d.type==='inauthentic') return '#ff6b6b'; if(d.status==='inactive') return '#2a2a2a'; return TC[d.tier]||'#6e7681'; }
+
+    const linkG  = gN.append('g');
+    const nodeG  = gN.append('g');
+    const labelG = gN.append('g');
+
+    const sim2 = d3.forceSimulation(simNodes)
+      .force('link', d3.forceLink(simEdges).id(d=>d.id).distance(d=>d.conf?65:105).strength(d=>d.conf?0.32:0.1))
+      .force('charge', d3.forceManyBody().strength(d=>-160-nr(d)*5))
+      .force('collide', d3.forceCollide(d=>nr(d)+11))
+      .force('x', d3.forceX(d=>(tierCx[d.tier]||{x:W*.5}).x).strength(0.07))
+      .force('y', d3.forceY(d=>(tierCx[d.tier]||{y:H*.5}).y).strength(0.07))
+      .force('center', d3.forceCenter(W*.5,H*.5).strength(0.02))
+      .alphaDecay(0.025);
+
+    const lkSel = linkG.selectAll('line').data(simEdges).join('line')
+      .attr('stroke', d => d.type==='inauth'?'#ff6b6b': d.type==='conflict'?'#f85149': (NAR_COL[d.nar]||NAR_COL.relay))
+      .attr('stroke-width', d => 0.7 + (d.w||1)*0.5)
+      .attr('stroke-dasharray', d => d.conf ? 'none' : '5,4')
+      .attr('opacity', d => d.type==='inauth'?0.35: d.conf?0.6:0.28)
+      .attr('marker-end', d => d.type==='relay'?'url(#nv-arr)':'none');
+
+    const ndSel = nodeG.selectAll('g.nv-node').data(simNodes,d=>d.id).join('g')
+      .attr('class','nv-node').style('cursor','pointer')
+      .call(d3.drag()
+        .on('start',(e,d)=>{if(!e.active)sim2.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;})
+        .on('drag', (e,d)=>{d.fx=e.x;d.fy=e.y;})
+        .on('end',  (e,d)=>{if(!e.active)sim2.alphaTarget(0);d.fx=null;d.fy=null;}))
+      .on('click',(e,d)=>{e.stopPropagation();openSide(d);})
+      .on('mousemove',(e,d)=>{
+        const tt=document.getElementById('tooltip');tt.style.display='block';
+        document.getElementById('tt-h').textContent=d.id;
+        document.getElementById('tt-tier').textContent=`${d.tier||''} — ${TL[d.tier]||d.type||''}`;
+        document.getElementById('tt-country').textContent=d.country||'';
+        document.getElementById('tt-conf').textContent=CL[d.conf]||d.conf||'';
+        posTooltip(e);
+      })
+      .on('mouseleave',()=>document.getElementById('tooltip').style.display='none');
+
+    // Role ring
+    ndSel.append('circle')
+      .attr('r',d=>nr(d)+5).attr('fill','none')
+      .attr('stroke',d=>d.role==='seeder'?'#ffd700':d.role==='amplifier'?'#58a6ff':'transparent')
+      .attr('stroke-width',2.5).attr('stroke-dasharray',d=>d.role==='amplifier'?'4,3':'none').attr('opacity',.85);
+
+    // Main circle
+    ndSel.append('circle')
+      .attr('r',d=>nr(d))
+      .attr('fill',d=>nc(d)).attr('fill-opacity',d=>d.status==='inactive'?0.22:0.85)
+      .attr('stroke',d=>{ try{return d3.color(nc(d)).brighter(.5).formatHex();}catch{return '#fff';} })
+      .attr('stroke-width',1.5)
+      .attr('filter',d=>d.role==='seeder'?'url(#nv-glow)':'none');
+
+    // Labels for key nodes
+    labelG.selectAll('text')
+      .data(simNodes.filter(d=>d.coord_score>0||d.role==='seeder'||['T1','T2'].includes(d.tier)||d.type==='inauthentic'),d=>d.id)
+      .join('text').attr('text-anchor','middle').attr('font-size','11px')
+      .attr('fill','#9ba8b5').attr('font-family','Heebo,sans-serif').attr('pointer-events','none')
+      .attr('dy',d=>nr(d)+13).text(d=>d.id.replace('@',''));
+
+    sim2.on('tick',()=>{
+      lkSel.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+      ndSel.attr('transform',d=>`translate(${d.x||W/2},${d.y||H/2})`);
+      labelG.selectAll('text').attr('transform',d=>`translate(${d.x||W/2},${d.y||H/2})`);
+    });
+
+    // Stats overlay
+    d3.select('#stat-nodes').text(simNodes.length);
+    d3.select('#stat-links').text(simEdges.filter(e=>e.type!=='inauth').length);
+  }
+
+  // Inauthentic toggle button in legend
+  const legDiv = d3.select(el).append('div')
+    .style('position','absolute').style('bottom','12px').style('right','12px')
+    .style('background','rgba(13,17,23,0.93)').style('border','1px solid #30363d')
+    .style('border-radius','10px').style('padding','12px 14px').style('font-size','13px')
+    .style('color','#e6edf3').style('pointer-events','all').style('backdrop-filter','blur(8px)')
+    .style('min-width','190px').style('z-index','10');
+
+  legDiv.html(`
+    <div style="font-size:12px;font-weight:700;color:#7d8590;margin-bottom:9px;text-transform:uppercase;letter-spacing:.5px">מקרא</div>
+    ${Object.entries(TC).map(([t,c])=>`<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:13px"><div style="width:10px;height:10px;border-radius:50%;background:${c};flex-shrink:0"></div>${t} — ${TL[t]||t}</div>`).join('')}
+    <div style="margin-top:9px;padding-top:9px;border-top:1px solid #30363d">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:13px"><div style="width:12px;height:12px;border-radius:50%;border:2.5px solid #ffd700;flex-shrink:0"></div>Seeder — זורע הנרטיב</div>
+      <div style="display:flex;align-items:center;gap:7px;font-size:13px"><div style="width:12px;height:12px;border-radius:50%;border:2.5px dashed #58a6ff;flex-shrink:0"></div>Amplifier — מגבר</div>
+    </div>
+    <div style="margin-top:9px;padding-top:9px;border-top:1px solid #30363d">
+      <div style="font-size:12px;color:#7d8590;margin-bottom:6px">קשרים:</div>
+      ${Object.entries(NAR_COL).filter(([k])=>k!=='relay').map(([k,c])=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px"><div style="width:18px;height:2px;background:${c};flex-shrink:0"></div>${k}</div>`).join('')}
+    </div>
+    <button id="nv-inauth-btn" style="margin-top:10px;width:100%;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.35);border-radius:6px;padding:5px 8px;color:#ff6b6b;font-family:Heebo;font-size:13px;cursor:pointer">הצג רשתות לא-אותנטיות</button>
+  `);
+
+  document.getElementById('nv-inauth-btn').onclick = () => {
+    showInauth = !showInauth;
+    document.getElementById('nv-inauth-btn').textContent = showInauth ? 'הסתר רשתות לא-אותנטיות' : 'הצג רשתות לא-אותנטיות';
+    document.getElementById('nv-inauth-btn').style.background = showInauth ? 'rgba(255,107,107,0.18)' : 'rgba(255,107,107,0.08)';
+    render();
+  };
+
+  render();
+  svgN.on('click', ()=>{});
+}
+
 // ─── TIMELINE VIEW (multi-layer) ─────────────────────────────────────────────
 function buildTimelineView() {
   const el = document.getElementById('graph');
@@ -2244,41 +2470,52 @@ function buildTimelineView() {
     .attr('y1', y2).attr('y2', y2)
     .attr('stroke', 'rgba(255,255,255,0.06)');
 
-  const maxTrump = d3.max(TRUMP_TWEETS, d => d.count) || 5;
-  const trumpHeight = d3.scaleLinear().domain([0, maxTrump]).range([0, R1 - 12]);
-
   // Tooltip
   const tlTip = d3.select(el).append('div')
     .style('position','absolute').style('display','none')
-    .style('background','var(--surface)').style('border','1px solid var(--border)')
+    .style('background','var(--surface)').style('border','1px solid var(--border2)')
     .style('border-radius','8px').style('padding','10px 14px')
-    .style('font-size','12px').style('font-family','Heebo').style('color','var(--text)')
-    .style('pointer-events','none').style('z-index','50');
+    .style('font-size','14px').style('font-family','Heebo').style('color','var(--text)')
+    .style('pointer-events','none').style('z-index','50').style('max-width','260px').style('line-height','1.6');
 
-  TRUMP_TWEETS.forEach(t => {
+  // Use TRUMP_POSTS from data.js (40 entries) if available, else TRUMP_TWEETS
+  const trumpSource = (typeof TRUMP_POSTS !== 'undefined') ? TRUMP_POSTS : TRUMP_TWEETS.map(t=>({date:t.date,aggression:t.count,topic:t.topics,quote:''}));
+  // Group by day
+  const trumpByDay = {};
+  trumpSource.forEach(p => {
+    const key = (p.date||'').substring(0,10);
+    if (!key || !/^\d{4}-\d{2}-\d{2}$/.test(key)) return;
+    if (!trumpByDay[key]) trumpByDay[key] = {date:key, count:0, maxAgg:0, topics:[], quote:p.quote||''};
+    trumpByDay[key].count++;
+    trumpByDay[key].maxAgg = Math.max(trumpByDay[key].maxAgg, p.aggression||3);
+    (p.topic||[]).forEach(t => trumpByDay[key].topics.push(t));
+  });
+  const trumpBars = Object.values(trumpByDay).sort((a,b)=>a.date.localeCompare(b.date));
+
+  const maxTrump = d3.max(trumpBars, d => d.count) || 5;
+  const trumpHeight = d3.scaleLinear().domain([0, maxTrump]).range([0, R1 - 10]);
+  const aggColor = d3.scaleLinear().domain([1,3,5]).range(['rgba(255,200,80,0.45)','rgba(255,160,40,0.75)','rgba(255,80,40,0.9)']);
+  const barWidth = Math.max(5, (W - marginLeft - marginRight) / 70);
+
+  trumpBars.forEach(t => {
     const tx = x(new Date(t.date));
-    const bh = trumpHeight(t.count);
-    const barWidth = Math.max(4, (W - marginLeft - marginRight) / 56);
-
+    const bh = Math.max(3, trumpHeight(t.count));
     svg2.append('rect')
       .attr('x', tx - barWidth/2).attr('y', y2 - bh)
       .attr('width', barWidth).attr('height', bh)
-      .attr('fill', t.count >= 4 ? 'rgba(255,200,80,0.85)' : 'rgba(255,200,80,0.5)')
+      .attr('fill', aggColor(t.maxAgg))
       .attr('rx', 2).style('cursor','pointer')
       .on('mouseenter', (evt) => {
+        const uniqueTopics = [...new Set(t.topics)].slice(0,4);
         tlTip.style('display','block')
-          .html(`<b>טראמפ · ${t.date}</b><br>ציוצים: ${t.count}<br>נושאים: ${t.topics.join(', ')}`);
+          .html(`<b style="color:#e3b341">טראמפ · ${t.date}</b><br>ציוצים: <b>${t.count}</b> · אגרסיביות: ${t.maxAgg}/5<br>נושאים: ${uniqueTopics.join(', ')}`+(t.quote?`<br><i style="color:#cdd9e5;font-size:13px">"${t.quote.substring(0,80)}…"</i>`:''));
       })
-      .on('mousemove', evt => {
-        tlTip.style('left', (evt.offsetX+12)+'px').style('top', (evt.offsetY-10)+'px');
-      })
+      .on('mousemove', evt => tlTip.style('left',(evt.offsetX+12)+'px').style('top',(evt.offsetY-10)+'px'))
       .on('mouseleave', () => tlTip.style('display','none'));
-
-    if (t.count >= 4) {
+    if (t.maxAgg >= 4) {
       svg2.append('polygon')
-        .attr('points', `${tx-5},${y2+2} ${tx+5},${y2+2} ${tx},${y2+10}`)
-        .attr('fill', 'rgba(255,200,80,0.6)')
-        .attr('pointer-events', 'none');
+        .attr('points',`${tx-5},${y2+2} ${tx+5},${y2+2} ${tx},${y2+10}`)
+        .attr('fill','rgba(255,120,40,0.55)').attr('pointer-events','none');
     }
   });
 
@@ -2311,20 +2548,7 @@ function buildTimelineView() {
     if (rowY === undefined) return;
 
     posts.forEach(p => {
-      // Parse Hebrew date strings to a JS date for x-positioning
-      const raw = p.date || "";
-      const monthMap = {
-        "ינואר":0,"פברואר":1,"מרץ":2,"אפריל":3,"מאי":4,"יוני":5,
-        "יולי":6,"אוגוסט":7,"ספטמבר":8,"אוקטובר":9,"נובמבר":10,"דצמבר":11,
-        "ינו׳":0,"פבר׳":1,"אפ׳":3,"אוג׳":7,"ספט׳":8,"אוק׳":9,"נוב׳":10,"דצמ׳":11,
-        "Jan":0,"Feb":1,"Mar":2,"Apr":3,"May":4,"Jun":5,
-        "Jul":6,"Aug":7,"Sep":8,"Oct":9,"Nov":10,"Dec":11
-      };
-      let dateObj = null;
-      for(const [heb, mon] of Object.entries(monthMap)){
-        const m = raw.match(new RegExp(`(\\d{1,2})\\s*${heb}\\s*(\\d{4})`));
-        if(m){ dateObj = new Date(+m[2], mon, +m[1]); break; }
-      }
+      const dateObj = parseDateStr(p.date || "");
       if(!dateObj) return;
 
       const px = x(dateObj);
@@ -2399,19 +2623,7 @@ function buildTimelineView() {
 
     const byDate = {};
     posts.forEach(p => {
-      const raw = p.date || "";
-      const monthMap = {
-        "ינואר":0,"פברואר":1,"מרץ":2,"אפריל":3,"מאי":4,"יוני":5,
-        "יולי":6,"אוגוסט":7,"ספטמבר":8,"אוקטובר":9,"נובמבר":10,"דצמבר":11,
-        "ינו׳":0,"פבר׳":1,"אפ׳":3,"אוג׳":7,"ספט׳":8,"אוק׳":9,"נוב׳":10,"דצמ׳":11,
-        "Jan":0,"Feb":1,"Mar":2,"Apr":3,"May":4,"Jun":5,
-        "Jul":6,"Aug":7,"Sep":8,"Oct":9,"Nov":10,"Dec":11
-      };
-      let dateObj = null;
-      for(const [heb, mon] of Object.entries(monthMap)){
-        const m2 = raw.match(new RegExp(`(\\d{1,2})\\s*${heb}\\s*(\\d{4})`));
-        if(m2){ dateObj = new Date(+m2[2], mon, +m2[1]); break; }
-      }
+      const dateObj = parseDateStr(p.date || "");
       if(!dateObj) return;
       const key = dateObj.toISOString().substring(0,10);
       (byDate[key] = byDate[key] || []).push({...p, dateObj});
