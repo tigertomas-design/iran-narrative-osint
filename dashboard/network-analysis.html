@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>רשת קשרים — Coordination Network Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="data.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #21262d; --border2: #30363d;
+  --text: #e6edf3; --muted: #7d8590; --muted2: #484f58;
+  --T1: #f85149; --T2: #fb8500; --T3: #388bfd; --T4: #bc8cff; --T5: #3fb950; --T6: #6e7681;
+  --seed-color: #ffd700; --amp-color: #58a6ff; --inauth-color: #ff6b6b;
+  --hormuz: #388bfd; --military: #f85149; --nuclear: #bc8cff; --ceasefire: #3fb950; --sanctions: #fb8500;
+}
+body { background: var(--bg); color: var(--text); font-family: 'Heebo', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── HEADER ── */
+header {
+  display: flex; align-items: center; gap: 12px; padding: 10px 20px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  flex-shrink: 0; flex-wrap: wrap;
+}
+.back-btn {
+  padding: 6px 14px; background: transparent; border: 1px solid var(--border2);
+  color: var(--muted); border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 15px;
+}
+.back-btn:hover { color: var(--text); border-color: var(--text); }
+.hdr-title { font-size: 18px; font-weight: 700; flex: 1; }
+.hdr-sub { font-size: 14px; color: var(--muted); }
+.sep { width: 1px; height: 28px; background: var(--border2); }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex; align-items: center; gap: 8px; padding: 8px 20px;
+  background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap;
+}
+.filter-label { font-size: 14px; color: var(--muted); margin-left: 4px; }
+.filter-btn {
+  padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border2);
+  background: transparent; color: var(--muted); cursor: pointer; font-family: inherit; font-size: 14px;
+  transition: all 0.15s;
+}
+.filter-btn:hover { border-color: var(--text); color: var(--text); }
+.filter-btn.active { color: #0d1117; font-weight: 700; }
+.filter-btn[data-tier="T1"].active { background: var(--T1); border-color: var(--T1); }
+.filter-btn[data-tier="T2"].active { background: var(--T2); border-color: var(--T2); }
+.filter-btn[data-tier="T3"].active { background: var(--T3); border-color: var(--T3); }
+.filter-btn[data-tier="T4"].active { background: var(--T4); border-color: var(--T4); }
+.filter-btn[data-tier="T5"].active { background: var(--T5); border-color: var(--T5); }
+.filter-btn[data-tier="T6"].active { background: var(--T6); border-color: var(--T6); }
+.filter-btn[data-mode].active { background: #238636; border-color: #238636; color: #fff; }
+.mode-btn {
+  padding: 4px 14px; border-radius: 6px; border: 1px solid var(--border2);
+  background: transparent; color: var(--muted); cursor: pointer; font-family: inherit; font-size: 14px;
+  transition: all 0.15s;
+}
+.mode-btn.active { background: #1f2937; border-color: #58a6ff; color: #58a6ff; }
+
+/* ── MAIN LAYOUT ── */
+.main { display: flex; flex: 1; overflow: hidden; }
+#graph-container { flex: 1; position: relative; overflow: hidden; }
+svg#network { width: 100%; height: 100%; }
+
+/* ── SIDE PANEL ── */
+.side-panel {
+  width: 340px; background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;
+}
+.panel-head {
+  padding: 16px 18px 12px; border-bottom: 1px solid var(--border);
+  font-size: 15px; font-weight: 700; color: var(--muted);
+}
+.panel-body { flex: 1; overflow-y: auto; padding: 14px 18px; }
+.panel-body::-webkit-scrollbar { width: 4px; }
+.panel-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.node-card { display: none; }
+.node-card.visible { display: block; }
+.nc-name { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+.nc-meta { font-size: 15px; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
+.nc-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 13px;
+  font-weight: 700; margin-left: 6px; margin-bottom: 8px;
+}
+.nc-section { margin-top: 14px; }
+.nc-section-title { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 700; }
+.nc-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
+.nc-stat-val { font-size: 18px; font-weight: 700; }
+.nc-coord-item { padding: 6px 10px; background: var(--bg); border-radius: 6px; margin-bottom: 5px; font-size: 14px; display: flex; justify-content: space-between; }
+.nc-quote {
+  font-size: 14px; line-height: 1.65; color: #cdd9e5; border-right: 3px solid var(--border2);
+  padding-right: 10px; font-style: italic; direction: ltr; text-align: left; margin-top: 6px;
+}
+.role-seeder { color: var(--seed-color); }
+.role-amplifier { color: var(--amp-color); }
+.role-unknown { color: var(--muted); }
+
+.placeholder-msg { color: var(--muted); font-size: 16px; line-height: 1.7; text-align: center; padding: 40px 20px; }
+
+/* ── LEGEND ── */
+.legend {
+  position: absolute; bottom: 16px; right: 16px;
+  background: rgba(22,27,34,0.92); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 14px 16px; backdrop-filter: blur(8px);
+  font-size: 14px; min-width: 200px;
+}
+.legend-title { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; color: var(--text); }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.legend-line { width: 24px; height: 3px; flex-shrink: 0; border-radius: 2px; }
+.legend-dash { width: 24px; height: 0; border-top: 3px dashed; flex-shrink: 0; }
+
+/* ── STATS BAR ── */
+.stats-bar {
+  display: flex; align-items: center; gap: 28px; padding: 8px 20px;
+  background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.stat-item { text-align: center; }
+.stat-num { font-size: 22px; font-weight: 900; }
+.stat-lbl { font-size: 12px; color: var(--muted); }
+
+/* ── TOOLTIP ── */
+.tooltip {
+  position: fixed; background: rgba(22,27,34,0.97); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 12px 16px; pointer-events: none; font-size: 14px;
+  max-width: 280px; z-index: 100; opacity: 0; transition: opacity 0.15s; line-height: 1.6;
+}
+.tt-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.tt-row { color: var(--muted); }
+.tt-row strong { color: var(--text); }
+
+/* ── CAMPAIGN BANNER ── */
+.campaign-banner {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,215,0,0.12); border: 1px solid rgba(255,215,0,0.35);
+  border-radius: 8px; padding: 6px 18px; font-size: 14px; color: #ffd700;
+  pointer-events: none; display: none;
+}
+
+/* ── SCROLL for panel ── */
+.panel-scroll { overflow-y: auto; flex: 1; }
+
+/* ── NODE STYLES in SVG (via CSS) ── */
+.node circle { cursor: pointer; transition: filter 0.15s; }
+.node circle:hover { filter: brightness(1.3); }
+.node.selected circle { filter: brightness(1.5) drop-shadow(0 0 8px currentColor); }
+.link { stroke-opacity: 0.55; }
+.link.inauth { stroke-opacity: 0.35; }
+.node-label { font-family: 'Heebo', sans-serif; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" onclick="location.href='home.html'">← בית</button>
+  <div class="hdr-title">רשת קשרים — Coordination Network</div>
+  <div class="hdr-sub">זרעים · מגברים · השפעה ויראלית</div>
+  <div class="sep"></div>
+  <span style="font-size:13px;color:var(--muted)" id="node-count-badge"></span>
+</header>
+
+<div class="filter-bar">
+  <span class="filter-label">Tier:</span>
+  <button class="filter-btn active" data-tier="all" onclick="filterTier('all',this)">הכל</button>
+  <button class="filter-btn" data-tier="T1" onclick="filterTier('T1',this)">T1 מנהיגות</button>
+  <button class="filter-btn" data-tier="T2" onclick="filterTier('T2',this)">T2 ממשלה</button>
+  <button class="filter-btn" data-tier="T3" onclick="filterTier('T3',this)">T3 שגרירויות</button>
+  <button class="filter-btn" data-tier="T4" onclick="filterTier('T4',this)">T4 מדיה</button>
+  <button class="filter-btn" data-tier="T5" onclick="filterTier('T5',this)">T5 פרטים</button>
+  <button class="filter-btn" data-tier="T6" onclick="filterTier('T6',this)">T6 פרוקסי</button>
+  <div class="sep"></div>
+  <span class="filter-label">תצוגה:</span>
+  <button class="mode-btn active" id="mode-coord" onclick="setMode('coord')">קואורדינציה</button>
+  <button class="mode-btn" id="mode-reach" onclick="setMode('reach')">השפעה ויראלית</button>
+  <button class="mode-btn" id="mode-cascade" onclick="setMode('cascade')">Cascade מפתחות הורמוז</button>
+  <div class="sep"></div>
+  <button class="mode-btn" id="btn-inauth" onclick="toggleInauth()" style="border-color:#ff6b6b;color:#ff6b6b">
+    הצג רשתות לא-אותנטיות
+  </button>
+</div>
+
+<div class="main">
+  <!-- Side panel -->
+  <div class="side-panel">
+    <div class="panel-head">פרטי צומת</div>
+    <div class="panel-body" id="side-panel-body">
+      <div class="placeholder-msg" id="panel-placeholder">
+        לחץ על חשבון ברשת לפרטים מלאים:<br><br>
+        ● גודל הצומת = השפעה ויראלית<br>
+        ● צבע הצומת = רמת Tier<br>
+        ● טבעת זהב = <strong style="color:var(--seed-color)">Seeder</strong><br>
+        ● טבעת כחולה = <strong style="color:var(--amp-color)">Amplifier</strong><br>
+        ● קו מלא = קואורדינציה ישירה<br>
+        ● קו מקווקו = קואורדינציה משוערת
+      </div>
+      <div class="node-card" id="node-card"></div>
+    </div>
+  </div>
+
+  <!-- Graph -->
+  <div id="graph-container">
+    <svg id="network"></svg>
+    <div class="campaign-banner" id="campaign-banner">🔑 Cascade: מפתחות הורמוז — Apr 5–7</div>
+    <div class="legend" id="legend">
+      <div class="legend-title">מקרא</div>
+      <div class="legend-row"><div class="legend-dot" style="background:var(--T1)"></div> T1 — מנהיגות עליאמה</div>
+      <div class="legend-row"><div class="legend-dot" style="background:var(--T2)"></div> T2 — ממשלה / MFA</div>
+      <div class="legend-row"><div class="legend-dot" style="background:var(--T3)"></div> T3 — שגרירויות</div>
+      <div class="legend-row"><div class="legend-dot" style="background:var(--T4)"></div> T4 — מדיה ממלכתית</div>
+      <div class="legend-row"><div class="legend-dot" style="background:var(--T5)"></div> T5 — משפיענים</div>
+      <div class="legend-row"><div class="legend-dot" style="background:var(--T6)"></div> T6 — פרוקסי</div>
+      <div style="margin-top:10px;border-top:1px solid var(--border2);padding-top:10px;">
+        <div class="legend-row"><div style="width:14px;height:14px;border-radius:50%;border:3px solid var(--seed-color);flex-shrink:0"></div> Seeder (זורע)</div>
+        <div class="legend-row"><div style="width:14px;height:14px;border-radius:50%;border:3px solid var(--amp-color);flex-shrink:0"></div> Amplifier (מגבר)</div>
+        <div class="legend-row"><div class="legend-line" style="background:rgba(255,255,255,0.4)"></div> קואורדינציה מאומתת</div>
+        <div class="legend-row"><div class="legend-dash" style="border-color:rgba(255,255,255,0.25)"></div> קואורדינציה משוערת</div>
+        <div class="legend-row"><div class="legend-line" style="background:var(--inauth-color)"></div> הגברה לא-אותנטית</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num" id="s-nodes" style="color:#58a6ff">—</div><div class="stat-lbl">חשבונות</div></div>
+  <div class="stat-item"><div class="stat-num" id="s-edges" style="color:#3fb950">—</div><div class="stat-lbl">קשרי קואורדינציה</div></div>
+  <div class="stat-item"><div class="stat-num" id="s-seeders" style="color:var(--seed-color)">—</div><div class="stat-lbl">Seeders</div></div>
+  <div class="stat-item"><div class="stat-num" id="s-amps" style="color:var(--amp-color)">—</div><div class="stat-lbl">Amplifiers</div></div>
+  <div class="stat-item"><div class="stat-num" id="s-views" style="color:#bc8cff">900M+</div><div class="stat-lbl">צפיות מוערכות</div></div>
+  <div class="stat-item"><div class="stat-num" id="s-inauth" style="color:var(--inauth-color)">41</div><div class="stat-lbl">חשבונות לא-אותנטיים</div></div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ── TIER COLORS ───────────────────────────────────────────────────────────────
+const TC = { T1:"#f85149", T2:"#fb8500", T3:"#388bfd", T4:"#bc8cff", T5:"#3fb950", T6:"#6e7681" };
+const NAR_COLORS = { "hormuz":"#388bfd","military-threat":"#f85149","nuclear-threat":"#bc8cff","ceasefire":"#3fb950","sanctions":"#fb8500","pro-israel":"#e3b341","regime-change":"#ff9500" };
+
+// ── BUILD GRAPH DATA ──────────────────────────────────────────────────────────
+// Nodes from ACCOUNTS in data.js
+const rawNodes = ACCOUNTS.filter(a => a.id.startsWith('@')).map(a => ({
+  id: a.id, tier: a.tier, type: a.type, lang: a.lang, country: a.country,
+  region: a.region, status: a.status, notes: a.notes, conf: a.conf,
+  role: null,       // seeder / amplifier / relay / null
+  views: 0,         // total reach
+  coord_score: 0,   // number of confirmed coordination links
+  campaigns: []
+}));
+
+// Deduplicate by id (ACCOUNTS has some dupes)
+const nodesMap = {};
+rawNodes.forEach(n => { if (!nodesMap[n.id]) nodesMap[n.id] = n; });
+const nodes = Object.values(nodesMap);
+
+// ── ENGAGEMENT DATA ───────────────────────────────────────────────────────────
+const engagementMap = {};
+VIRAL_POSTS.forEach(p => {
+  const key = p.account;
+  if (!engagementMap[key]) engagementMap[key] = 0;
+  engagementMap[key] += (p.views || 0);
+});
+// Assign views
+nodes.forEach(n => { n.views = engagementMap[n.id] || 0; });
+
+// ── COORDINATION EDGES ────────────────────────────────────────────────────────
+const rawEdges = [];
+
+// From CAMPAIGNS in data.js
+// keys_to_hormuz cascade: Zimbabwe → SA → Bulgaria → Zimbabwe (full circle)
+rawEdges.push({ source:"@IraninZimbabwe", target:"@IraninSA",       type:"coord", campaign:"keys_to_hormuz", narrative:"hormuz",   confirmed:true,  weight:3 });
+rawEdges.push({ source:"@IraninSA",       target:"@IRANinBULGARIA", type:"coord", campaign:"keys_to_hormuz", narrative:"hormuz",   confirmed:true,  weight:2 });
+rawEdges.push({ source:"@IraninZimbabwe", target:"@IRANinBULGARIA", type:"coord", campaign:"keys_to_hormuz", narrative:"hormuz",   confirmed:true,  weight:2 });
+rawEdges.push({ source:"@IraninZimbabwe", target:"@Iran_in_UK",     type:"coord", campaign:"keys_to_hormuz", narrative:"hormuz",   confirmed:false, weight:1 });
+rawEdges.push({ source:"@IraninZimbabwe", target:"@EmbassyofIrtoRF",type:"coord", campaign:"keys_to_hormuz", narrative:"hormuz",   confirmed:false, weight:1 });
+rawEdges.push({ source:"@IraninZimbabwe", target:"@IRANinTJ",       type:"coord", campaign:"keys_to_hormuz", narrative:"hormuz",   confirmed:false, weight:1 });
+rawEdges.push({ source:"@IraninZimbabwe", target:"@IraninAlgeria",  type:"coord", campaign:"keys_to_hormuz", narrative:"hormuz",   confirmed:false, weight:1 });
+rawEdges.push({ source:"@IraninZimbabwe", target:"@IRANinKENYA",    type:"coord", campaign:"keys_to_hormuz", narrative:"hormuz",   confirmed:false, weight:1 });
+
+// Pirates of Hormuz
+rawEdges.push({ source:"@IraninSA",       target:"@IraninZimbabwe", type:"coord", campaign:"pirates",        narrative:"hormuz",   confirmed:true,  weight:2 });
+
+// Africa bloc coordination
+const africaBloc = ["@IraninZimbabwe","@IraninSA","@IRANinKENYA","@IRANinETHIOPIA","@IraninAlgeria","@IranNigeria"];
+for (let i = 0; i < africaBloc.length; i++) {
+  for (let j = i+1; j < africaBloc.length; j++) {
+    if (africaBloc[i] !== "@IraninZimbabwe" || africaBloc[j] !== "@IraninSA") {
+      rawEdges.push({ source:africaBloc[i], target:africaBloc[j], type:"coord", campaign:"africa_iw", narrative:"hormuz", confirmed:false, weight:1 });
+    }
+  }
+}
+
+// State media relay chain: IRNA → PressTV → Tasnim → Fars
+rawEdges.push({ source:"@IrnaEnglish",    target:"@PressTV",        type:"relay", narrative:"nuclear-threat", confirmed:true,  weight:3 });
+rawEdges.push({ source:"@PressTV",        target:"@Tasnimnews_EN",  type:"relay", narrative:"military-threat",confirmed:true,  weight:3 });
+rawEdges.push({ source:"@Tasnimnews_EN",  target:"@EnglishFars",    type:"relay", narrative:"military-threat",confirmed:true,  weight:2 });
+rawEdges.push({ source:"@PressTV",        target:"@AlMayadeenNews", type:"relay", narrative:"hormuz",          confirmed:true,  weight:2 });
+rawEdges.push({ source:"@Tasnimnews_EN",  target:"@Tasnimnews_Fa",  type:"relay", narrative:"military-threat",confirmed:true,  weight:2 });
+
+// Government → Media relay
+rawEdges.push({ source:"@IRIMFA_SPOX",   target:"@IrnaEnglish",    type:"relay", narrative:"nuclear-threat", confirmed:true,  weight:3 });
+rawEdges.push({ source:"@IRIMFA_SPOX",   target:"@PressTV",        type:"relay", narrative:"nuclear-threat", confirmed:true,  weight:3 });
+rawEdges.push({ source:"@araghchi",      target:"@IrnaEnglish",    type:"relay", narrative:"ceasefire",      confirmed:true,  weight:3 });
+rawEdges.push({ source:"@araghchi",      target:"@PressTV",        type:"relay", narrative:"ceasefire",      confirmed:true,  weight:2 });
+rawEdges.push({ source:"@IRIMFA_EN",     target:"@IrnaEnglish",    type:"relay", narrative:"nuclear-threat", confirmed:true,  weight:2 });
+rawEdges.push({ source:"@Iran_GOV",      target:"@IRIMFA_SPOX",    type:"relay", narrative:"sovereignty",    confirmed:true,  weight:2 });
+
+// Tasnim attacked Araghchi — coordination failure (shown as tension edge)
+rawEdges.push({ source:"@Tasnimnews_EN", target:"@araghchi",       type:"conflict", narrative:"hormuz",    confirmed:true,  weight:2 });
+
+// Proxy network
+rawEdges.push({ source:"@AlMayadeenNews",target:"@MayadeenEnglish",type:"relay", narrative:"hormuz",        confirmed:true,  weight:2 });
+rawEdges.push({ source:"@PressTV",       target:"@MayadeenEnglish",type:"relay", narrative:"military-threat",confirmed:false,weight:1 });
+
+// HispanTV LatAm coordination
+rawEdges.push({ source:"@HispanTV",      target:"@hispantv_brasil", type:"relay", narrative:"sanctions",    confirmed:true,  weight:2 });
+rawEdges.push({ source:"@HispanTV",      target:"@IRANINARGENTINA", type:"coord", narrative:"sanctions",    confirmed:false, weight:1 });
+rawEdges.push({ source:"@HispanTV",      target:"@Eiranencaracas",  type:"coord", narrative:"sanctions",    confirmed:false, weight:1 });
+
+// Leadership → Government relay (now Mojtaba-era)
+rawEdges.push({ source:"@drpezeshkian", target:"@araghchi",        type:"relay", narrative:"sovereignty",   confirmed:true,  weight:2 });
+rawEdges.push({ source:"@drpezeshkian", target:"@IRIMFA_SPOX",    type:"relay", narrative:"sovereignty",   confirmed:true,  weight:2 });
+rawEdges.push({ source:"@IRIran_Military",target:"@Tasnimnews_EN", type:"relay", narrative:"military-threat",confirmed:true, weight:2 });
+
+// Individual expert amplifier
+rawEdges.push({ source:"@s_m_marandi",  target:"@PressTV",         type:"relay", narrative:"nuclear-threat",confirmed:true,  weight:2 });
+rawEdges.push({ source:"@s_m_marandi",  target:"@AlMayadeenNews",  type:"relay", narrative:"nuclear-threat",confirmed:false, weight:1 });
+
+// ── INAUTHENTIC NETWORKS ──────────────────────────────────────────────────────
+// Represented as special nodes
+const inauthNodes = [
+  { id:"BRICS4CLICKS", tier:"IX", type:"inauthentic", lang:"multi", country:"unknown", region:"Global", status:"active", notes:"23 حشبонות. 772M+ צפיות. IRGC-linked. רכשו check כחול פבר-מרץ 2026.", views:772000000, coord_score:0, campaigns:["keys_to_hormuz","africa_iw"], role:"amplifier" },
+  { id:"Verified4War",  tier:"IX", type:"inauthentic", lang:"multi", country:"South Asia", region:"Global", status:"active", notes:"18 חשבונות. 82% רכשו check כחול. דרום אסיה/דרום-מזרח אסיה.", views:370000000, coord_score:0, campaigns:["keys_to_hormuz"], role:"amplifier" },
+  { id:"Clemson_Network",tier:"IX",type:"inauthentic", lang:"EN/ES", country:"Europe", region:"Global", status:"active", notes:"61 חשבונות. מתחזים לאמריקאים/בריטים. תמונות AI. 'Iran Android App'.", views:50000000, coord_score:0, campaigns:["africa_iw"], role:"amplifier" },
+];
+
+// Inauthentic → verified amplification edges
+const inauthEdges = [
+  { source:"BRICS4CLICKS",   target:"@IraninZimbabwe", type:"inauth", narrative:"hormuz",          confirmed:true,  weight:4 },
+  { source:"BRICS4CLICKS",   target:"@IraninSA",       type:"inauth", narrative:"hormuz",          confirmed:true,  weight:4 },
+  { source:"BRICS4CLICKS",   target:"@PressTV",        type:"inauth", narrative:"military-threat", confirmed:true,  weight:3 },
+  { source:"Verified4War",   target:"@IraninZimbabwe", type:"inauth", narrative:"hormuz",          confirmed:true,  weight:3 },
+  { source:"Verified4War",   target:"@IraninSA",       type:"inauth", narrative:"hormuz",          confirmed:true,  weight:3 },
+  { source:"Clemson_Network",target:"@IraninSA",       type:"inauth", narrative:"hormuz",          confirmed:false, weight:2 },
+  { source:"Clemson_Network",target:"@PressTV",        type:"inauth", narrative:"military-threat", confirmed:false, weight:2 },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let showInauth = false;
+let currentMode = 'coord';
+let activeTier = 'all';
+let simulation = null;
+let selectedNode = null;
+let cascadeStep = 0;
+let cascadeTimer = null;
+
+// Assign roles based on edges
+const seederIds = new Set(["@IraninZimbabwe","@IRIMFA_SPOX","@araghchi","@IrnaEnglish","@drpezeshkian"]);
+const amplifierIds = new Set(["@IraninSA","@IRANinBULGARIA","@Iran_in_UK","@EmbassyofIrtoRF","@IRANinTJ",
+  "@PressTV","@Tasnimnews_EN","@EnglishFars","@AlMayadeenNews","@MayadeenEnglish",
+  "@HispanTV","@hispantv_brasil","@IRANINARGENTINA","@s_m_marandi"]);
+
+nodes.forEach(n => {
+  if (seederIds.has(n.id)) n.role = 'seeder';
+  else if (amplifierIds.has(n.id)) n.role = 'amplifier';
+  else n.role = null;
+  // coord score = number of edges touching this node
+  n.coord_score = rawEdges.filter(e => e.source === n.id || e.target === n.id).length;
+  // campaigns
+  const myCampaigns = new Set();
+  rawEdges.filter(e => e.source === n.id || e.target === n.id).forEach(e => { if (e.campaign) myCampaigns.add(e.campaign); });
+  n.campaigns = [...myCampaigns];
+});
+
+inauthNodes.forEach(n => { n.coord_score = inauthEdges.filter(e => e.source === n.id).length; });
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function getActiveNodes() {
+  let ns = [...nodes];
+  if (activeTier !== 'all') ns = ns.filter(n => n.tier === activeTier);
+  if (showInauth) ns = [...ns, ...inauthNodes];
+  return ns;
+}
+
+function getActiveEdges(activeNodes) {
+  const ids = new Set(activeNodes.map(n => n.id));
+  let es = rawEdges.filter(e => ids.has(e.source) && ids.has(e.target));
+  if (showInauth) {
+    const inEs = inauthEdges.filter(e => ids.has(e.source) && ids.has(e.target));
+    es = [...es, ...inEs];
+  }
+  return es;
+}
+
+function nodeRadius(d) {
+  if (currentMode === 'reach') {
+    if (d.views > 1000000) return Math.min(50, 10 + Math.sqrt(d.views) / 3500);
+    return 8 + d.coord_score * 1.5;
+  }
+  return 8 + d.coord_score * 1.5 + (d.views > 0 ? 4 : 0);
+}
+
+function nodeColor(d) {
+  if (d.type === 'inauthentic') return '#ff6b6b';
+  if (d.status === 'inactive') return '#333';
+  return TC[d.tier] || '#6e7681';
+}
+
+function edgeColor(d) {
+  if (d.type === 'inauth') return '#ff6b6b';
+  if (d.type === 'conflict') return '#f85149';
+  return NAR_COLORS[d.narrative] || 'rgba(255,255,255,0.2)';
+}
+
+function edgeWidth(d) {
+  if (d.type === 'inauth') return 1.5;
+  return 0.8 + (d.weight || 1) * 0.6;
+}
+
+let svgEl, g, linkGroup, nodeGroup, labelGroup;
+let zoom;
+
+function initSVG() {
+  svgEl = d3.select('#network');
+  svgEl.selectAll('*').remove();
+
+  zoom = d3.zoom().scaleExtent([0.15, 4]).on('zoom', e => g.attr('transform', e.transform));
+  svgEl.call(zoom);
+
+  g = svgEl.append('g');
+  // Defs for glow
+  const defs = svgEl.append('defs');
+  const glow = defs.append('filter').attr('id','glow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+  glow.append('feGaussianBlur').attr('stdDeviation','4').attr('result','blur');
+  const merge = glow.append('feMerge');
+  merge.append('feMergeNode').attr('in','blur');
+  merge.append('feMergeNode').attr('in','SourceGraphic');
+
+  const seedGlow = defs.append('filter').attr('id','seed-glow').attr('x','-80%').attr('y','-80%').attr('width','360%').attr('height','360%');
+  seedGlow.append('feGaussianBlur').attr('stdDeviation','8').attr('result','blur');
+  const merge2 = seedGlow.append('feMerge');
+  merge2.append('feMergeNode').attr('in','blur');
+  merge2.append('feMergeNode').attr('in','SourceGraphic');
+
+  const arrow = defs.append('marker').attr('id','arrow').attr('markerWidth',8).attr('markerHeight',8).attr('refX',18).attr('refY',3).attr('orient','auto');
+  arrow.append('path').attr('d','M0,0 L0,6 L8,3 z').attr('fill','rgba(255,255,255,0.3)');
+
+  linkGroup  = g.append('g').attr('class','links');
+  nodeGroup  = g.append('g').attr('class','nodes');
+  labelGroup = g.append('g').attr('class','labels');
+}
+
+function buildGraph() {
+  if (cascadeTimer) { clearInterval(cascadeTimer); cascadeTimer = null; }
+  document.getElementById('campaign-banner').style.display = 'none';
+
+  initSVG();
+  const W = document.getElementById('graph-container').clientWidth;
+  const H = document.getElementById('graph-container').clientHeight;
+
+  const activeNodes = getActiveNodes();
+  const activeEdges = getActiveEdges(activeNodes);
+
+  // Clone to avoid mutation
+  const simNodes = activeNodes.map(d => ({...d}));
+  const idToSim = {};
+  simNodes.forEach(n => { idToSim[n.id] = n; });
+  const simEdges = activeEdges.map(e => ({ ...e, source: idToSim[e.source] || e.source, target: idToSim[e.target] || e.target })).filter(e => e.source && e.target);
+
+  // Update stats
+  const seeders = simNodes.filter(n => n.role === 'seeder').length;
+  const amps = simNodes.filter(n => n.role === 'amplifier').length;
+  document.getElementById('s-nodes').textContent = simNodes.length;
+  document.getElementById('s-edges').textContent = simEdges.filter(e => e.type !== 'inauth').length;
+  document.getElementById('s-seeders').textContent = seeders;
+  document.getElementById('s-amps').textContent = amps;
+  document.getElementById('node-count-badge').textContent = `${simNodes.length} חשבונות · ${simEdges.length} קשרים`;
+
+  // Force cluster by tier
+  const tierCenters = {
+    T1: { x: W*0.5, y: H*0.18 },
+    T2: { x: W*0.5, y: H*0.35 },
+    T3: { x: W*0.5, y: H*0.65 },
+    T4: { x: W*0.3, y: H*0.5  },
+    T5: { x: W*0.7, y: H*0.35 },
+    T6: { x: W*0.2, y: H*0.7  },
+    IX: { x: W*0.85, y: H*0.6 },
+  };
+
+  simulation = d3.forceSimulation(simNodes)
+    .force('link', d3.forceLink(simEdges).id(d => d.id).distance(d => {
+      if (d.type === 'inauth') return 120;
+      if (d.confirmed) return 60 + (5 - (d.weight||1)) * 15;
+      return 100;
+    }).strength(d => d.confirmed ? 0.4 : 0.15))
+    .force('charge', d3.forceManyBody().strength(d => -200 - nodeRadius(d) * 8))
+    .force('collision', d3.forceCollide().radius(d => nodeRadius(d) + 12))
+    .force('x', d3.forceX(d => (tierCenters[d.tier] || {x:W*0.5}).x).strength(0.08))
+    .force('y', d3.forceY(d => (tierCenters[d.tier] || {y:H*0.5}).y).strength(0.08))
+    .force('center', d3.forceCenter(W*0.5, H*0.5).strength(0.02))
+    .alphaDecay(0.025);
+
+  // Draw links
+  const link = linkGroup.selectAll('line').data(simEdges).join('line')
+    .attr('class', d => 'link' + (d.type === 'inauth' ? ' inauth' : ''))
+    .attr('stroke', d => edgeColor(d))
+    .attr('stroke-width', d => edgeWidth(d))
+    .attr('stroke-dasharray', d => d.confirmed ? 'none' : '5,4')
+    .attr('marker-end', d => d.type === 'relay' ? 'url(#arrow)' : 'none')
+    .attr('opacity', d => d.type === 'inauth' ? (showInauth ? 0.4 : 0) : (d.confirmed ? 0.7 : 0.35));
+
+  // Draw nodes
+  const node = nodeGroup.selectAll('g.node').data(simNodes, d => d.id).join('g')
+    .attr('class', 'node')
+    .call(d3.drag()
+      .on('start', (e,d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+      .on('drag',  (e,d) => { d.fx=e.x; d.fy=e.y; })
+      .on('end',   (e,d) => { if (!e.active) simulation.alphaTarget(0); d.fx=null; d.fy=null; })
+    )
+    .on('click', (e,d) => { e.stopPropagation(); selectNode(d, node); })
+    .on('mousemove', (e,d) => showTooltip(e,d))
+    .on('mouseleave', hideTooltip);
+
+  // Role ring (outer)
+  node.append('circle')
+    .attr('r', d => nodeRadius(d) + 5)
+    .attr('fill', 'none')
+    .attr('stroke', d => d.role === 'seeder' ? '#ffd700' : d.role === 'amplifier' ? '#58a6ff' : 'transparent')
+    .attr('stroke-width', d => d.role ? 2.5 : 0)
+    .attr('stroke-dasharray', d => d.role === 'amplifier' ? '4,3' : 'none')
+    .attr('opacity', 0.85);
+
+  // Main circle
+  node.append('circle')
+    .attr('r', d => nodeRadius(d))
+    .attr('fill', d => nodeColor(d))
+    .attr('fill-opacity', d => d.status === 'inactive' ? 0.3 : 0.85)
+    .attr('stroke', d => d3.color(nodeColor(d)) ? d3.color(nodeColor(d)).brighter(0.5) : '#fff')
+    .attr('stroke-width', 1.5)
+    .attr('filter', d => d.role === 'seeder' && d.views > 100000 ? 'url(#glow)' : 'none');
+
+  // Reach halo (for viral posts mode)
+  if (currentMode === 'reach') {
+    node.filter(d => d.views > 500000)
+      .append('circle')
+      .attr('r', d => nodeRadius(d) + 15 + Math.sqrt(d.views)/8000)
+      .attr('fill', d => nodeColor(d))
+      .attr('fill-opacity', 0.06)
+      .attr('stroke', 'none');
+  }
+
+  // Views label for reach mode
+  if (currentMode === 'reach') {
+    node.filter(d => d.views > 500000)
+      .append('text')
+      .attr('text-anchor', 'middle')
+      .attr('dy', d => -(nodeRadius(d) + 8))
+      .attr('font-size', '12px')
+      .attr('font-family', 'Heebo, sans-serif')
+      .attr('fill', '#ffd700')
+      .attr('font-weight', '700')
+      .text(d => d.views >= 1000000 ? (d.views/1000000).toFixed(1)+'M' : (d.views/1000).toFixed(0)+'K');
+  }
+
+  // Node label
+  const labelThreshold = activeTier === 'all' ? 3 : 0;
+  labelGroup.selectAll('text').data(simNodes.filter(d => d.coord_score >= labelThreshold || d.role === 'seeder' || d.views > 500000), d => d.id)
+    .join('text')
+    .attr('class', 'node-label')
+    .attr('text-anchor', 'middle')
+    .attr('font-size', '12px')
+    .attr('fill', '#cdd9e5')
+    .attr('dy', d => nodeRadius(d) + 14)
+    .text(d => d.id.replace('@',''));
+
+  // Tick
+  simulation.on('tick', () => {
+    link
+      .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+    labelGroup.selectAll('text').attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+
+  svgEl.on('click', () => { deselectNode(node); });
+}
+
+// ── CASCADE MODE ──────────────────────────────────────────────────────────────
+const cascadeSteps = [
+  { date:'Apr 5 ~08:00', account:'@IraninZimbabwe', text:"We've lost the keys.", role:'seeder', color:'#ffd700' },
+  { date:'Apr 5 ~09:30', account:'@IraninSA',       text:"Shh… the key's under the flowerpot. Just open for friends.", role:'amplifier', color:'#58a6ff' },
+  { date:'Apr 5 ~11:00', account:'@IRANinBULGARIA', text:"Doors open for friends. Epstein's friends need keys.", role:'amplifier', color:'#58a6ff' },
+  { date:'Apr 5 ~14:00', account:'@Iran_in_UK',      text:"Joins Hormuz meme campaign.", role:'amplifier', color:'#58a6ff' },
+  { date:'Apr 5 ~18:00', account:'@EmbassyofIrtoRF', text:"Moscow embassy amplifies campaign.", role:'amplifier', color:'#58a6ff' },
+  { date:'Apr 5 ~22:00', account:'BRICS4CLICKS',      text:"23 inauthentic accounts amplify to 772M+ reach.", role:'inauth', color:'#ff6b6b' },
+  { date:'Apr 6',        account:'@IRANinTJ',         text:"Tajikistan embassy joins.", role:'amplifier', color:'#58a6ff' },
+  { date:'Apr 7 ~10:00', account:'@IraninZimbabwe',   text:"We found the keys. @IraninSA — 1.9M views", role:'seeder', color:'#ffd700' },
+];
+
+function runCascade() {
+  document.getElementById('campaign-banner').style.display = 'block';
+  if (cascadeTimer) clearInterval(cascadeTimer);
+  cascadeStep = 0;
+
+  // Highlight nodes progressively
+  const allNodeEls = nodeGroup.selectAll('g.node');
+  allNodeEls.selectAll('circle:last-of-type').attr('fill-opacity', 0.15);
+
+  function step() {
+    if (cascadeStep >= cascadeSteps.length) { clearInterval(cascadeTimer); return; }
+    const cs = cascadeSteps[cascadeStep];
+    const banner = document.getElementById('campaign-banner');
+    banner.innerHTML = `🔑 ${cs.date} · <strong style="color:${cs.color}">${cs.account}</strong> · ${cs.role === 'inauth' ? '⚠ ' : ''}${cs.text}`;
+
+    allNodeEls.each(function(d) {
+      if (d.id === cs.account) {
+        d3.select(this).selectAll('circle')
+          .transition().duration(400)
+          .attr('fill-opacity', 1)
+          .attr('filter', 'url(#seed-glow)');
+      }
+    });
+    cascadeStep++;
+  }
+  step();
+  cascadeTimer = setInterval(step, 2200);
+}
+
+// ── INTERACTION ───────────────────────────────────────────────────────────────
+function selectNode(d, nodeEls) {
+  selectedNode = d;
+  nodeEls.classed('selected', n => n.id === d.id);
+
+  const card = document.getElementById('node-card');
+  document.getElementById('panel-placeholder').style.display = 'none';
+  card.classList.add('visible');
+
+  const col = nodeColor(d);
+  const roleLabel = d.role === 'seeder' ? `<span class="role-seeder">● Seeder (זורע)</span>` :
+                    d.role === 'amplifier' ? `<span class="role-amplifier">● Amplifier (מגבר)</span>` :
+                    `<span class="role-unknown">● לא מסווג</span>`;
+
+  const tierLabel = d.tier === 'IX' ? 'רשת לא-אותנטית' :
+    { T1:'T1 — מנהיגות', T2:'T2 — ממשלה', T3:'T3 — שגרירות', T4:'T4 — מדיה', T5:'T5 — משפיע', T6:'T6 — פרוקסי' }[d.tier] || d.tier;
+
+  const statusBadge = d.status === 'inactive' ? '<span class="nc-badge" style="background:#333;color:#999">לא פעיל (נהרג פבר 2026)</span>' :
+    d.status === 'suspended' ? '<span class="nc-badge" style="background:#f85149;color:#fff">מושעה</span>' :
+    '<span class="nc-badge" style="background:#238636;color:#fff">פעיל</span>';
+
+  const viewsStr = d.views >= 1000000 ? (d.views/1000000).toFixed(1)+'M' : d.views > 0 ? (d.views/1000).toFixed(0)+'K' : '—';
+
+  // Find coordination partners
+  const partners = rawEdges
+    .filter(e => e.source === d.id || e.target === d.id)
+    .map(e => ({ other: e.source === d.id ? e.target : e.source, type: e.type, confirmed: e.confirmed, narrative: e.narrative, campaign: e.campaign }));
+
+  const coordHtml = partners.length > 0
+    ? partners.map(p => `<div class="nc-coord-item">
+        <span style="color:${NAR_COLORS[p.narrative]||'#7d8590'}">${p.other}</span>
+        <span style="color:var(--muted);font-size:12px">${p.confirmed ? '✓' : '~'} ${p.campaign||p.type}</span>
+      </div>`).join('')
+    : '<div style="color:var(--muted);font-size:14px">אין קשרי קואורדינציה מתועדים</div>';
+
+  // Viral posts for this account
+  const myPosts = VIRAL_POSTS.filter(p => p.account === d.id);
+  const postsHtml = myPosts.length > 0
+    ? myPosts.map(p => `<div class="nc-section">
+        <div style="font-size:13px;color:var(--muted)">${p.date}</div>
+        <div class="nc-quote">${p.text}</div>
+        <div style="font-size:14px;color:#ffd700;margin-top:4px">${p.views ? (p.views/1000000).toFixed(1)+'M' : ''} צפיות${p.likes ? ' · '+p.likes.toLocaleString()+' לייקים' : ''}</div>
+      </div>`).join('')
+    : '';
+
+  card.innerHTML = `
+    <div class="nc-name" style="color:${col}">${d.id}</div>
+    <div class="nc-meta">${tierLabel} · ${d.lang || ''} · ${d.country || ''}</div>
+    ${statusBadge}
+    <div style="margin-top:2px">${roleLabel}</div>
+    <div class="nc-section">
+      <div class="nc-section-title">מדדים</div>
+      <div class="nc-stat-row"><span>קשרי קואורדינציה</span><span class="nc-stat-val" style="color:${col}">${d.coord_score}</span></div>
+      <div class="nc-stat-row"><span>צפיות מוערכות</span><span class="nc-stat-val" style="color:#ffd700">${viewsStr}</span></div>
+      <div class="nc-stat-row"><span>קמפיינים</span><span class="nc-stat-val" style="color:var(--muted);font-size:14px">${d.campaigns.length > 0 ? d.campaigns.join(', ') : '—'}</span></div>
+    </div>
+    <div class="nc-section">
+      <div class="nc-section-title">קואורדינציה עם (${partners.length})</div>
+      ${coordHtml}
+    </div>
+    ${postsHtml ? `<div class="nc-section"><div class="nc-section-title">פוסטים ויראליים</div>${postsHtml}</div>` : ''}
+    <div class="nc-section">
+      <div class="nc-section-title">הערות</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.6">${d.notes || '—'}</div>
+    </div>
+  `;
+}
+
+function deselectNode(nodeEls) {
+  selectedNode = null;
+  nodeEls.classed('selected', false);
+  document.getElementById('node-card').classList.remove('visible');
+  document.getElementById('panel-placeholder').style.display = 'block';
+}
+
+// ── TOOLTIP ───────────────────────────────────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+function showTooltip(e, d) {
+  const col = nodeColor(d);
+  const roleStr = d.role === 'seeder' ? '<span style="color:#ffd700">● Seeder</span>' :
+                  d.role === 'amplifier' ? '<span style="color:#58a6ff">● Amplifier</span>' : '';
+  const viewsStr = d.views > 1000000 ? (d.views/1000000).toFixed(1)+'M צפיות' : d.views > 0 ? (d.views/1000).toFixed(0)+'K צפיות' : '';
+  tooltip.innerHTML = `
+    <div class="tt-name" style="color:${col}">${d.id}</div>
+    <div class="tt-row">${{ T1:'T1 מנהיגות', T2:'T2 ממשלה', T3:'T3 שגרירות', T4:'T4 מדיה', T5:'T5 משפיע', T6:'T6 פרוקסי', IX:'רשת לא-אותנטית' }[d.tier]||d.tier}</div>
+    ${roleStr ? `<div>${roleStr}</div>` : ''}
+    ${viewsStr ? `<div class="tt-row"><strong style="color:#ffd700">${viewsStr}</strong></div>` : ''}
+    <div class="tt-row">קואורדינציה: <strong>${d.coord_score} קשרים</strong></div>
+    ${d.country ? `<div class="tt-row">${d.country}</div>` : ''}
+  `;
+  tooltip.style.opacity = '1';
+  tooltip.style.left = (e.clientX + 14)+'px';
+  tooltip.style.top  = (e.clientY - 10)+'px';
+}
+function hideTooltip() { tooltip.style.opacity = '0'; }
+
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+function filterTier(tier, btn) {
+  activeTier = tier;
+  document.querySelectorAll('.filter-btn[data-tier]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildGraph();
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn[id^="mode"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('mode-'+mode)?.classList.add('active');
+  if (mode === 'cascade') {
+    showInauth = true;
+    buildGraph();
+    setTimeout(runCascade, 800);
+  } else {
+    buildGraph();
+  }
+}
+
+function toggleInauth() {
+  showInauth = !showInauth;
+  const btn = document.getElementById('btn-inauth');
+  btn.textContent = showInauth ? 'הסתר רשתות לא-אותנטיות' : 'הצג רשתות לא-אותנטיות';
+  btn.style.background = showInauth ? 'rgba(255,107,107,0.15)' : 'transparent';
+  buildGraph();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  buildGraph();
+  window.addEventListener('resize', buildGraph);
+});
+</script>
+</body>
+</html>
