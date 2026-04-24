@@ -1260,9 +1260,10 @@ select:hover { border-color: rgba(255,255,255,.16); }
 
 <script>
 // ─── DEEP-LINK FROM HOME PAGE ────────────────────────────────────────────────
-if (localStorage.getItem('startView') === 'timeline') {
+const _sv = localStorage.getItem('startView');
+if (_sv) {
   localStorage.removeItem('startView');
-  document.addEventListener('DOMContentLoaded', () => setTimeout(() => setView('timeline'), 100));
+  document.addEventListener('DOMContentLoaded', () => setTimeout(() => setView(_sv), 150));
 }
 
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
