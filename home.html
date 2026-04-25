@@ -366,78 +366,201 @@ html, body {
 </div>
 
 <script>
-// ── CANVAS ANIMATION ──────────────────────────────────────────────────────────
+// ── CANVAS NETWORK ANIMATION ──────────────────────────────────────────────────
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
 
-let particles = [];
-let animId;
+let nodes = [], animId;
+let mouse = { x: -9999, y: -9999 };
+
+// Color palette — blue/cyan/purple intel theme
+const COLORS = [
+  [88,  166, 255],   // blue
+  [56,  189, 248],   // cyan
+  [188, 140, 255],   // purple
+  [99,  235, 192],   // teal
+  [255, 166, 88],    // amber (rare — hot nodes)
+];
 
 function initCanvas() {
-  canvas.width = window.innerWidth;
+  canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
+  nodes = [];
 
-  particles = [];
-  const count = Math.floor((canvas.width * canvas.height) / 9000);
-  const clampedCount = Math.min(Math.max(count, 80), 150);
+  // Density: ~1 node per 5500px²  →  ~300 on a 1920×900 screen
+  const count = Math.min(Math.max(
+    Math.floor((canvas.width * canvas.height) / 5500), 140
+  ), 320);
 
-  for (let i = 0; i < clampedCount; i++) {
-    const useBlue = Math.random() > 0.4;
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-      r: Math.random() * 2.5 + 1,
-      color: useBlue ? 'rgba(88,166,255,0.6)' : 'rgba(188,140,255,0.4)'
+  for (let i = 0; i < count; i++) {
+    const isHub = Math.random() < 0.07;   // 7% are hub nodes (larger, brighter)
+    const ci    = Math.floor(Math.random() * (isHub ? COLORS.length : 3));
+    const [r,g,b] = COLORS[ci];
+    const speed  = isHub ? 0.18 : (Math.random() * 0.55 + 0.08);
+    const angle  = Math.random() * Math.PI * 2;
+    nodes.push({
+      x:    Math.random() * canvas.width,
+      y:    Math.random() * canvas.height,
+      vx:   Math.cos(angle) * speed,
+      vy:   Math.sin(angle) * speed,
+      r:    isHub ? (Math.random() * 2.5 + 3.5) : (Math.random() * 1.8 + 0.8),
+      r0:   0,          // base radius, set below
+      rgb:  [r, g, b],
+      isHub,
+      pulse: Math.random() * Math.PI * 2,   // phase offset for hub pulse
+      alpha: isHub ? 0.9 : (Math.random() * 0.4 + 0.35),
     });
+    nodes[nodes.length-1].r0 = nodes[nodes.length-1].r;
   }
 }
 
-function drawCanvas() {
+// Spatial grid for fast neighbour lookup
+function buildGrid(cellSize) {
+  const cols = Math.ceil(canvas.width  / cellSize) + 1;
+  const rows = Math.ceil(canvas.height / cellSize) + 1;
+  const grid = new Array(cols * rows).fill(null).map(() => []);
+  for (let i = 0; i < nodes.length; i++) {
+    const cx = Math.floor(nodes[i].x / cellSize);
+    const cy = Math.floor(nodes[i].y / cellSize);
+    if (cx >= 0 && cx < cols && cy >= 0 && cy < rows)
+      grid[cy * cols + cx].push(i);
+  }
+  return { grid, cols, rows, cellSize };
+}
+
+const LINK_DIST  = 175;   // max connection distance
+const MOUSE_DIST = 200;   // mouse influence radius
+
+function drawCanvas(ts) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw links
-  for (let i = 0; i < particles.length; i++) {
-    for (let j = i + 1; j < particles.length; j++) {
-      const dx = particles[i].x - particles[j].x;
-      const dy = particles[i].y - particles[j].y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 130) {
-        const alpha = (1 - dist / 130) * 0.35;
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(88,166,255,${alpha})`;
-        ctx.lineWidth = 0.6;
-        ctx.moveTo(particles[i].x, particles[i].y);
-        ctx.lineTo(particles[j].x, particles[j].y);
-        ctx.stroke();
+  const t = ts * 0.001;
+  const { grid, cols, rows, cellSize } = buildGrid(LINK_DIST);
+
+  // ── Draw connections ────────────────────────────────────────────────────────
+  const drawn = new Set();
+  for (let i = 0; i < nodes.length; i++) {
+    const a  = nodes[i];
+    const cx = Math.floor(a.x / cellSize);
+    const cy = Math.floor(a.y / cellSize);
+
+    for (let dy2 = -1; dy2 <= 1; dy2++) {
+      for (let dx2 = -1; dx2 <= 1; dx2++) {
+        const nx = cx + dx2, ny = cy + dy2;
+        if (nx < 0 || nx >= cols || ny < 0 || ny >= rows) continue;
+        const cell = grid[ny * cols + nx];
+        for (let k = 0; k < cell.length; k++) {
+          const j = cell[k];
+          if (j <= i) continue;
+          const key = i * 10000 + j;
+          if (drawn.has(key)) continue;
+          drawn.add(key);
+
+          const b    = nodes[j];
+          const ddx  = a.x - b.x, ddy = a.y - b.y;
+          const dist = Math.sqrt(ddx*ddx + ddy*ddy);
+          if (dist >= LINK_DIST) continue;
+
+          const fade    = 1 - dist / LINK_DIST;
+          const lineAlpha = fade * (a.isHub || b.isHub ? 0.55 : 0.28);
+          const [r1,g1,b1] = a.rgb;
+          const [r2,g2,b2] = b.rgb;
+
+          // Gradient line
+          const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+          grad.addColorStop(0, `rgba(${r1},${g1},${b1},${lineAlpha})`);
+          grad.addColorStop(1, `rgba(${r2},${g2},${b2},${lineAlpha * 0.6})`);
+
+          ctx.beginPath();
+          ctx.strokeStyle = grad;
+          ctx.lineWidth   = a.isHub || b.isHub ? 0.9 : 0.5;
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
       }
     }
   }
 
-  // Draw nodes
-  for (const p of particles) {
+  // ── Mouse connections ───────────────────────────────────────────────────────
+  for (let i = 0; i < nodes.length; i++) {
+    const a = nodes[i];
+    const mdx = a.x - mouse.x, mdy = a.y - mouse.y;
+    const md  = Math.sqrt(mdx*mdx + mdy*mdy);
+    if (md < MOUSE_DIST) {
+      const fa = (1 - md / MOUSE_DIST) * 0.6;
+      const [r,g,b] = a.rgb;
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(${r},${g},${b},${fa})`;
+      ctx.lineWidth   = 1;
+      ctx.moveTo(mouse.x, mouse.y);
+      ctx.lineTo(a.x, a.y);
+      ctx.stroke();
+    }
+  }
+
+  // ── Draw & move nodes ───────────────────────────────────────────────────────
+  for (const p of nodes) {
+    // Hub pulse
+    if (p.isHub) {
+      p.r = p.r0 + Math.sin(t * 2.2 + p.pulse) * 0.8;
+    }
+
+    // Mouse repulsion (subtle)
+    const mdx = p.x - mouse.x, mdy = p.y - mouse.y;
+    const md  = Math.sqrt(mdx*mdx + mdy*mdy);
+    if (md < 120 && md > 0) {
+      const force = (120 - md) / 120 * 0.4;
+      p.x += (mdx / md) * force;
+      p.y += (mdy / md) * force;
+    }
+
     p.x += p.vx;
     p.y += p.vy;
-    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+    if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
 
+    const [r,g,b] = p.rgb;
+
+    // Glow for hub nodes
+    if (p.isHub) {
+      const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+      glow.addColorStop(0, `rgba(${r},${g},${b},0.35)`);
+      glow.addColorStop(1, `rgba(${r},${g},${b},0)`);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+      ctx.fillStyle = glow;
+      ctx.fill();
+    }
+
+    // Core dot
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fillStyle = p.color;
+    ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
     ctx.fill();
+
+    // Inner highlight
+    if (p.r > 2) {
+      ctx.beginPath();
+      ctx.arc(p.x - p.r * 0.25, p.y - p.r * 0.25, p.r * 0.35, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,0.35)`;
+      ctx.fill();
+    }
   }
 
   animId = requestAnimationFrame(drawCanvas);
 }
 
 initCanvas();
-drawCanvas();
+animId = requestAnimationFrame(drawCanvas);
+
+window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+window.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
 
 window.addEventListener('resize', () => {
   cancelAnimationFrame(animId);
   initCanvas();
-  drawCanvas();
+  animId = requestAnimationFrame(drawCanvas);
 });
 
 // ── POOL META + SCAN BADGE ────────────────────────────────────────────────────
