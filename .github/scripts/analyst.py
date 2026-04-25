@@ -294,38 +294,58 @@ def write_briefing(iran_posts, trump_posts, escalation):
 def load(path):
     return json.loads(path.read_text()) if path.exists() else {"posts": []}
 
-iran_data  = load(DATA / "iran_posts.json")
-trump_data = load(DATA / "trump_posts.json")
+iran_data     = load(DATA / "iran_posts.json")
+trump_data    = load(DATA / "trump_posts.json")
+telegram_data = load(DATA / "telegram_posts.json")
+
+log(f"Loaded: iran={len(iran_data['posts'])} X posts, "
+    f"telegram={len(telegram_data['posts'])} Telegram posts, "
+    f"trump={len(trump_data['posts'])} posts")
 
 # Seed Trump from data.js if empty
 if not trump_data["posts"]:
     trump_data = seed_trump_from_datajs(trump_data)
 
-# Label
-iran_data["posts"]  = label_iran_posts(iran_data["posts"])
+# Merge Telegram into Iran posts for unified labeling + escalation
+# (Telegram posts go through same Iran labeling pipeline)
+combined_iran_posts = iran_data["posts"] + telegram_data["posts"]
+
+# Label all Iranian content (X + Telegram)
+labeled_combined   = label_iran_posts(combined_iran_posts)
 trump_data["posts"] = label_trump_posts(trump_data["posts"])
 
+# Split back: X posts vs Telegram posts (by source field)
+iran_labeled     = [p for p in labeled_combined if p.get("source") != "telegram"]
+telegram_labeled = [p for p in labeled_combined if p.get("source") == "telegram"]
+
+iran_data["posts"]     = iran_labeled
+telegram_data["posts"] = telegram_labeled
+
 # Save labeled posts
-(DATA / "iran_posts.json").write_text(json.dumps(iran_data,  ensure_ascii=False, indent=2))
-(DATA / "trump_posts.json").write_text(json.dumps(trump_data, ensure_ascii=False, indent=2))
-log("Posts saved.")
+(DATA / "iran_posts.json").write_text(json.dumps(iran_data,       ensure_ascii=False, indent=2))
+(DATA / "trump_posts.json").write_text(json.dumps(trump_data,     ensure_ascii=False, indent=2))
+(DATA / "telegram_posts.json").write_text(json.dumps(telegram_data, ensure_ascii=False, indent=2))
+log(f"Saved: {len(iran_labeled)} Iran X + {len(telegram_labeled)} Telegram + {len(trump_data['posts'])} Trump")
 
 # Update trump meta
 trump_data.setdefault("meta", {}).update({
-    "track":       "trump",
+    "track":        "trump",
     "last_updated": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
-    "total_posts": len(trump_data["posts"]),
+    "total_posts":  len(trump_data["posts"]),
 })
 
 # Update pool meta
 meta_path = DATA / "pool_meta.json"
 pool_meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
-pool_meta.setdefault("tracks", {})["trump"] = trump_data["meta"]
+pool_meta.setdefault("tracks", {})["trump"]    = trump_data["meta"]
+pool_meta.setdefault("tracks", {})["telegram"] = telegram_data.get("meta", {
+    "track": "telegram", "total_posts": len(telegram_labeled)
+})
 pool_meta["last_any_update"] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 meta_path.write_text(json.dumps(pool_meta, ensure_ascii=False, indent=2))
 
-# Escalation + briefing
-escalation = compute_escalation(iran_data["posts"])
-write_briefing(iran_data["posts"], trump_data["posts"], escalation)
+# Escalation + briefing — use ALL Iranian content (X + Telegram)
+escalation = compute_escalation(labeled_combined)
+write_briefing(labeled_combined, trump_data["posts"], escalation)
 
 log("Done.")

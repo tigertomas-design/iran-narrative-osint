@@ -29,10 +29,10 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests anthropic
+        run: pip install requests anthropic beautifulsoup4 lxml
 
-      # ── Collect Iranian accounts ────────────────────────────────────────────
-      - name: Collect — Iran
+      # ── Collect Iranian accounts (X/Twitter via SocialData) ────────────────
+      - name: Collect — Iran (X)
         env:
           SOCIALDATA_KEY: ${{ secrets.SOCIALDATA_KEY }}
         run: |
@@ -40,10 +40,18 @@ jobs:
           if [ "${{ github.event.inputs.mode }}" = "backfill" ]; then MODE_FLAG="--backfill"; fi
           python .github/scripts/collect-iran.py $MODE_FLAG
 
-      # ── Collect Trump ───────────────────────────────────────────────────────
+      # ── Collect Iranian Telegram channels (free, no key needed) ────────────
+      - name: Collect — Iran (Telegram)
+        run: |
+          MODE_FLAG=""
+          if [ "${{ github.event.inputs.mode }}" = "backfill" ]; then MODE_FLAG="--backfill"; fi
+          python .github/scripts/collect-telegram.py $MODE_FLAG
+
+      # ── Collect Trump (twitterapi.io primary, SocialData fallback) ──────────
       - name: Collect — Trump
         env:
           SOCIALDATA_KEY: ${{ secrets.SOCIALDATA_KEY }}
+          TWITTERAPIO_KEY: ${{ secrets.TWITTERAPIO_KEY }}
         run: |
           MODE_FLAG=""
           if [ "${{ github.event.inputs.mode }}" = "backfill" ]; then MODE_FLAG="--backfill"; fi
@@ -70,11 +78,12 @@ jobs:
         run: |
           git fetch origin gh-pages
           git checkout gh-pages
-          cp data/pool_meta.json      pool_meta.json      2>/dev/null || true
-          cp data/iran_posts.json     iran_posts.json     2>/dev/null || true
-          cp data/trump_posts.json    trump_posts.json    2>/dev/null || true
-          cp data/daily_briefing.json daily_briefing.json 2>/dev/null || true
-          git add pool_meta.json iran_posts.json trump_posts.json daily_briefing.json 2>/dev/null || true
+          cp data/pool_meta.json       pool_meta.json       2>/dev/null || true
+          cp data/iran_posts.json      iran_posts.json      2>/dev/null || true
+          cp data/trump_posts.json     trump_posts.json     2>/dev/null || true
+          cp data/telegram_posts.json  telegram_posts.json  2>/dev/null || true
+          cp data/daily_briefing.json  daily_briefing.json  2>/dev/null || true
+          git add pool_meta.json iran_posts.json trump_posts.json telegram_posts.json daily_briefing.json 2>/dev/null || true
           git diff --cached --quiet && echo "No gh-pages changes" || \
             git commit -m "data: deploy scan $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push origin gh-pages
