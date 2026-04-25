@@ -1,0 +1,690 @@
+[
+  {
+    "id": "@khamenei_ir",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "EN",
+    "conf": "H",
+    "status": "inactive"
+  },
+  {
+    "id": "@Khamenei_fa",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "FA",
+    "conf": "H",
+    "status": "inactive"
+  },
+  {
+    "id": "@ar_Khamenei",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "AR",
+    "conf": "H",
+    "status": "inactive"
+  },
+  {
+    "id": "@Khamenei_es",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "ES",
+    "conf": "M",
+    "status": "inactive"
+  },
+  {
+    "id": "@fr_Khamenei",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "FR",
+    "conf": "H",
+    "status": "inactive"
+  },
+  {
+    "id": "@Khamenei_fra",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "FR",
+    "conf": "H",
+    "status": "inactive"
+  },
+  {
+    "id": "@de_Khamenei",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "DE",
+    "conf": "M",
+    "status": "inactive"
+  },
+  {
+    "id": "@it_Khamenei",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "IT",
+    "conf": "M",
+    "status": "inactive"
+  },
+  {
+    "id": "@tr_Khamenei_ir",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "TR",
+    "conf": "M",
+    "status": "inactive"
+  },
+  {
+    "id": "@ur_Khamenei",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "UR",
+    "conf": "M",
+    "status": "inactive"
+  },
+  {
+    "id": "@ru_Khamenei",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "RU",
+    "conf": "M",
+    "status": "inactive"
+  },
+  {
+    "id": "@in_Khamenei",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "HI",
+    "conf": "M",
+    "status": "inactive"
+  },
+  {
+    "id": "@Khamenei_m",
+    "tier": "T1",
+    "type": "leadership",
+    "lang": "multi",
+    "conf": "M",
+    "status": "inactive"
+  },
+  {
+    "id": "@araghchi",
+    "tier": "T2",
+    "type": "government",
+    "lang": "EN/FA",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@drpezeshkian",
+    "tier": "T2",
+    "type": "government",
+    "lang": "EN/FA",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@Iran_GOV",
+    "tier": "T2",
+    "type": "government",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IRIMFA_EN",
+    "tier": "T2",
+    "type": "government",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IRIMFA_SPOX",
+    "tier": "T2",
+    "type": "government",
+    "lang": "EN/FA",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IRIran_Military",
+    "tier": "T2",
+    "type": "government",
+    "lang": "EN/FA",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@Iran_UN",
+    "tier": "T2",
+    "type": "government",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IranmissionEU",
+    "tier": "T2",
+    "type": "government",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@PMIRAN_GENEVA",
+    "tier": "T2",
+    "type": "government",
+    "lang": "EN/FR",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@IraninZimbabwe",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IraninSA",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IRANinBULGARIA",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/BG",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@Iran_in_India",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IraninBerlin",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "DE/EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IraninAustria",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "DE/EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@EmbassyofIrtoRF",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "RU/EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IRANinTJ",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "FA/TJ/EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@Iran_in_UK",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IRANinMumbai",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/HI",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IRANinKENYA",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IRANinETHIOPIA",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/AM",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@IraninAlgeria",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "FR/AR/EN",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@IraninSKorea",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/KO",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@IraninIslamabad",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/UR",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@IranInThailand",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/TH",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@IRANinFRANCE",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "FR/EN",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@IRANinQATAR",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "AR/EN",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@IRANinBRAZIL",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "PT/EN",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@IRANINARGENTINA",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "ES",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@Eiranencaracas",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "ES",
+    "conf": "L",
+    "status": "active"
+  },
+  {
+    "id": "@iranincuba",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "ES",
+    "conf": "L",
+    "status": "active"
+  },
+  {
+    "id": "@IRANinNorway",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "NO/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IRANinFINLAND",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "FI/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IRANinGREECE",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EL/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IRANinHUNGARY",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "HU/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IRANinROMANIA",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "RO/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IRANinCZECH",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "CS/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IRANinBELGIQUE",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "FR/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IRANinBiH",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "BS/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IRAN_in_NL",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "NL/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IRANinKabul",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "FA/DA",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IRANINBAKU",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "AZ/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IranAmbIndia",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN",
+    "conf": "L",
+    "status": "active"
+  },
+  {
+    "id": "@IranEmbassyLB",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "AR/EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IranembassyDam",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "AR/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IraninChina",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/ZH",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@IraninJapan",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/JA",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@iraninmalaysia",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/MS",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IraninDhaka",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/BN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IraninIndonesia",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/ID",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IraninSerbia",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "SR/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IraninSpain",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "ES/EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IraninGeorgia",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/KA",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@iraninyerevan",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN/HY",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@IranNigeria",
+    "tier": "T3",
+    "type": "embassy",
+    "lang": "EN",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@PressTV",
+    "tier": "T4",
+    "type": "media",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@IrnaEnglish",
+    "tier": "T4",
+    "type": "media",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@EnglishFars",
+    "tier": "T4",
+    "type": "media",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@Tasnimnews_EN",
+    "tier": "T4",
+    "type": "media",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@Tasnimnews_Fa",
+    "tier": "T4",
+    "type": "media",
+    "lang": "FA",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@Tasnimnews_He",
+    "tier": "T4",
+    "type": "media",
+    "lang": "HE",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@iribnews_irib",
+    "tier": "T4",
+    "type": "media",
+    "lang": "FA",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@sahartvonline",
+    "tier": "T4",
+    "type": "media",
+    "lang": "UR",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@OfficialSaharTV",
+    "tier": "T4",
+    "type": "media",
+    "lang": "EN",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@EnSaharTV",
+    "tier": "T4",
+    "type": "media",
+    "lang": "EN",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@HispanTV",
+    "tier": "T4",
+    "type": "media",
+    "lang": "ES",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@hispantv_brasil",
+    "tier": "T4",
+    "type": "media",
+    "lang": "PT",
+    "conf": "M",
+    "status": "active"
+  },
+  {
+    "id": "@presstvturk",
+    "tier": "T4",
+    "type": "media",
+    "lang": "TR",
+    "conf": "L",
+    "status": "unknown"
+  },
+  {
+    "id": "@AlalamNews",
+    "tier": "T4",
+    "type": "media",
+    "lang": "AR",
+    "conf": "M",
+    "status": "suspended"
+  },
+  {
+    "id": "@s_m_marandi",
+    "tier": "T5",
+    "type": "individual",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@AlMayadeenNews",
+    "tier": "T6",
+    "type": "proxy",
+    "lang": "AR",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@MayadeenEnglish",
+    "tier": "T6",
+    "type": "proxy",
+    "lang": "EN",
+    "conf": "H",
+    "status": "active"
+  },
+  {
+    "id": "@AlMayadeenNews",
+    "tier": "T6",
+    "type": "proxy",
+    "lang": "AR",
+    "conf": "H",
+    "status": "active"
+  }
+]
