@@ -49,9 +49,8 @@ jobs:
           if [ "${{ github.event.inputs.mode }}" = "backfill" ]; then MODE_FLAG="--backfill"; fi
           python .github/scripts/collect-trump.py $MODE_FLAG
 
-      # ── Run analyst agents (if Anthropic key is set) ────────────────────────
+      # ── Run analyst agents ─────────────────────────────────────────────────
       - name: Analyst agents
-        if: ${{ secrets.ANTHROPIC_API_KEY != '' }}
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python .github/scripts/analyst.py
