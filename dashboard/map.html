@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מפת שגרירויות | Iran Narrative OSINT</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --border:  #30363d;
+    --blue:    #388bfd;
+    --cyan:    #39c5cf;
+    --purple:  #bc8cff;
+    --green:   #3fb950;
+    --yellow:  #e3b341;
+    --red:     #f85149;
+    --amber:   #ffa657;
+    --text:    #e6edf3;
+    --muted:   #8b949e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
+
+  /* ── Top bar ── */
+  #topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(13,17,23,0.96); border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    display: flex; align-items: center; gap: 12px; padding: 0 16px;
+    height: 54px;
+  }
+  #topbar a.back {
+    color: var(--muted); text-decoration: none; font-size: 20px;
+    line-height: 1; transition: color .2s;
+  }
+  #topbar a.back:hover { color: var(--text); }
+  #topbar h1 { font-size: 17px; font-weight: 600; color: var(--text); }
+  #topbar .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 6px var(--green); animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* ── Stats row ── */
+  #stats-row {
+    position: fixed; top: 54px; left: 0; right: 0; z-index: 999;
+    background: rgba(13,17,23,0.94); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 0; padding: 0;
+    height: 52px; overflow-x: auto;
+  }
+  .stat-card {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 0 20px; border-left: 1px solid var(--border);
+    min-width: 110px; height: 100%;
+  }
+  .stat-card:last-child { border-right: 1px solid var(--border); }
+  .stat-val { font-size: 20px; font-weight: 700; line-height: 1.1; }
+  .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* ── Filter bar ── */
+  #filter-bar {
+    position: fixed; top: 106px; left: 0; right: 0; z-index: 998;
+    background: rgba(13,17,23,0.92); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px; padding: 6px 16px;
+    height: 44px;
+  }
+  #filter-bar label { font-size: 12px; color: var(--muted); }
+  .filter-btn {
+    padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); font-size: 12px; cursor: pointer;
+    transition: all .15s;
+  }
+  .filter-btn:hover { border-color: var(--blue); color: var(--text); }
+  .filter-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
+  #custom-range { display: none; align-items: center; gap: 6px; }
+  #custom-range input[type=date] {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 3px 8px; font-size: 12px;
+  }
+  .filter-sep { flex: 1; }
+  #legend { display: flex; gap: 10px; align-items: center; }
+  .leg-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); }
+  .leg-dot { width: 9px; height: 9px; border-radius: 50%; }
+
+  /* ── Map ── */
+  #map {
+    position: fixed; top: 150px; left: 0; right: 0; bottom: 0; z-index: 1;
+  }
+
+  /* ── Sidebar panel ── */
+  #side-panel {
+    position: fixed; top: 150px; right: 0; bottom: 0; z-index: 500;
+    width: 320px; background: rgba(22,27,34,0.97);
+    border-left: 1px solid var(--border); transform: translateX(100%);
+    transition: transform .3s ease; display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  #side-panel.open { transform: translateX(0); }
+  #panel-header {
+    padding: 16px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  #panel-header h2 { font-size: 15px; font-weight: 600; }
+  #panel-header .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  #panel-close { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; }
+  #panel-close:hover { color: var(--text); }
+  #panel-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px 16px; }
+  .ps-card { background: var(--bg); border-radius: 6px; padding: 8px 10px; }
+  .ps-val { font-size: 18px; font-weight: 700; }
+  .ps-lbl { font-size: 10px; color: var(--muted); }
+  #panel-posts { flex: 1; overflow-y: auto; padding: 0 16px 16px; }
+  .post-item {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px; margin-bottom: 8px;
+  }
+  .post-meta { font-size: 10px; color: var(--muted); margin-bottom: 5px; display: flex; gap: 8px; }
+  .post-text { font-size: 12px; line-height: 1.5; color: var(--text); }
+  .post-stats { display: flex; gap: 10px; margin-top: 6px; font-size: 10px; color: var(--muted); }
+  .lang-badge {
+    display: inline-block; padding: 1px 6px; border-radius: 10px;
+    font-size: 10px; font-weight: 600; background: rgba(56,139,253,.15);
+    border: 1px solid rgba(56,139,253,.3); color: var(--blue);
+  }
+
+  /* ── Leaflet custom markers ── */
+  .iran-marker { cursor: pointer; }
+  .pulse-ring {
+    border-radius: 50%; position: absolute;
+    animation: pulse-anim 2s ease-out infinite;
+  }
+  @keyframes pulse-anim {
+    0%   { transform: scale(1);   opacity: .7; }
+    100% { transform: scale(2.8); opacity: 0;  }
+  }
+
+  /* ── Leaflet overrides for dark theme ── */
+  .leaflet-popup-content-wrapper {
+    background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  }
+  .leaflet-popup-tip { background: var(--surface); }
+  .leaflet-popup-content { font-size: 13px; margin: 12px 14px; }
+  .leaflet-popup-content b { color: var(--blue); }
+  .leaflet-control-zoom a { background: var(--surface) !important; color: var(--text) !important;
+    border-color: var(--border) !important; }
+  .leaflet-control-attribution { background: rgba(13,17,23,.8) !important; color: var(--muted) !important; }
+  .leaflet-control-attribution a { color: var(--muted) !important; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div id="topbar">
+  <a class="back" href="home.html">←</a>
+  <h1>🌍 מפת פעילות שגרירויות</h1>
+  <div class="dot"></div>
+  <span id="last-updated" style="font-size:11px;color:var(--muted);margin-right:auto"></span>
+</div>
+
+<!-- Stats row -->
+<div id="stats-row">
+  <div class="stat-card">
+    <div class="stat-val" id="s-posts" style="color:var(--blue)">—</div>
+    <div class="stat-lbl">פוסטים</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val" id="s-embassies" style="color:var(--cyan)">—</div>
+    <div class="stat-lbl">שגרירויות פעילות</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val" id="s-langs" style="color:var(--purple)">—</div>
+    <div class="stat-lbl">שפות</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val" id="s-views" style="color:var(--amber)">—</div>
+    <div class="stat-lbl">חשיפה כוללת</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val" id="s-engage" style="color:var(--green)">—</div>
+    <div class="stat-lbl">מעורבות</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val" id="s-accounts" style="color:var(--yellow)">—</div>
+    <div class="stat-lbl">חשבונות ב-DB</div>
+  </div>
+</div>
+
+<!-- Filter bar -->
+<div id="filter-bar">
+  <label>תקופה:</label>
+  <button class="filter-btn active" data-range="1">24 שעות</button>
+  <button class="filter-btn" data-range="7">7 ימים</button>
+  <button class="filter-btn" data-range="30">30 ימים</button>
+  <button class="filter-btn" data-range="0">הכל</button>
+  <button class="filter-btn" data-range="custom">טווח מותאם</button>
+  <div id="custom-range">
+    <input type="date" id="date-from">
+    <span style="color:var(--muted)">—</span>
+    <input type="date" id="date-to">
+    <button class="filter-btn active" onclick="applyCustomRange()">החל</button>
+  </div>
+  <div class="filter-sep"></div>
+  <div id="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#ffa657"></div> T1 מנהיגות</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#388bfd"></div> T2 ממשלה</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#bc8cff"></div> T3 שגרירויות</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#3fb950"></div> T4 מדיה</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#8b949e"></div> לא פעיל</div>
+  </div>
+</div>
+
+<!-- Map -->
+<div id="map"></div>
+
+<!-- Side panel -->
+<div id="side-panel">
+  <div id="panel-header">
+    <div>
+      <h2 id="panel-title">—</h2>
+      <div class="sub" id="panel-sub"></div>
+    </div>
+    <button id="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div id="panel-stats"></div>
+  <div style="padding:0 16px 8px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border)">
+    פוסטים אחרונים בטווח הנבחר
+  </div>
+  <div id="panel-posts"></div>
+</div>
+
+<script>
+// ── Embassy coordinates ────────────────────────────────────────────────────────
+const COORDS = {
+  // T1 — Leadership (Tehran)
+  "@khamenei_ir":      [35.689,  51.389],
+  "@Khamenei_fa":      [35.689,  51.389],
+  "@ar_Khamenei":      [35.689,  51.389],
+  "@Khamenei_es":      [35.689,  51.389],
+  "@fr_Khamenei":      [35.689,  51.389],
+  "@Khamenei_fra":     [35.689,  51.389],
+  "@de_Khamenei":      [35.689,  51.389],
+  "@it_Khamenei":      [35.689,  51.389],
+  "@tr_Khamenei_ir":   [35.689,  51.389],
+  "@ur_Khamenei":      [35.689,  51.389],
+  "@ru_Khamenei":      [35.689,  51.389],
+  "@in_Khamenei":      [35.689,  51.389],
+  "@Khamenei_m":       [35.689,  51.389],
+  // T2 — Government
+  "@araghchi":         [35.700,  51.400],
+  "@drpezeshkian":     [35.710,  51.410],
+  "@Iran_GOV":         [35.695,  51.395],
+  "@IRIMFA_EN":        [35.715,  51.405],
+  "@IRIMFA_SPOX":      [35.712,  51.402],
+  "@IRIran_Military":  [35.720,  51.415],
+  "@Iran_UN":          [40.748, -73.985],  // New York (UN)
+  "@IranmissionEU":    [50.846,   4.352],  // Brussels (EU)
+  "@PMIRAN_GENEVA":    [46.228,   6.019],  // Geneva
+  // T3 — Embassies
+  "@IraninZimbabwe":   [-17.825,  31.034],
+  "@IraninSA":         [24.688,   46.722],  // Riyadh
+  "@IRANinBULGARIA":   [42.698,   23.322],  // Sofia
+  "@Iran_in_India":    [28.614,   77.209],  // New Delhi
+  "@IraninBerlin":     [52.520,   13.405],
+  "@IraninAustria":    [48.208,   16.374],  // Vienna
+  "@EmbassyofIrtoRF":  [55.756,   37.618],  // Moscow
+  "@IRANinTJ":         [38.560,   68.787],  // Dushanbe
+  "@Iran_in_UK":       [51.507,   -0.128],  // London
+  "@IRANinMumbai":     [19.076,   72.878],
+  "@IRANinKENYA":      [-1.292,   36.822],  // Nairobi
+  "@IRANinETHIOPIA":   [ 9.032,   38.747],  // Addis Ababa
+  "@IraninAlgeria":    [36.737,    3.086],  // Algiers
+  "@IraninSKorea":     [37.567,  126.978],  // Seoul
+  "@IraninIslamabad":  [33.684,   73.048],
+  "@IranInThailand":   [13.756,  100.502],  // Bangkok
+  "@IRANinFRANCE":     [48.857,    2.352],  // Paris
+  "@IRANinQATAR":      [25.285,   51.531],  // Doha
+  "@IRANinBRAZIL":     [-15.798, -47.892],  // Brasilia
+  "@IRANINARGENTINA":  [-34.604, -58.382],  // Buenos Aires
+  "@Eiranencaracas":   [10.480,  -66.879],  // Caracas
+  "@iranincuba":       [23.114,  -82.367],  // Havana
+  "@IRANinNorway":     [59.914,   10.752],  // Oslo
+  "@IRANinFINLAND":    [60.170,   24.938],  // Helsinki
+  "@IRANinGREECE":     [37.984,   23.728],  // Athens
+  "@IRANinHUNGARY":    [47.498,   19.040],  // Budapest
+  "@IRANinROMANIA":    [44.427,   26.103],  // Bucharest
+  "@IRANinCZECH":      [50.076,   14.438],  // Prague
+  "@IRANinBELGIQUE":   [50.850,    4.352],  // Brussels
+  "@IRANinBiH":        [43.856,   18.413],  // Sarajevo
+  "@IRAN_in_NL":       [52.368,    4.904],  // Amsterdam
+  "@IRANinKabul":      [34.555,   69.208],  // Kabul
+  "@IRANINBAKU":       [40.409,   49.867],  // Baku
+  "@IranAmbIndia":     [28.600,   77.200],  // New Delhi
+  "@IranEmbassyLB":    [33.894,   35.502],  // Beirut
+  "@IranembassyDam":   [33.514,   36.277],  // Damascus
+  "@IraninChina":      [39.904,  116.407],  // Beijing
+  "@IraninJapan":      [35.676,  139.650],  // Tokyo
+  "@iraninmalaysia":   [ 3.139,  101.687],  // Kuala Lumpur
+  "@IraninDhaka":      [23.810,   90.413],
+  "@IraninIndonesia":  [-6.209,  106.846],  // Jakarta
+  "@IraninSerbia":     [44.818,   20.463],  // Belgrade
+  "@IraninSpain":      [40.417,   -3.704],  // Madrid
+  "@IraninGeorgia":    [41.694,   44.802],  // Tbilisi
+  "@iraninyerevan":    [40.179,   44.499],  // Yerevan
+  "@IranNigeria":      [ 9.077,    7.399],  // Abuja
+  // T4 — State media (Tehran cluster + slight offsets)
+  "@PressTV":          [35.680,  51.380],
+  "@IrnaEnglish":      [35.685,  51.385],
+  "@EnglishFars":      [35.678,  51.375],
+  "@Tasnimnews_EN":    [35.683,  51.370],
+  "@Tasnimnews_Fa":    [35.676,  51.365],
+  "@Tasnimnews_He":    [35.672,  51.360],
+  "@iribnews_irib":    [35.668,  51.355],
+  "@sahartvonline":    [35.665,  51.350],
+  "@OfficialSaharTV":  [35.662,  51.345],
+  "@HispanTV":         [35.659,  51.340],
+  "@hispantv_brasil":  [35.656,  51.335],
+  "@AlalamNews":       [35.650,  51.332],
+  // T5 — Influencers
+  "@s_m_marandi":      [35.660,  51.395],
+  // T6 — Proxy / regional
+  "@AlMayadeenNews":   [33.890,  35.495],  // Beirut (Al-Mayadeen HQ)
+  "@MayadeenEnglish":  [33.887,  35.492],
+};
+
+const TIER_COLORS = {
+  T1: '#ffa657',  // amber — leadership
+  T2: '#388bfd',  // blue  — government
+  T3: '#bc8cff',  // purple — embassies
+  T4: '#3fb950',  // green  — media
+  T5: '#39c5cf',  // cyan   — influencers
+  T6: '#e3b341',  // yellow — proxy/regional
+};
+
+// ── Init map ──────────────────────────────────────────────────────────────────
+const map = L.map('map', {
+  center: [25, 20], zoom: 3, minZoom: 2, maxZoom: 10,
+  zoomControl: true,
+});
+
+L.tileLayer(
+  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  { attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19 }
+).addTo(map);
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let allPosts     = [];
+let accountsMeta = {};   // handle → {tier, type, lang, status}
+let activeFilter = 1;    // days; 0 = all
+let customFrom   = null, customTo = null;
+let markersLayer = L.layerGroup().addTo(map);
+
+// ── Load data ─────────────────────────────────────────────────────────────────
+async function loadData() {
+  const bust = '?t=' + Date.now();
+  try {
+    const [iranRes, trumpRes, metaRes] = await Promise.all([
+      fetch('iran_posts.json' + bust).then(r => r.ok ? r.json() : {posts:[]}),
+      fetch('trump_posts.json' + bust).then(r => r.ok ? r.json() : {posts:[]}),
+      fetch('pool_meta.json'  + bust).then(r => r.ok ? r.json() : {}),
+    ]);
+    allPosts = [...(iranRes.posts || []), ...(trumpRes.posts || [])];
+
+    // Build accounts meta from known data
+    const accs = metaRes?.tracks?.iran?.accounts || {};
+    accountsMeta = buildAccountsMeta();
+
+    const lu = metaRes?.last_any_update;
+    if (lu) {
+      const d = new Date(lu);
+      document.getElementById('last-updated').textContent =
+        'עודכן: ' + d.toLocaleDateString('he-IL') + ' ' + d.toTimeString().slice(0,5);
+    }
+  } catch(e) {
+    console.warn('Load error:', e);
+    allPosts = [];
+  }
+  render();
+  // Auto-refresh every 5 min
+  setTimeout(loadData, 5 * 60 * 1000);
+}
+
+function buildAccountsMeta() {
+  // Tier/type from known list
+  const meta = {};
+  const KNOWN = [
+    // [handle, tier, type, lang, status]
+    ["@khamenei_ir","T1","leadership","EN","inactive"],
+    ["@Khamenei_fa","T1","leadership","FA","inactive"],
+    ["@ar_Khamenei","T1","leadership","AR","inactive"],
+    ["@Khamenei_es","T1","leadership","ES","inactive"],
+    ["@fr_Khamenei","T1","leadership","FR","inactive"],
+    ["@Khamenei_fra","T1","leadership","FR","inactive"],
+    ["@de_Khamenei","T1","leadership","DE","inactive"],
+    ["@it_Khamenei","T1","leadership","IT","inactive"],
+    ["@tr_Khamenei_ir","T1","leadership","TR","inactive"],
+    ["@ur_Khamenei","T1","leadership","UR","inactive"],
+    ["@ru_Khamenei","T1","leadership","RU","inactive"],
+    ["@in_Khamenei","T1","leadership","HI","inactive"],
+    ["@Khamenei_m","T1","leadership","multi","inactive"],
+    ["@araghchi","T2","mfa","EN/FA","active"],
+    ["@drpezeshkian","T2","leadership","EN/FA","active"],
+    ["@Iran_GOV","T2","gov","EN","active"],
+    ["@IRIMFA_EN","T2","mfa","EN","active"],
+    ["@IRIMFA_SPOX","T2","mfa","EN/FA","active"],
+    ["@IRIran_Military","T2","military","EN/FA","active"],
+    ["@Iran_UN","T2","un","EN","active"],
+    ["@IranmissionEU","T2","eu","EN","active"],
+    ["@PMIRAN_GENEVA","T2","un","EN/FR","active"],
+    ["@IraninZimbabwe","T3","embassy","EN","active"],
+    ["@IraninSA","T3","embassy","EN","active"],
+    ["@IRANinBULGARIA","T3","embassy","EN/BG","active"],
+    ["@Iran_in_India","T3","embassy","EN","active"],
+    ["@IraninBerlin","T3","embassy","DE/EN","active"],
+    ["@IraninAustria","T3","embassy","DE/EN","active"],
+    ["@EmbassyofIrtoRF","T3","embassy","RU/EN","active"],
+    ["@IRANinTJ","T3","embassy","FA/TJ/EN","active"],
+    ["@Iran_in_UK","T3","embassy","EN","active"],
+    ["@IRANinMumbai","T3","embassy","EN/HI","active"],
+    ["@IRANinKENYA","T3","embassy","EN","active"],
+    ["@IRANinETHIOPIA","T3","embassy","EN/AM","active"],
+    ["@IraninAlgeria","T3","embassy","FR/AR/EN","active"],
+    ["@IraninSKorea","T3","embassy","EN/KO","active"],
+    ["@IraninIslamabad","T3","embassy","EN/UR","active"],
+    ["@IranInThailand","T3","embassy","EN/TH","active"],
+    ["@IRANinFRANCE","T3","embassy","FR/EN","active"],
+    ["@IRANinQATAR","T3","embassy","AR/EN","active"],
+    ["@IRANinBRAZIL","T3","embassy","PT/EN","active"],
+    ["@IRANINARGENTINA","T3","embassy","ES","active"],
+    ["@Eiranencaracas","T3","embassy","ES","active"],
+    ["@iranincuba","T3","embassy","ES","active"],
+    ["@IRANinNorway","T3","embassy","NO/EN","unknown"],
+    ["@IRANinFINLAND","T3","embassy","FI/EN","unknown"],
+    ["@IRANinGREECE","T3","embassy","EL/EN","unknown"],
+    ["@IRANinHUNGARY","T3","embassy","HU/EN","unknown"],
+    ["@IRANinROMANIA","T3","embassy","RO/EN","unknown"],
+    ["@IRANinCZECH","T3","embassy","CS/EN","unknown"],
+    ["@IRANinBELGIQUE","T3","embassy","FR/EN","unknown"],
+    ["@IRANinBiH","T3","embassy","BS/EN","unknown"],
+    ["@IRAN_in_NL","T3","embassy","NL/EN","unknown"],
+    ["@IRANinKabul","T3","embassy","FA/DA","unknown"],
+    ["@IRANINBAKU","T3","embassy","AZ/EN","unknown"],
+    ["@IranAmbIndia","T3","embassy","EN","active"],
+    ["@IranEmbassyLB","T3","embassy","AR/EN","active"],
+    ["@IranembassyDam","T3","embassy","AR/EN","unknown"],
+    ["@IraninChina","T3","embassy","EN/ZH","active"],
+    ["@IraninJapan","T3","embassy","EN/JA","unknown"],
+    ["@iraninmalaysia","T3","embassy","EN/MS","unknown"],
+    ["@IraninDhaka","T3","embassy","EN/BN","unknown"],
+    ["@IraninIndonesia","T3","embassy","EN/ID","unknown"],
+    ["@IraninSerbia","T3","embassy","SR/EN","unknown"],
+    ["@IraninSpain","T3","embassy","ES/EN","unknown"],
+    ["@IraninGeorgia","T3","embassy","EN/KA","unknown"],
+    ["@iraninyerevan","T3","embassy","EN/HY","unknown"],
+    ["@IranNigeria","T3","embassy","EN","active"],
+    ["@PressTV","T4","media","EN","active"],
+    ["@IrnaEnglish","T4","media","EN","active"],
+    ["@EnglishFars","T4","media","EN","active"],
+    ["@Tasnimnews_EN","T4","media","EN","active"],
+    ["@Tasnimnews_Fa","T4","media","FA","active"],
+    ["@Tasnimnews_He","T4","media","HE","active"],
+    ["@iribnews_irib","T4","media","FA","active"],
+    ["@sahartvonline","T4","media","UR","active"],
+    ["@OfficialSaharTV","T4","media","EN","active"],
+    ["@HispanTV","T4","media","ES","active"],
+    ["@hispantv_brasil","T4","media","PT","active"],
+    ["@AlalamNews","T4","media","AR","suspended"],
+    ["@s_m_marandi","T5","analyst","EN","active"],
+    ["@AlMayadeenNews","T6","media","AR","active"],
+    ["@MayadeenEnglish","T6","media","EN","active"],
+  ];
+  for (const [h,tier,type,lang,status] of KNOWN) {
+    meta[h] = { tier, type, lang, status };
+  }
+  return meta;
+}
+
+// ── Date filter helpers ───────────────────────────────────────────────────────
+function getCutoff() {
+  if (activeFilter === 'custom') {
+    return { from: customFrom ? new Date(customFrom) : null,
+             to:   customTo   ? new Date(customTo + 'T23:59:59Z') : new Date() };
+  }
+  if (activeFilter === 0) return { from: null, to: null };
+  const to   = new Date();
+  const from = new Date(to - activeFilter * 86400000);
+  return { from, to };
+}
+
+function postInRange(p, from, to) {
+  if (!from && !to) return true;
+  const d = new Date(p.date);
+  if (isNaN(d)) return false;
+  if (from && d < from) return false;
+  if (to   && d > to)   return false;
+  return true;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function fmtNum(n) {
+  if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+  return String(n);
+}
+
+function render() {
+  const { from, to } = getCutoff();
+  const filtered = allPosts.filter(p => postInRange(p, from, to));
+
+  // Stats
+  const byAccount = {};
+  let totalViews = 0, totalEngage = 0;
+  const langs = new Set();
+
+  for (const p of filtered) {
+    const acc = p.account;
+    if (!byAccount[acc]) byAccount[acc] = [];
+    byAccount[acc].push(p);
+    totalViews  += (p.views   || 0);
+    totalEngage += (p.likes   || 0) + (p.retweets || 0) + (p.replies || 0);
+    if (p.lang) p.lang.split('/').forEach(l => langs.add(l.trim()));
+  }
+
+  const activeEmbassies = Object.keys(byAccount).filter(a => {
+    const m = accountsMeta[a] || {};
+    return m.tier === 'T3';
+  }).length;
+
+  document.getElementById('s-posts').textContent     = fmtNum(filtered.length);
+  document.getElementById('s-embassies').textContent = activeEmbassies;
+  document.getElementById('s-langs').textContent     = langs.size;
+  document.getElementById('s-views').textContent     = fmtNum(totalViews);
+  document.getElementById('s-engage').textContent    = fmtNum(totalEngage);
+  document.getElementById('s-accounts').textContent  = Object.keys(COORDS).length;
+
+  renderMarkers(byAccount);
+}
+
+function renderMarkers(byAccount) {
+  markersLayer.clearLayers();
+
+  for (const [handle, coords] of Object.entries(COORDS)) {
+    const meta  = accountsMeta[handle] || { tier: 'T3', lang: 'EN', status: 'unknown' };
+    const posts = byAccount[handle] || [];
+    const color = TIER_COLORS[meta.tier] || '#8b949e';
+    const hasActivity = posts.length > 0;
+
+    // Marker size based on tier + activity
+    const baseR = meta.tier === 'T1' ? 10 :
+                  meta.tier === 'T2' ? 8  :
+                  meta.tier === 'T4' ? 7  : 7;
+    const r = hasActivity ? baseR + 2 : baseR;
+
+    // Build custom HTML marker
+    const pulse = hasActivity
+      ? `<div class="pulse-ring" style="
+          width:${r*2}px;height:${r*2}px;
+          top:0;left:0;
+          border:2px solid ${color};
+          box-shadow:0 0 8px ${color}44;
+         "></div>` : '';
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="iran-marker" style="position:relative;width:${r*2}px;height:${r*2}px;">
+        ${pulse}
+        <div style="
+          position:absolute;top:0;left:0;
+          width:${r*2}px;height:${r*2}px;
+          border-radius:50%;
+          background:${hasActivity ? color : '#30363d'};
+          border:2px solid ${hasActivity ? color : '#484f58'};
+          box-shadow:${hasActivity ? `0 0 10px ${color}88` : 'none'};
+          opacity:${hasActivity ? 1 : 0.45};
+        "></div>
+      </div>`,
+      iconSize:   [r*2, r*2],
+      iconAnchor: [r,   r],
+    });
+
+    const marker = L.marker(coords, { icon })
+      .addTo(markersLayer)
+      .on('click', () => openPanel(handle, posts, meta));
+
+    // Quick tooltip
+    const tipLines = [
+      `<b>${handle}</b>`,
+      `${meta.tier} · ${meta.lang}`,
+      hasActivity ? `✉ ${posts.length} פוסטים בטווח` : 'אין פוסטים בטווח',
+    ];
+    marker.bindTooltip(tipLines.join('<br>'), {
+      direction: 'top', offset: [0, -r],
+      className: 'leaflet-tooltip',
+    });
+  }
+}
+
+// ── Side panel ────────────────────────────────────────────────────────────────
+function openPanel(handle, posts, meta) {
+  document.getElementById('panel-title').textContent = handle;
+  document.getElementById('panel-sub').textContent   =
+    `${meta.tier} · ${meta.type || ''} · שפות: ${meta.lang}`;
+
+  const totalV = posts.reduce((s,p) => s + (p.views||0), 0);
+  const totalE = posts.reduce((s,p) => s + (p.likes||0)+(p.retweets||0)+(p.replies||0), 0);
+  const avgAgg = posts.length
+    ? (posts.reduce((s,p) => s + (p.aggression||0), 0) / posts.length).toFixed(1)
+    : '—';
+
+  document.getElementById('panel-stats').innerHTML = `
+    <div class="ps-card"><div class="ps-val" style="color:var(--blue)">${posts.length}</div><div class="ps-lbl">פוסטים</div></div>
+    <div class="ps-card"><div class="ps-val" style="color:var(--amber)">${fmtNum(totalV)}</div><div class="ps-lbl">חשיפה</div></div>
+    <div class="ps-card"><div class="ps-val" style="color:var(--green)">${fmtNum(totalE)}</div><div class="ps-lbl">מעורבות</div></div>
+    <div class="ps-card"><div class="ps-val" style="color:var(--red)">${avgAgg}</div><div class="ps-lbl">אגרסיביות ממוצעת</div></div>
+  `;
+
+  const sorted = [...posts].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
+  document.getElementById('panel-posts').innerHTML = sorted.length
+    ? sorted.map(p => {
+        const d   = p.date ? new Date(p.date).toLocaleDateString('he-IL') : '';
+        const txt = (p.text||'').slice(0,160) + ((p.text||'').length > 160 ? '…' : '');
+        const v   = p.views   ? `👁 ${fmtNum(p.views)}` : '';
+        const l   = p.likes   ? `❤️ ${fmtNum(p.likes)}` : '';
+        const rt  = p.retweets? `🔁 ${fmtNum(p.retweets)}` : '';
+        const agg = p.aggression > 1 ? `🔥 ${p.aggression}` : '';
+        const narr = (p.narratives||[]).slice(0,2).map(n =>
+          `<span style="font-size:9px;padding:1px 5px;background:rgba(188,140,255,.15);border:1px solid rgba(188,140,255,.3);border-radius:8px;color:var(--purple)">${n}</span>`
+        ).join(' ');
+        return `<div class="post-item">
+          <div class="post-meta">
+            <span>${d}</span>
+            <span class="lang-badge">${p.lang||'?'}</span>
+            ${agg}
+          </div>
+          <div class="post-text">${txt}</div>
+          <div class="post-stats">${[v,l,rt].filter(Boolean).join(' ')}</div>
+          ${narr ? `<div style="margin-top:5px">${narr}</div>` : ''}
+        </div>`;
+      }).join('')
+    : '<div style="color:var(--muted);font-size:13px;padding:16px">אין פוסטים בטווח הזמן הנבחר</div>';
+
+  document.getElementById('side-panel').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('side-panel').classList.remove('open');
+}
+
+// ── Filter buttons ────────────────────────────────────────────────────────────
+document.querySelectorAll('.filter-btn[data-range]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn[data-range]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const val = btn.dataset.range;
+    if (val === 'custom') {
+      activeFilter = 'custom';
+      document.getElementById('custom-range').style.display = 'flex';
+    } else {
+      activeFilter = parseInt(val);
+      document.getElementById('custom-range').style.display = 'none';
+    }
+    render();
+  });
+});
+
+function applyCustomRange() {
+  customFrom = document.getElementById('date-from').value;
+  customTo   = document.getElementById('date-to').value;
+  render();
+}
+
+// Set default custom range dates
+const today = new Date().toISOString().slice(0,10);
+const week  = new Date(Date.now() - 7*86400000).toISOString().slice(0,10);
+document.getElementById('date-from').value = week;
+document.getElementById('date-to').value   = today;
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
