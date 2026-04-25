@@ -148,6 +148,105 @@
   .leaflet-control-attribution { background: rgba(13,17,23,.8) !important; color: var(--muted) !important; }
   .leaflet-control-attribution a { color: var(--muted) !important; }
 
+  /* ── Live ticker ── */
+  #live-ticker {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 900;
+    height: 42px; background: rgba(13,17,23,0.97);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; overflow: hidden;
+  }
+  #ticker-label {
+    padding: 0 12px; font-size: 10px; font-weight: 700; letter-spacing: .08em;
+    color: var(--green); white-space: nowrap; border-left: 3px solid var(--green);
+    height: 100%; display: flex; align-items: center;
+  }
+  #ticker-label .live-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 6px var(--green); margin-left: 6px;
+    animation: blink 1s ease-in-out infinite;
+  }
+  #ticker-track {
+    flex: 1; overflow: hidden; height: 100%; position: relative;
+  }
+  #ticker-inner {
+    display: flex; align-items: center; gap: 0;
+    position: absolute; height: 100%; white-space: nowrap;
+    transition: none;
+  }
+  .tick-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 0 20px; height: 100%; cursor: pointer;
+    border-left: 1px solid var(--border);
+    transition: background .15s;
+    flex-shrink: 0;
+  }
+  .tick-item:hover { background: rgba(56,139,253,.08); }
+  .tick-item.is-new { border-left-color: var(--green); background: rgba(63,185,80,.06); }
+  .tick-account { font-size: 11px; font-weight: 700; color: var(--blue); }
+  .tick-account.new-badge::after {
+    content: 'NEW'; margin-right: 5px; font-size: 9px; padding: 1px 5px;
+    background: var(--green); color: #000; border-radius: 8px; font-weight: 800;
+    animation: newpop .4s ease;
+  }
+  @keyframes newpop { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+  .tick-text { font-size: 11px; color: var(--muted); max-width: 300px;
+    overflow: hidden; text-overflow: ellipsis; }
+  .tick-ago { font-size: 10px; color: var(--muted); opacity: .6; }
+  .tick-lang { font-size: 9px; padding: 1px 5px; border-radius: 8px;
+    background: rgba(56,139,253,.15); border: 1px solid rgba(56,139,253,.3); color: var(--blue); }
+
+  /* ── Toast notifications ── */
+  #toast-container {
+    position: fixed; bottom: 52px; left: 16px; z-index: 1100;
+    display: flex; flex-direction: column-reverse; gap: 8px; pointer-events: none;
+  }
+  .toast {
+    background: var(--surface); border: 1px solid var(--green);
+    border-radius: 10px; padding: 10px 14px; max-width: 320px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.6), 0 0 0 1px rgba(63,185,80,.2);
+    pointer-events: all; cursor: pointer;
+    animation: toast-in .3s ease;
+  }
+  .toast.out { animation: toast-out .3s ease forwards; }
+  @keyframes toast-in {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+  @keyframes toast-out {
+    to   { transform: translateY(10px); opacity: 0; }
+  }
+  .toast-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .toast-dot  { width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 6px var(--green); flex-shrink: 0; }
+  .toast-acc  { font-size: 12px; font-weight: 700; color: var(--green); }
+  .toast-ago  { font-size: 10px; color: var(--muted); margin-right: auto; }
+  .toast-text { font-size: 11px; color: var(--text); line-height: 1.4;
+    max-width: 290px; overflow: hidden; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .toast-lang { font-size: 9px; margin-top: 4px; color: var(--muted); }
+
+  /* ── NEW ring on markers ── */
+  @keyframes pulse-new {
+    0%   { transform: scale(1);   opacity: .9; }
+    100% { transform: scale(3.5); opacity: 0;  }
+  }
+  .pulse-new { animation: pulse-new 1.4s ease-out infinite !important; }
+
+  /* ── Notif permission bar ── */
+  #notif-bar {
+    position: fixed; top: 54px; left: 0; right: 0; z-index: 1050;
+    background: rgba(63,185,80,.12); border-bottom: 1px solid rgba(63,185,80,.3);
+    display: flex; align-items: center; gap: 10px; padding: 6px 16px;
+    font-size: 12px; color: var(--text);
+  }
+  #notif-bar button { padding: 3px 12px; border-radius: 20px; border: 1px solid var(--green);
+    background: rgba(63,185,80,.2); color: var(--green); font-size: 11px; cursor: pointer; }
+  #notif-bar .dismiss { background: none; border-color: var(--border); color: var(--muted); }
+
+  /* ── Map shifted up for ticker ── */
+  #map { bottom: 42px !important; }
+  #side-panel { bottom: 42px !important; }
+
   /* scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -216,8 +315,24 @@
   </div>
 </div>
 
+<!-- Notification permission bar (hidden by default) -->
+<div id="notif-bar" style="display:none">
+  🔔 רוצה להתריע בדפדפן כשמגיע פוסט חדש?
+  <button onclick="askNotifPermission()">אפשר התראות</button>
+  <button class="dismiss" onclick="document.getElementById('notif-bar').style.display='none'">לא עכשיו</button>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
 <!-- Map -->
 <div id="map"></div>
+
+<!-- Live ticker -->
+<div id="live-ticker">
+  <div id="ticker-label">LIVE <div class="live-dot"></div></div>
+  <div id="ticker-track"><div id="ticker-inner"></div></div>
+</div>
 
 <!-- Side panel -->
 <div id="side-panel">
@@ -682,8 +797,295 @@ const week  = new Date(Date.now() - 7*86400000).toISOString().slice(0,10);
 document.getElementById('date-from').value = week;
 document.getElementById('date-to').value   = today;
 
+// ── Live feed state ───────────────────────────────────────────────────────────
+let seenPostIds    = new Set(JSON.parse(localStorage.getItem('seenPostIds') || '[]'));
+let lastLiveCheck  = null;   // ISO string of last live_feed generated_at
+let livePostCache  = [];     // last 60 posts from live_feed
+let tickerOffset   = 0;
+let tickerPaused   = false;
+let newPostsBuffer = [];     // newly arrived posts waiting to be shown
+
+// Freshness thresholds (ms)
+const FRESH_NEW    = 35 * 60 * 1000;   // < 35 min → "just arrived" on map
+const FRESH_HOT    = 2  * 60 * 60 * 1000; // < 2h → active pulse
+
+// ── Live polling ──────────────────────────────────────────────────────────────
+async function pollLiveFeed() {
+  try {
+    const r = await fetch('live_feed.json?t=' + Date.now());
+    if (!r.ok) return;
+    const data = await r.json();
+
+    const genAt = data.generated_at;
+    if (genAt === lastLiveCheck) return;   // nothing changed
+    lastLiveCheck = genAt;
+
+    const posts     = data.posts || [];
+    const incoming  = posts.filter(p => p.id && !seenPostIds.has(p.id));
+
+    if (incoming.length > 0) {
+      // Mark as seen
+      incoming.forEach(p => seenPostIds.add(p.id));
+      // Keep localStorage manageable
+      const arr = [...seenPostIds];
+      if (arr.length > 2000) arr.splice(0, arr.length - 2000);
+      localStorage.setItem('seenPostIds', JSON.stringify(arr));
+
+      newPostsBuffer.push(...incoming);
+      livePostCache = posts;
+
+      // Merge new into allPosts
+      const existingIds = new Set(allPosts.map(p => p.id));
+      const merged = incoming.filter(p => !existingIds.has(p.id));
+      if (merged.length) {
+        allPosts = [...merged, ...allPosts];
+        render();   // refresh map markers
+      }
+
+      // Show toasts (max 3 at once)
+      incoming.slice(0, 3).forEach((p, i) => {
+        setTimeout(() => showToast(p), i * 600);
+      });
+
+      // Browser notification for first post
+      if (incoming.length) {
+        sendBrowserNotif(incoming[0], incoming.length);
+      }
+    }
+
+    // Update ticker with latest posts regardless
+    if (posts.length) {
+      livePostCache = posts;
+      renderTicker(posts);
+    }
+
+    // Update "last updated" label
+    const lu = data.generated_at;
+    if (lu) {
+      document.getElementById('last-updated').textContent =
+        'live: ' + timeAgo(new Date(lu));
+    }
+
+  } catch(e) { /* silent */ }
+}
+
+// ── Time helpers ──────────────────────────────────────────────────────────────
+function timeAgo(date) {
+  const sec = Math.floor((Date.now() - date) / 1000);
+  if (sec < 60)  return 'עכשיו';
+  if (sec < 3600) return `לפני ${Math.floor(sec/60)} ד'`;
+  if (sec < 86400) return `לפני ${Math.floor(sec/3600)} ש'`;
+  return `לפני ${Math.floor(sec/86400)} ימים`;
+}
+
+// ── Ticker ────────────────────────────────────────────────────────────────────
+const NOW_THRESHOLD = 35 * 60 * 1000;
+
+function renderTicker(posts) {
+  const sorted = [...posts].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 15);
+  const inner  = document.getElementById('ticker-inner');
+  inner.innerHTML = sorted.map(p => {
+    const isNew  = (Date.now() - new Date(p.date)) < NOW_THRESHOLD;
+    const ago    = timeAgo(new Date(p.date));
+    const txt    = (p.text || '').slice(0, 80);
+    const acc    = p.account || '';
+    const color  = TIER_COLORS[(accountsMeta[acc] || {}).tier] || '#8b949e';
+    return `<div class="tick-item ${isNew ? 'is-new' : ''}"
+        onclick="focusAccount('${acc.replace(/'/g,"\\'")}')">
+      <span class="tick-account ${isNew ? 'new-badge' : ''}"
+        style="color:${color}">${acc}</span>
+      <span class="tick-lang">${p.lang || '?'}</span>
+      <span class="tick-text">${txt}</span>
+      <span class="tick-ago">${ago}</span>
+    </div>`;
+  }).join('');
+
+  // Auto-scroll ticker
+  startTickerScroll();
+}
+
+let tickerScrollTimer = null;
+function startTickerScroll() {
+  if (tickerScrollTimer) clearInterval(tickerScrollTimer);
+  const track  = document.getElementById('ticker-track');
+  const inner  = document.getElementById('ticker-inner');
+  let offset   = 0;
+
+  tickerScrollTimer = setInterval(() => {
+    if (tickerPaused) return;
+    const maxScroll = inner.scrollWidth - track.clientWidth;
+    if (maxScroll <= 0) return;
+    offset = (offset + 0.5) % (inner.scrollWidth);
+    if (offset > maxScroll) offset = 0;
+    inner.style.transform = `translateX(${offset}px)`;
+  }, 30);
+}
+
+document.getElementById('ticker-track').addEventListener('mouseenter', () => tickerPaused = true);
+document.getElementById('ticker-track').addEventListener('mouseleave', () => tickerPaused = false);
+
+// ── Toast notifications ───────────────────────────────────────────────────────
+function showToast(post) {
+  const container = document.getElementById('toast-container');
+  const color = TIER_COLORS[(accountsMeta[post.account] || {}).tier] || '#3fb950';
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.borderColor = color;
+  toast.innerHTML = `
+    <div class="toast-head">
+      <div class="toast-dot" style="background:${color};box-shadow:0 0 6px ${color}"></div>
+      <span class="toast-acc" style="color:${color}">${post.account}</span>
+      <span class="toast-ago">${timeAgo(new Date(post.date))}</span>
+    </div>
+    <div class="toast-text">${(post.text||'').slice(0,120)}</div>
+    <div class="toast-lang">${post.lang || ''} · לחץ למיקום על המפה</div>
+  `;
+  toast.onclick = () => { focusAccount(post.account); toast.remove(); };
+  container.appendChild(toast);
+
+  // Auto-dismiss after 8s
+  setTimeout(() => {
+    toast.classList.add('out');
+    setTimeout(() => toast.remove(), 300);
+  }, 8000);
+
+  // Max 4 toasts visible
+  const all = container.querySelectorAll('.toast');
+  if (all.length > 4) all[0].remove();
+}
+
+// ── Browser notifications ─────────────────────────────────────────────────────
+function askNotifPermission() {
+  if (!('Notification' in window)) return;
+  Notification.requestPermission().then(p => {
+    document.getElementById('notif-bar').style.display = 'none';
+    localStorage.setItem('notifAsked', '1');
+  });
+}
+
+function sendBrowserNotif(post, total) {
+  if (Notification.permission !== 'granted') return;
+  const title = total > 1
+    ? `${total} פוסטים חדשים ברשת האיראנית`
+    : `${post.account} פרסם פוסט חדש`;
+  new Notification(title, {
+    body: (post.text || '').slice(0, 100),
+    icon: 'https://tigertomas-design.github.io/iran-narrative-osint/favicon.png',
+    tag:  'iran-live',   // replace previous notification
+  });
+}
+
+// Ask for notification permission once
+if (!localStorage.getItem('notifAsked') && 'Notification' in window
+    && Notification.permission === 'default') {
+  setTimeout(() => {
+    document.getElementById('notif-bar').style.display = 'flex';
+  }, 3000);
+}
+
+// ── Focus account on map ──────────────────────────────────────────────────────
+function focusAccount(handle) {
+  const coords = COORDS[handle];
+  if (!coords) return;
+  map.flyTo(coords, 6, { animate: true, duration: 1.2 });
+  // Open side panel for this account
+  const { from, to } = getCutoff();
+  const posts = allPosts.filter(p =>
+    p.account === handle && postInRange(p, from, to)
+  );
+  const meta = accountsMeta[handle] || { tier: 'T3', lang: 'EN', type: '' };
+  openPanel(handle, posts, meta);
+}
+
+// ── Update marker freshness ───────────────────────────────────────────────────
+// Extend renderMarkers to show NEW ring for very recent posts
+const _origRenderMarkers = renderMarkers;
+function renderMarkers(byAccount) {
+  markersLayer.clearLayers();
+  const now = Date.now();
+
+  for (const [handle, coords] of Object.entries(COORDS)) {
+    const meta       = accountsMeta[handle] || { tier: 'T3', lang: 'EN', status: 'unknown' };
+    const posts      = byAccount[handle] || [];
+    const color      = TIER_COLORS[meta.tier] || '#8b949e';
+    const hasActivity = posts.length > 0;
+
+    // Freshness
+    const newest    = posts.reduce((best, p) => {
+      const d = new Date(p.date); return d > best ? d : best;
+    }, new Date(0));
+    const age       = now - newest.getTime();
+    const isNew     = age < FRESH_NEW && hasActivity;
+    const isHot     = age < FRESH_HOT && hasActivity;
+
+    const baseR = meta.tier === 'T1' ? 10 : meta.tier === 'T2' ? 8 : 7;
+    const r     = hasActivity ? baseR + (isNew ? 4 : 2) : baseR;
+
+    const pulseColor = isNew ? '#ffffff' : color;
+    const pulseClass = isNew ? 'pulse-ring pulse-new' : 'pulse-ring';
+    const pulse = hasActivity
+      ? `<div class="${pulseClass}" style="
+            width:${r*2}px;height:${r*2}px;top:0;left:0;
+            border:2px solid ${pulseColor};"></div>
+         ${isNew ? `<div class="pulse-ring pulse-new" style="
+            width:${r*2}px;height:${r*2}px;top:0;left:0;
+            border:1px solid ${pulseColor};animation-delay:.5s;"></div>` : ''}`
+      : '';
+
+    const newLabel = isNew
+      ? `<div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+            white-space:nowrap;font-size:9px;font-weight:800;
+            background:var(--green);color:#000;border-radius:8px;padding:1px 5px;
+            animation:newpop .4s ease;">עכשיו</div>`
+      : '';
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="iran-marker" style="position:relative;width:${r*2}px;height:${r*2}px;">
+        ${newLabel}${pulse}
+        <div style="
+          position:absolute;top:0;left:0;
+          width:${r*2}px;height:${r*2}px;border-radius:50%;
+          background:${hasActivity ? color : '#30363d'};
+          border:2px solid ${hasActivity ? color : '#484f58'};
+          box-shadow:${isNew ? `0 0 18px ${color}cc` : isHot ? `0 0 10px ${color}88` : 'none'};
+          opacity:${hasActivity ? 1 : 0.4};
+        "></div>
+      </div>`,
+      iconSize: [r*2, r*2], iconAnchor: [r, r],
+    });
+
+    const marker = L.marker(coords, { icon })
+      .addTo(markersLayer)
+      .on('click', () => openPanel(handle, posts, meta));
+
+    const freshLabel = isNew ? '🟢 עכשיו' : isHot ? '🟡 לאחרונה' : '';
+    const tipLines = [
+      `<b>${handle}</b>`,
+      `${meta.tier} · ${meta.lang}`,
+      hasActivity ? `✉ ${posts.length} פוסטים ${freshLabel}` : 'אין פוסטים בטווח',
+    ];
+    marker.bindTooltip(tipLines.join('<br>'), {
+      direction: 'top', offset: [0, -r], className: 'leaflet-tooltip',
+    });
+  }
+}
+
+// ── Update time-ago every 30s ─────────────────────────────────────────────────
+setInterval(() => {
+  if (livePostCache.length) renderTicker(livePostCache);
+  // Refresh "last updated" display
+  if (lastLiveCheck) {
+    document.getElementById('last-updated').textContent =
+      'live: ' + timeAgo(new Date(lastLiveCheck));
+  }
+}, 30000);
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 loadData();
+// Start live polling immediately, then every 60s
+pollLiveFeed();
+setInterval(pollLiveFeed, 60 * 1000);
 </script>
 </body>
 </html>
