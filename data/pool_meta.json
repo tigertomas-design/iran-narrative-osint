@@ -1,0 +1,22 @@
+{
+  "last_any_update": null,
+  "tracks": {
+    "iran": {
+      "track": "iran",
+      "last_updated": null,
+      "coverage_from": "2026-01-01",
+      "total_posts": 0,
+      "new_posts_today": 0,
+      "accounts_scanned": 0,
+      "accounts_total": 86
+    },
+    "trump": {
+      "track": "trump",
+      "last_updated": null,
+      "coverage_from": "2026-01-01",
+      "total_posts": 0,
+      "new_posts_today": 0,
+      "account": "@realDonaldTrump"
+    }
+  }
+}

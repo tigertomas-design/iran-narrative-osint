@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בריכת מידע — Intelligence Pool</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #21262d; --border2: #30363d;
+  --text: #e6edf3; --muted: #7d8590; --muted2: #484f58;
+  --iran: #f85149; --trump: #e3b341; --pool: #58a6ff;
+  --green: #3fb950; --purple: #bc8cff;
+}
+html, body { background: var(--bg); color: var(--text); font-family: 'Heebo', sans-serif;
+  font-weight: 300; min-height: 100vh; }
+
+/* ── TOP BAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,17,23,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border2);
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 24px; height: 52px;
+}
+.topbar-logo { font-size: 17px; font-weight: 700; color: var(--pool); white-space: nowrap; }
+.topbar-sep  { flex: 1; }
+.scan-status {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; color: var(--muted);
+}
+.status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dot-green  { background: var(--green); box-shadow: 0 0 6px #3fb95088; }
+.dot-yellow { background: var(--trump); box-shadow: 0 0 6px #e3b34188; }
+.dot-red    { background: var(--iran);  box-shadow: 0 0 6px #f8514988; }
+.dot-pulse  { animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 6px; padding: 5px 12px; font-family: 'Heebo', sans-serif;
+  font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: opacity .15s;
+}
+.btn:hover { opacity: .8; }
+.btn-scan  { background: rgba(88,166,255,.15); color: var(--pool); border: 1px solid rgba(88,166,255,.3); }
+.btn-back  { background: rgba(255,255,255,.06); color: var(--muted); border: 1px solid var(--border2); text-decoration: none; }
+
+/* ── LAYOUT ── */
+.page { max-width: 1200px; margin: 0 auto; padding: 32px 24px 64px; }
+
+/* ── ESCALATION BANNER ── */
+.escalation-banner {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 16px; padding: 24px 28px; margin-bottom: 28px;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center;
+}
+.esc-score-wrap { text-align: center; }
+.esc-score {
+  font-size: 56px; font-weight: 900; line-height: 1;
+  background: linear-gradient(135deg, #f85149, #e3b341);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.esc-label { font-size: 12px; color: var(--muted); margin-top: 4px; letter-spacing: .5px; text-transform: uppercase; }
+.esc-bar-wrap { }
+.esc-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.esc-trend { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+.esc-bar-bg { height: 8px; background: var(--border2); border-radius: 4px; overflow: hidden; }
+.esc-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease;
+  background: linear-gradient(90deg, #3fb950, #e3b341, #f85149); }
+.esc-meta { font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; min-width: 160px; }
+.esc-meta span { display: flex; justify-content: space-between; gap: 12px; }
+.esc-meta strong { color: var(--text); }
+
+/* ── TRACK CARDS ROW ── */
+.tracks-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px;
+}
+.track-card {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 20px 22px;
+}
+.track-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.track-name { font-size: 17px; font-weight: 700; }
+.track-badge {
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.badge-live { background: rgba(63,185,80,.15); color: var(--green); border: 1px solid rgba(63,185,80,.3); }
+.badge-soon { background: rgba(125,133,144,.1); color: var(--muted); border: 1px solid var(--border2); }
+.track-stat { display: flex; gap: 20px; font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+.track-stat strong { color: var(--text); font-size: 22px; font-weight: 700; display: block; }
+.track-narratives { display: flex; flex-wrap: wrap; gap: 6px; }
+.nar-tag {
+  font-size: 12px; padding: 2px 8px; border-radius: 12px;
+  background: rgba(88,166,255,.1); color: var(--pool); border: 1px solid rgba(88,166,255,.2);
+}
+
+/* ── BRIEFING ── */
+.section-title {
+  font-size: 18px; font-weight: 700; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border2); }
+.briefing-card {
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 12px;
+  padding: 24px 28px; margin-bottom: 28px; line-height: 1.8; font-size: 16px;
+}
+.briefing-card h3 { font-size: 15px; font-weight: 700; color: var(--pool);
+  margin: 20px 0 6px; letter-spacing: .3px; }
+.briefing-card h3:first-child { margin-top: 0; }
+.briefing-date { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+.briefing-empty { color: var(--muted); font-size: 15px; text-align: center; padding: 40px 0; }
+
+/* ── POSTS FEED ── */
+.feed-controls {
+  display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+}
+.filter-btn {
+  font-size: 13px; padding: 4px 12px; border-radius: 20px; cursor: pointer;
+  border: 1px solid var(--border2); background: transparent; color: var(--muted);
+  font-family: 'Heebo', sans-serif; transition: all .15s;
+}
+.filter-btn.active, .filter-btn:hover {
+  background: rgba(88,166,255,.1); border-color: rgba(88,166,255,.3); color: var(--pool);
+}
+.post-list { display: flex; flex-direction: column; gap: 10px; }
+.post-item {
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 10px;
+  padding: 14px 18px; display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: start;
+}
+.post-item:hover { border-color: var(--border2); background: rgba(22,27,34,.8); }
+.post-handle { font-size: 13px; font-weight: 700; color: var(--iran); white-space: nowrap; }
+.post-handle.trump { color: var(--trump); }
+.post-date   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.post-text   { font-size: 15px; line-height: 1.6; color: var(--text); direction: ltr; text-align: left; }
+.post-metrics { display: flex; gap: 12px; font-size: 12px; color: var(--muted); white-space: nowrap; flex-direction: column; align-items: flex-end; }
+.post-metrics span { display: flex; align-items: center; gap: 3px; }
+.agg-dot { width: 6px; height: 6px; border-radius: 50%; }
+.agg-1,.agg-2 { background: #3fb950; }
+.agg-3        { background: #e3b341; }
+.agg-4,.agg-5 { background: #f85149; }
+.post-narr { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.mini-tag { font-size: 11px; padding: 1px 6px; border-radius: 10px;
+  background: rgba(248,81,73,.1); color: var(--iran); border: 1px solid rgba(248,81,73,.2); }
+
+.load-more { width: 100%; margin-top: 14px; padding: 10px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--muted); font-size: 14px; font-family: 'Heebo';
+  cursor: pointer; transition: background .15s; }
+.load-more:hover { background: rgba(255,255,255,.08); }
+
+/* ── FUTURE TRACKS ── */
+.future-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+.future-card {
+  background: var(--surface); border: 1px dashed var(--border2);
+  border-radius: 12px; padding: 18px 20px; opacity: .6;
+}
+.future-card:hover { opacity: .85; border-style: solid; }
+.future-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.future-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+@media (max-width: 700px) {
+  .tracks-row { grid-template-columns: 1fr; }
+  .future-grid { grid-template-columns: 1fr 1fr; }
+  .escalation-banner { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="home.html" class="btn btn-back">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    בית
+  </a>
+  <span class="topbar-logo">🌊 בריכת מידע</span>
+  <span class="topbar-sep"></span>
+  <div class="scan-status">
+    <div class="status-dot dot-yellow" id="scan-dot"></div>
+    <span id="scan-time">טוען...</span>
+  </div>
+  <button class="btn btn-scan" onclick="triggerScan()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    סרוק עכשיו
+  </button>
+</div>
+
+<div class="page">
+
+  <!-- ESCALATION BANNER -->
+  <div class="escalation-banner" id="esc-banner">
+    <div class="esc-score-wrap">
+      <div class="esc-score" id="esc-score">—</div>
+      <div class="esc-label">הסלמה /10</div>
+    </div>
+    <div class="esc-bar-wrap">
+      <div class="esc-title" id="esc-title">מחשב ציון הסלמה...</div>
+      <div class="esc-trend" id="esc-trend"></div>
+      <div class="esc-bar-bg"><div class="esc-bar-fill" id="esc-bar" style="width:0%"></div></div>
+    </div>
+    <div class="esc-meta" id="esc-meta"></div>
+  </div>
+
+  <!-- TRACK STATUS CARDS -->
+  <div class="section-title">מסלולי נרטיב</div>
+  <div class="tracks-row">
+    <div class="track-card">
+      <div class="track-header">
+        <div class="track-name" style="color:var(--iran)">🇮🇷 נרטיב איראני</div>
+        <span class="track-badge badge-live">LIVE</span>
+      </div>
+      <div class="track-stat">
+        <div><strong id="iran-posts">—</strong>פוסטים</div>
+        <div><strong id="iran-accounts">—</strong>חשבונות</div>
+        <div><strong id="iran-new">—</strong>היום</div>
+      </div>
+      <div class="track-narratives" id="iran-narr"></div>
+    </div>
+    <div class="track-card">
+      <div class="track-header">
+        <div class="track-name" style="color:var(--trump)">🇺🇸 טראמפ</div>
+        <span class="track-badge badge-live">LIVE</span>
+      </div>
+      <div class="track-stat">
+        <div><strong id="trump-posts">—</strong>פוסטים</div>
+        <div><strong id="trump-new">—</strong>היום</div>
+      </div>
+      <div class="track-narratives" id="trump-narr"></div>
+    </div>
+  </div>
+
+  <!-- FUTURE TRACKS -->
+  <div class="future-grid">
+    <div class="future-card">
+      <div class="future-name">🇮🇱 נתניהו</div>
+      <div class="future-desc">נרטיב ממשלת ישראל · ציוצי PM + שרים · תגובות למתיחות</div>
+    </div>
+    <div class="future-card">
+      <div class="future-name">🇷🇺 רוסיה</div>
+      <div class="future-desc">RT, Sputnik, MFA Russia · תמיכה איראנית · counter-narrative</div>
+    </div>
+    <div class="future-card">
+      <div class="future-name">🇨🇳 סין</div>
+      <div class="future-desc">Global Times, CGTN · גישור · עניין כלכלי בהורמוז</div>
+    </div>
+  </div>
+
+  <!-- DAILY BRIEFING -->
+  <div class="section-title">תדריך יומי — סוכן אנליסט</div>
+  <div class="briefing-card" id="briefing-card">
+    <div class="briefing-empty">
+      טרם נוצר תדריך — הסוכן ירוץ אחרי הסריקה הראשונה.<br>
+      <small style="color:var(--muted2);margin-top:8px;display:block">נדרש: ANTHROPIC_API_KEY ב-GitHub Secrets</small>
+    </div>
+  </div>
+
+  <!-- POSTS FEED -->
+  <div class="section-title">פיד פוסטים</div>
+  <div class="feed-controls">
+    <button class="filter-btn active" data-track="all"   onclick="filterFeed('all',this)">הכל</button>
+    <button class="filter-btn"        data-track="iran"  onclick="filterFeed('iran',this)">🇮🇷 איראן</button>
+    <button class="filter-btn"        data-track="trump" onclick="filterFeed('trump',this)">🇺🇸 טראמפ</button>
+    <button class="filter-btn"        data-nar="hormuz"  onclick="filterNarr('hormuz',this)">הורמוז</button>
+    <button class="filter-btn"        data-nar="nuclear-threat" onclick="filterNarr('nuclear-threat',this)">גרעין</button>
+    <button class="filter-btn"        data-nar="military-threat" onclick="filterNarr('military-threat',this)">צבאי</button>
+  </div>
+  <div class="post-list" id="post-list"></div>
+  <button class="load-more" id="load-more-btn" onclick="loadMore()" style="display:none">טען עוד פוסטים</button>
+
+</div>
+
+<script>
+// ── State ───────────────────────────────────────────────────────────────────
+let allPosts   = [];
+let filtTrack  = 'all';
+let filtNarr   = null;
+let shownCount = 30;
+const PAGE_SIZE = 30;
+
+// ── Utilities ────────────────────────────────────────────────────────────────
+function fmtDate(iso) {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('he-IL', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  } catch(e) { return iso.slice(0,10); }
+}
+function fmtTime(iso) {
+  if (!iso) return 'טרם נסרק';
+  const d = new Date(iso), now = new Date();
+  const h = Math.round((now - d) / 3600000);
+  if (h < 1)  return 'עכשיו';
+  if (h < 24) return `לפני ${h} שע׳`;
+  return `לפני ${Math.floor(h/24)} ימים`;
+}
+function fmt(n) { return n ? Number(n).toLocaleString() : '—'; }
+
+// ── Load pool meta ────────────────────────────────────────────────────────────
+fetch('pool_meta.json?t=' + Date.now())
+  .then(r => r.ok ? r.json() : null)
+  .then(meta => {
+    if (!meta) return;
+    const iran  = meta.tracks?.iran  || {};
+    const trump = meta.tracks?.trump || {};
+    const dot   = document.getElementById('scan-dot');
+    const time  = document.getElementById('scan-time');
+
+    time.textContent = 'סריקה אחרונה: ' + fmtTime(meta.last_any_update);
+    dot.className = 'status-dot ' + (meta.last_any_update ? 'dot-green' : 'dot-yellow');
+
+    document.getElementById('iran-posts').textContent    = fmt(iran.total_posts);
+    document.getElementById('iran-accounts').textContent = fmt(iran.accounts_scanned) + '/' + (iran.accounts_total||86);
+    document.getElementById('iran-new').textContent      = fmt(iran.new_posts_today);
+    document.getElementById('trump-posts').textContent   = fmt(trump.total_posts);
+    document.getElementById('trump-new').textContent     = fmt(trump.new_posts_today);
+  })
+  .catch(() => {});
+
+// ── Load Iran posts ───────────────────────────────────────────────────────────
+Promise.all([
+  fetch('iran_posts.json?t='  + Date.now()).then(r => r.ok ? r.json() : {posts:[]}),
+  fetch('trump_posts.json?t=' + Date.now()).then(r => r.ok ? r.json() : {posts:[]}),
+]).then(([iranData, trumpData]) => {
+  const iranPosts  = (iranData.posts  || []).map(p => ({...p, _track:'iran'}));
+  const trumpPosts = (trumpData.posts || []).map(p => ({...p, _track:'trump'}));
+  allPosts = [...iranPosts, ...trumpPosts].sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  renderEscalation(iranPosts);
+  renderNarrativeTags(iranPosts);
+  renderFeed();
+}).catch(() => {
+  document.getElementById('post-list').innerHTML =
+    '<div style="color:var(--muted);padding:40px;text-align:center">טרם בוצעה סריקה.<br><small>הפעילי את ה-GitHub Action לסריקה ראשונה.</small></div>';
+});
+
+// ── Load briefing ─────────────────────────────────────────────────────────────
+fetch('daily_briefing.json?t=' + Date.now())
+  .then(r => r.ok ? r.json() : null)
+  .then(data => {
+    if (!data?.latest) return;
+    const b    = data.latest;
+    const card = document.getElementById('briefing-card');
+    const lines = (b.text || '').split('\n');
+    let html = `<div class="briefing-date">${b.date || ''} · ציון הסלמה: ${b.escalation?.score || '—'}/10</div>`;
+    lines.forEach(l => {
+      const t = l.trim();
+      if (!t) return;
+      if (t.startsWith('===')) html += `<h3>${t.replace(/===/g,'').trim()}</h3>`;
+      else html += `<p>${t}</p>`;
+    });
+    card.innerHTML = html;
+  })
+  .catch(() => {});
+
+// ── Escalation render ─────────────────────────────────────────────────────────
+function renderEscalation(iranPosts) {
+  if (!iranPosts.length) return;
+  const cutoff7 = new Date(Date.now() - 7*864e5).toISOString().slice(0,10);
+  const cutoff1 = new Date(Date.now() - 864e5).toISOString().slice(0,10);
+  const p7  = iranPosts.filter(p => p.date >= cutoff7);
+  const p1  = iranPosts.filter(p => p.date >= cutoff1);
+  if (!p7.length) return;
+  const avgAgg  = p7.reduce((s,p) => s + (p.aggression||0), 0) / p7.length;
+  const avgVol  = p7.length / 7;
+  const langs   = new Set(p1.map(p=>p.lang).filter(Boolean));
+  const langSync = Math.min(langs.size / 5, 1);
+  const score   = Math.min(((avgAgg/5)*0.4 + (Math.min(p1.length/(avgVol+1),1))*0.3 + langSync*0.3)*10, 10);
+  const s = score.toFixed(1);
+
+  document.getElementById('esc-score').textContent = s;
+  document.getElementById('esc-bar').style.width   = (score*10) + '%';
+  document.getElementById('esc-title').textContent = s >= 7 ? 'הסלמה גבוהה' : s >= 4 ? 'רמת מתח בינונית' : 'פעילות רגילה';
+  document.getElementById('esc-trend').textContent = `${p1.length} פוסטים ב-24 שע׳ · ${p7.length} השבוע · ${langs.size} שפות פעילות`;
+
+  const top = {};
+  p7.forEach(p => (p.narratives||[]).forEach(n => top[n] = (top[n]||0)+1));
+  const topArr = Object.entries(top).sort((a,b) => b[1]-a[1]).slice(0,4);
+  document.getElementById('esc-meta').innerHTML = topArr.map(([n,c]) =>
+    `<span><span>${n}</span><strong>${c}</strong></span>`).join('');
+}
+
+// ── Narrative tags ────────────────────────────────────────────────────────────
+function renderNarrativeTags(iranPosts) {
+  const freq = {};
+  iranPosts.forEach(p => (p.narratives||[]).forEach(n => freq[n] = (freq[n]||0)+1));
+  const top = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0,6);
+  document.getElementById('iran-narr').innerHTML =
+    top.map(([n]) => `<span class="nar-tag">${n}</span>`).join('');
+}
+
+// ── Feed render ───────────────────────────────────────────────────────────────
+function filteredPosts() {
+  return allPosts.filter(p => {
+    if (filtTrack !== 'all' && p._track !== filtTrack) return false;
+    if (filtNarr && !(p.narratives||[]).includes(filtNarr) && !(p.topic||[]).includes(filtNarr)) return false;
+    return true;
+  });
+}
+
+function renderFeed() {
+  const posts = filteredPosts();
+  const visible = posts.slice(0, shownCount);
+  const list = document.getElementById('post-list');
+
+  if (!visible.length) {
+    list.innerHTML = '<div style="color:var(--muted);padding:30px;text-align:center">אין פוסטים תואמים</div>';
+    document.getElementById('load-more-btn').style.display = 'none';
+    return;
+  }
+
+  list.innerHTML = visible.map(p => {
+    const isIran  = p._track === 'iran';
+    const agg     = p.aggression || 0;
+    const narrs   = (p.narratives || p.topic || []).slice(0,3);
+    return `<div class="post-item">
+      <div>
+        <div class="post-handle ${isIran?'':'trump'}">${p.account||'@?'}</div>
+        <div class="post-date">${fmtDate(p.date)}</div>
+        <div style="margin-top:6px"><div class="agg-dot agg-${agg}" title="תוקפנות ${agg}/5"></div></div>
+      </div>
+      <div>
+        <div class="post-text">${(p.text||'').slice(0,280)}${(p.text||'').length>280?'…':''}</div>
+        ${narrs.length ? `<div class="post-narr">${narrs.map(n=>`<span class="mini-tag">${n}</span>`).join('')}</div>` : ''}
+      </div>
+      <div class="post-metrics">
+        ${p.views    ? `<span>👁 ${fmt(p.views)}</span>`    : ''}
+        ${p.likes    ? `<span>❤ ${fmt(p.likes)}</span>`    : ''}
+        ${p.retweets ? `<span>🔁 ${fmt(p.retweets)}</span>` : ''}
+        ${p.replies  ? `<span>💬 ${fmt(p.replies)}</span>`  : ''}
+        ${p.url ? `<a href="${p.url}" target="_blank" style="color:var(--muted);font-size:11px;margin-top:4px">↗ מקור</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('load-more-btn').style.display = posts.length > shownCount ? 'block' : 'none';
+}
+
+function loadMore() { shownCount += PAGE_SIZE; renderFeed(); }
+
+function filterFeed(track, btn) {
+  filtTrack = track; filtNarr = null; shownCount = PAGE_SIZE;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeed();
+}
+
+function filterNarr(nar, btn) {
+  filtNarr  = filtNarr === nar ? null : nar;
+  filtTrack = 'all'; shownCount = PAGE_SIZE;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (filtNarr) btn.classList.add('active');
+  else document.querySelector('[data-track="all"]').classList.add('active');
+  renderFeed();
+}
+
+// ── Trigger scan (opens GitHub Actions) ──────────────────────────────────────
+function triggerScan() {
+  const dot = document.getElementById('scan-dot');
+  dot.classList.add('dot-pulse');
+  window.open('https://github.com/tigertomas-design/iran-narrative-osint/actions/workflows/daily-scan.yml', '_blank');
+  setTimeout(() => dot.classList.remove('dot-pulse'), 3000);
+}
+</script>
+</body>
+</html>

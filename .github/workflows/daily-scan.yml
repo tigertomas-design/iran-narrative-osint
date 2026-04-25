@@ -1,26 +1,82 @@
-name: Daily Account Scan
+name: Daily Intelligence Collection + Analysis
 
 on:
   schedule:
     - cron: '0 6 * * *'   # 09:00 Israel time (UTC+3)
-  workflow_dispatch:        # allow manual trigger
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'backfill = fetch from 2026-01-01, incremental = last 48h'
+        required: false
+        default: 'incremental'
+        type: choice
+        options: [incremental, backfill]
 
 jobs:
-  scan:
+  collect-and-analyse:
     runs-on: ubuntu-latest
     permissions:
-      issues: write
-      contents: read
+      contents: write    # to commit updated JSON files
+      issues:   write    # for scan reports
 
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          ref: main
 
-      - name: Run daily scan
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests anthropic
+
+      # ── Collect Iranian accounts ────────────────────────────────────────────
+      - name: Collect — Iran
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-        run: node .github/scripts/daily-scan.js
+          SOCIALDATA_KEY: ${{ secrets.SOCIALDATA_KEY }}
+        run: |
+          MODE_FLAG=""
+          if [ "${{ github.event.inputs.mode }}" = "backfill" ]; then MODE_FLAG="--backfill"; fi
+          python .github/scripts/collect-iran.py $MODE_FLAG
+
+      # ── Collect Trump ───────────────────────────────────────────────────────
+      - name: Collect — Trump
+        env:
+          SOCIALDATA_KEY: ${{ secrets.SOCIALDATA_KEY }}
+        run: |
+          MODE_FLAG=""
+          if [ "${{ github.event.inputs.mode }}" = "backfill" ]; then MODE_FLAG="--backfill"; fi
+          python .github/scripts/collect-trump.py $MODE_FLAG
+
+      # ── Run analyst agents (if Anthropic key is set) ────────────────────────
+      - name: Analyst agents
+        if: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python .github/scripts/analyst.py
+
+      # ── Commit updated data files to main ───────────────────────────────────
+      - name: Commit data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet && echo "No changes" || \
+            git commit -m "data: daily scan $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
+
+      # ── Copy updated data to gh-pages so dashboard picks it up ─────────────
+      - name: Deploy data to gh-pages
+        run: |
+          git fetch origin gh-pages
+          git checkout gh-pages
+          cp data/pool_meta.json      pool_meta.json      2>/dev/null || true
+          cp data/iran_posts.json     iran_posts.json     2>/dev/null || true
+          cp data/trump_posts.json    trump_posts.json    2>/dev/null || true
+          cp data/daily_briefing.json daily_briefing.json 2>/dev/null || true
+          git add pool_meta.json iran_posts.json trump_posts.json daily_briefing.json 2>/dev/null || true
+          git diff --cached --quiet && echo "No gh-pages changes" || \
+            git commit -m "data: deploy scan $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push origin gh-pages
+          git checkout main
