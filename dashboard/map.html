@@ -975,12 +975,12 @@ function sendBrowserNotif(post, total) {
   });
 }
 
-// Ask for notification permission once
+// Ask for notification permission once — show after 5s delay
 if (!localStorage.getItem('notifAsked') && 'Notification' in window
     && Notification.permission === 'default') {
   setTimeout(() => {
     document.getElementById('notif-bar').style.display = 'flex';
-  }, 3000);
+  }, 5000);
 }
 
 // ── Focus account on map ──────────────────────────────────────────────────────

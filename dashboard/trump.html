@@ -21,15 +21,18 @@ body { background:var(--bg); color:var(--text); font-family:'Heebo',sans-serif; 
 
 /* HEADER */
 header {
-  background:linear-gradient(180deg,#040c18,#05101f);
-  border-bottom:1px solid rgba(227,179,65,0.2);
-  padding:0 18px; height:48px; display:flex; align-items:center; gap:12px; flex-shrink:0;
+  background:rgba(13,17,23,0.97);
+  border-bottom:1px solid #30363d;
+  backdrop-filter:blur(12px);
+  padding:0 18px; height:52px; display:flex; align-items:center; gap:12px; flex-shrink:0;
+  position:fixed; top:0; left:0; right:0; z-index:1000;
 }
+body { padding-top: 52px; }
 .back-btn {
   display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,.04);
   border:1px solid rgba(255,255,255,.1); border-radius:7px; padding:5px 12px;
   font-size:15px; font-weight:600; color:var(--muted); cursor:pointer;
-  font-family:'Heebo',sans-serif; transition:.15s;
+  font-family:'Heebo',sans-serif; transition:.15s; text-decoration:none;
 }
 .back-btn:hover { color:var(--text); background:rgba(255,255,255,.08); }
 .hdr-title { font-size:18px; font-weight:900; background:linear-gradient(90deg,#e3b341,#fb8500); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
@@ -154,11 +157,15 @@ svg#chart-svg { width:100%; height:100%; }
 <body>
 
 <header>
-  <button class="back-btn" onclick="location.href='home.html'">← בית</button>
+  <a href="home.html" class="back-btn">← בית</a>
   <div class="hdr-title">נרטיב טראמפ — Truth Social</div>
-  <div class="hdr-period">ינואר 1 – אפריל 24, 2026 · 40 פרסומים מאומתים</div>
-  <span class="hdr-tag" style="color:var(--gold);border-color:rgba(227,179,65,.35)">Truth Social / מסיבות עיתונאים / ראיונות</span>
+  <div style="display:flex;align-items:center;gap:5px;margin-right:auto;">
+    <div style="width:7px;height:7px;border-radius:50%;background:#3fb950;box-shadow:0 0 6px #3fb95088;animation:hdr-blink 1.6s ease-in-out infinite;flex-shrink:0;"></div>
+    <span style="font-size:14px;color:var(--muted)">LIVE</span>
+  </div>
+  <div id="hdr-scan-time" style="font-size:13px;color:var(--muted);white-space:nowrap;"></div>
 </header>
+<style>@keyframes hdr-blink{0%,100%{opacity:1}50%{opacity:.3}}</style>
 
 <!-- STAT STRIP -->
 <div class="stat-strip" id="stat-strip"></div>
@@ -610,6 +617,21 @@ window.addEventListener('DOMContentLoaded', () => {
   buildFeed();
   buildRight();
   window.addEventListener('resize', buildTimeline);
+
+  // Load scan time from pool_meta
+  fetch('pool_meta.json?t=' + Date.now())
+    .then(r => r.ok ? r.json() : null)
+    .then(meta => {
+      if (!meta) return;
+      const iso = meta.last_any_update;
+      if (!iso) return;
+      const d = new Date(iso);
+      const ds = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+      const ts = `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+      const el = document.getElementById('hdr-scan-time');
+      if (el) el.textContent = `סריקה: ${ds} · ${ts}`;
+    })
+    .catch(() => {});
 });
 </script>
 </body>

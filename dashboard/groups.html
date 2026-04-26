@@ -29,15 +29,20 @@ body {
 
 /* ── HEADER ── */
 header {
-  background: linear-gradient(180deg, #040c18 0%, #05101f 100%);
-  border-bottom: 1px solid rgba(188,140,255,0.15);
+  background: rgba(13,17,23,0.97);
+  border-bottom: 1px solid #30363d;
+  backdrop-filter: blur(12px);
   padding: 0 20px;
-  height: 50px;
+  height: 52px;
   display: flex;
   align-items: center;
   gap: 14px;
   flex-shrink: 0;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
 }
+body { padding-top: 52px; }
 
 .back-btn {
   display: inline-flex; align-items: center; gap: 5px;
@@ -67,7 +72,7 @@ header {
 /* ── COMPLETENESS BADGE ── */
 #completeness-badge {
   position: fixed;
-  top: 60px;
+  top: 62px;
   left: 12px;
   z-index: 50;
   display: flex;
@@ -367,11 +372,16 @@ header {
 <header>
   <a href="home.html" class="back-btn">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-    חזרה
+    בית
   </a>
   <span class="header-title">קבוצות שפה — מיקוד קהלים</span>
-  <span class="header-total">104 חשבונות · 6+ שפות</span>
+  <div style="display:flex;align-items:center;gap:5px;margin-right:auto;">
+    <div style="width:7px;height:7px;border-radius:50%;background:#3fb950;box-shadow:0 0 6px #3fb95088;animation:hdr-blink 1.6s ease-in-out infinite;flex-shrink:0;"></div>
+    <span style="font-size:14px;color:var(--muted)">LIVE</span>
+  </div>
+  <div id="hdr-scan-time" style="font-size:13px;color:var(--muted);white-space:nowrap;"></div>
 </header>
+<style>@keyframes hdr-blink{0%,100%{opacity:1}50%{opacity:.3}}</style>
 
 <!-- Completeness badge -->
 <div id="completeness-badge">
@@ -744,6 +754,21 @@ function detectTactics(lang, accounts) {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 renderGroups();
+
+// Load scan time from pool_meta
+fetch('pool_meta.json?t=' + Date.now())
+  .then(r => r.ok ? r.json() : null)
+  .then(meta => {
+    if (!meta) return;
+    const iso = meta.last_any_update;
+    if (!iso) return;
+    const d = new Date(iso);
+    const ds = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+    const ts = `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const el = document.getElementById('hdr-scan-time');
+    if (el) el.textContent = `סריקה: ${ds} · ${ts}`;
+  })
+  .catch(() => {});
 </script>
 </body>
 </html>

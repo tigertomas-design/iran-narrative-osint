@@ -142,19 +142,22 @@ html, body {
   backdrop-filter: blur(8px);
 }
 .stat-item {
-  padding: 12px 24px;
-  font-size: 16px;
+  padding: 14px 28px;
+  font-size: 14px;
   font-weight: 300;
   color: var(--muted);
   white-space: nowrap;
   border-left: 1px solid var(--border);
+  text-align: center;
+  flex: 1;
 }
 .stat-item:first-child { border-left: none; }
 .stat-item strong {
   color: var(--text);
   font-weight: 700;
-  font-size: 28px;
-  margin-left: 5px;
+  font-size: 32px;
+  margin-left: 0;
+  display: block;
 }
 
 /* ── NAV CARDS GRID ── */
@@ -163,7 +166,7 @@ html, body {
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   width: 100%;
-  max-width: 1000px;
+  max-width: 960px;
 }
 
 @media (max-width: 1050px) {
@@ -180,12 +183,13 @@ html, body {
   background: rgba(22,27,34,0.8);
   border: 1px solid var(--border2);
   border-radius: 20px;
-  padding: 32px 24px;
+  padding: 28px 22px;
   cursor: pointer;
   text-decoration: none;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  min-height: 140px;
   backdrop-filter: blur(8px);
   transition: transform 0.18s cubic-bezier(.4,0,.2,1), box-shadow 0.18s, border-color 0.18s;
   position: relative;
@@ -260,10 +264,10 @@ html, body {
 
   <!-- Stats row -->
   <div class="stat-row">
-    <div class="stat-item"><strong>104</strong> חשבונות</div>
-    <div class="stat-item"><strong>46</strong> פרסומים</div>
-    <div class="stat-item"><strong>7</strong> נרטיבים</div>
-    <div class="stat-item"><strong>56</strong> ימים</div>
+    <div class="stat-item"><strong id="stat-posts">—</strong> פרסומים</div>
+    <div class="stat-item"><strong id="stat-accounts">—</strong> חשבונות</div>
+    <div class="stat-item"><strong id="stat-langs">—</strong> שפות</div>
+    <div class="stat-item"><strong id="stat-days">—</strong> ימים</div>
   </div>
 
   <!-- Navigation cards -->
@@ -577,7 +581,7 @@ window.addEventListener('resize', () => {
   animId = requestAnimationFrame(drawCanvas);
 });
 
-// ── POOL META + SCAN BADGE ────────────────────────────────────────────────────
+// ── POOL META + SCAN BADGE + DYNAMIC STATS ───────────────────────────────────
 (function() {
   const dot  = document.getElementById('status-dot');
   const text = document.getElementById('status-text');
@@ -596,6 +600,11 @@ window.addEventListener('resize', () => {
     } catch(e) { return null; }
   }
 
+  // Days since Jan 1 2026
+  const daysSinceStart = Math.floor((Date.now() - new Date('2026-01-01').getTime()) / 86400000);
+  const statDays = document.getElementById('stat-days');
+  if (statDays) statDays.textContent = daysSinceStart;
+
   fetch('pool_meta.json?t=' + Date.now())
     .then(r => r.ok ? r.json() : null)
     .then(meta => {
@@ -608,16 +617,31 @@ window.addEventListener('resize', () => {
       const scanned  = iran.accounts_scanned || 0;
       const total_ac = iran.accounts_total   || 86;
       const pct      = Math.round(scanned / total_ac * 100);
+      const langs    = meta.languages_tracked || iran.languages_count || 7;
 
       dot.className = 'status-dot ' + (pct >= 85 ? 'dot-green' : pct >= 50 ? 'dot-yellow' : 'dot-red');
       text.textContent = `${timeStr} · כיסוי: ${pct}% (${scanned}/${total_ac})`;
       poolDesc.textContent = `${total.toLocaleString()} פוסטים · ${scanned} חשבונות · ${timeStr}`;
+
+      // Update stat row
+      const elPosts    = document.getElementById('stat-posts');
+      const elAccounts = document.getElementById('stat-accounts');
+      const elLangs    = document.getElementById('stat-langs');
+      if (elPosts)    elPosts.textContent    = total > 0 ? total.toLocaleString() : '—';
+      if (elAccounts) elAccounts.textContent = scanned > 0 ? scanned : total_ac;
+      if (elLangs)    elLangs.textContent    = langs;
     })
     .catch(() => {
-      // Fallback to static estimate
+      // Fallback to static estimates
       dot.className = 'status-dot dot-yellow';
       text.textContent = 'כיסוי נתונים: ~43% · סריקה ידנית';
       poolDesc.textContent = 'איראן + טראמפ · סריקה יומית אוטומטית';
+      const elPosts    = document.getElementById('stat-posts');
+      const elAccounts = document.getElementById('stat-accounts');
+      const elLangs    = document.getElementById('stat-langs');
+      if (elPosts)    elPosts.textContent    = '—';
+      if (elAccounts) elAccounts.textContent = '86';
+      if (elLangs)    elLangs.textContent    = '7';
     });
 })();
 </script>
