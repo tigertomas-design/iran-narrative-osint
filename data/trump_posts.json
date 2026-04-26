@@ -1,11 +1,12 @@
 {
   "meta": {
     "track": "trump",
-    "last_updated": "2026-04-25T20:02:50Z",
+    "last_updated": "2026-04-26T09:24:41Z",
     "coverage_from": "2026-01-01",
     "total_posts": 0,
     "new_posts_today": 0,
-    "account": "@realDonaldTrump"
+    "account": "@realDonaldTrump",
+    "source": "twitterapio"
   },
   "posts": []
 }
