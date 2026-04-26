@@ -168,14 +168,19 @@ textarea::placeholder { color: var(--muted2); }
   </a>
   <div>
     <div class="topbar-title">שולחן הערכת מצב</div>
-    <div class="topbar-sub">דבר ישירות עם השחקנים הגיאו-פוליטיים</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:5px;">
+    <div style="width:7px;height:7px;border-radius:50%;background:#3fb950;box-shadow:0 0 6px #3fb95088;animation:topbar-blink 1.6s ease-in-out infinite;flex-shrink:0;"></div>
+    <span style="font-size:13px;color:var(--muted)">LIVE</span>
   </div>
   <span class="topbar-sep"></span>
+  <div id="hdr-scan-time" style="font-size:13px;color:var(--muted);white-space:nowrap;"></div>
   <button class="btn btn-key" onclick="showKeyModal()">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
     מפתח API
   </button>
 </div>
+<style>@keyframes topbar-blink{0%,100%{opacity:1}50%{opacity:.3}}</style>
 
 <div class="layout">
   <!-- ACTOR SIDEBAR -->
@@ -614,6 +619,21 @@ function buildPoolContext() {
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 init();
+
+// Load scan time from pool_meta
+fetch('pool_meta.json?t=' + Date.now())
+  .then(r => r.ok ? r.json() : null)
+  .then(meta => {
+    if (!meta) return;
+    const iso = meta.last_any_update;
+    if (!iso) return;
+    const d = new Date(iso);
+    const ds = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+    const ts = `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const el = document.getElementById('hdr-scan-time');
+    if (el) el.textContent = `סריקה: ${ds} · ${ts}`;
+  })
+  .catch(() => {});
 </script>
 </body>
 </html>
