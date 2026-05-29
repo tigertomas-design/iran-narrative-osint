@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-05-28T10:02:25Z",
+    "last_updated": "2026-05-29T09:55:09Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -4424,7 +4424,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2053241593096749144",
@@ -18632,7 +18632,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052799920352927931",
@@ -20578,7 +20578,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052762136250659003",
@@ -27519,9 +27519,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052547867521302651",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "ceasefire",
+        "military-threat"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052547016081686819",
@@ -27535,9 +27540,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052547016081686819",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "ceasefire",
+        "anti-US"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052546923727319282",
@@ -27552,8 +27562,9 @@
       "quotes": 0,
       "url": "https://x.com/MayadeenEnglish/status/2052546923727319282",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052546271328543219",
@@ -27567,9 +27578,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052546271328543219",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "sovereignty",
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052545673157849381",
@@ -27583,9 +27598,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052545673157849381",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "military-threat",
+        "ceasefire"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052542748046344456",
@@ -27599,9 +27619,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052542748046344456",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052542316422815990",
@@ -27615,9 +27638,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/MayadeenEnglish/status/2052542316422815990",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "ceasefire",
+        "military-threat"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052541795314040972",
@@ -27631,9 +27659,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IRIMFA_SPOX/status/2052541795314040972",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "resistance-axis"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052539660459552834",
@@ -27647,9 +27678,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052539660459552834",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052539249434517633",
@@ -27663,9 +27697,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052539249434517633",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "military-threat"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "positive"
     },
     {
       "id": "2052538979929710711",
@@ -27680,8 +27718,9 @@
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052538979929710711",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052537180241674428",
@@ -27695,9 +27734,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052537180241674428",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "military-threat",
+        "anti-US"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "positive"
     },
     {
       "id": "2052536859415159206",
@@ -27711,9 +27754,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052536859415159206",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "sovereignty"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052536856886059068",
@@ -27727,9 +27773,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052536856886059068",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "ceasefire"
+      ],
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052536854453400014",
@@ -27744,8 +27794,9 @@
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052536854453400014",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052536851542495666",
@@ -27759,9 +27810,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052536851542495666",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US",
+        "conspiracy"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052536848065388699",
@@ -27775,9 +27830,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052536848065388699",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "positive"
     },
     {
       "id": "2052534366014767346",
@@ -27791,9 +27849,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052534366014767346",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "military-threat",
+        "anti-US",
+        "resistance-axis"
+      ],
+      "aggression": 4,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052533950254383412",
@@ -27807,9 +27870,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052533950254383412",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-Israel",
+        "proxy-support",
+        "resistance-axis"
+      ],
+      "aggression": 4,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052531424394441160",
@@ -27823,9 +27891,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052531424394441160",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "military-threat",
+        "anti-US"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052531171880268250",
@@ -27838,9 +27910,13 @@
       "likes": 23,
       "retweets": 5,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-US",
+        "anti-Israel"
+      ],
+      "aggression": 3,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052527920032145798",
@@ -27854,8 +27930,9 @@
       "retweets": 23,
       "replies": 0,
       "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052526935628996611",
@@ -27868,9 +27945,13 @@
       "likes": 27,
       "retweets": 5,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-Israel",
+        "resistance-axis"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052526366860407084",
@@ -27883,9 +27964,12 @@
       "likes": 21,
       "retweets": 3,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "resistance-axis"
+      ],
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052525874122052067",
@@ -27898,9 +27982,13 @@
       "likes": 8,
       "retweets": 7,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "ceasefire",
+        "hormuz"
+      ],
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052525041082945646",
@@ -27914,8 +28002,9 @@
       "retweets": 8,
       "replies": 0,
       "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052524373081288724",
@@ -27928,9 +28017,14 @@
       "likes": 19,
       "retweets": 1,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "ceasefire",
+        "anti-Israel",
+        "sovereignty"
+      ],
+      "aggression": 3,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052523877130276910",
