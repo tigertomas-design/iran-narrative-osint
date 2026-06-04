@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-03T10:59:43Z",
+    "last_updated": "2026-06-04T09:56:46Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -23823,10 +23823,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IRANinHUNGARY/status/2052694904829059439",
-      "narratives": [],
+      "narratives": [
+        "sovereignty"
+      ],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052694162655371540",
@@ -25082,7 +25084,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052666162006110503",
@@ -25991,7 +25993,9 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/MayadeenEnglish/status/2052643731447181503",
-      "narratives": [],
+      "narratives": [
+        "ceasefire"
+      ],
       "aggression": 1,
       "source": "socialdata",
       "sentiment": "neutral"
@@ -26773,7 +26777,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052610997479694504",
@@ -29523,7 +29527,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052497209946419280",
@@ -29880,8 +29884,10 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052493355368489085",
-      "narratives": [],
-      "aggression": 1,
+      "narratives": [
+        "military-threat"
+      ],
+      "aggression": 2,
       "source": "socialdata",
       "sentiment": "neutral"
     },
@@ -29897,8 +29903,10 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052492989931442223",
-      "narratives": [],
-      "aggression": 1,
+      "narratives": [
+        "military-threat"
+      ],
+      "aggression": 2,
       "source": "socialdata",
       "sentiment": "neutral"
     },
@@ -30253,9 +30261,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/iribnews_irib/status/2052489689408364786",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "military-threat"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052489383069073544",
@@ -30268,9 +30279,13 @@
       "likes": 115,
       "retweets": 23,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-US",
+        "sovereignty"
+      ],
+      "aggression": 4,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052489316287349127",
@@ -30283,9 +30298,12 @@
       "likes": 5,
       "retweets": 1,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "ceasefire"
+      ],
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052489219944099972",
@@ -30298,9 +30316,14 @@
       "likes": 15,
       "retweets": 6,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-US",
+        "military-threat",
+        "sovereignty"
+      ],
+      "aggression": 5,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052488943241699425",
@@ -30313,9 +30336,13 @@
       "likes": 5,
       "retweets": 3,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "humanitarian",
+        "resistance-axis"
+      ],
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052488641549652380",
@@ -30329,9 +30356,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052488641549652380",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "military-threat"
+      ],
+      "aggression": 4,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052488620624187755",
@@ -30345,9 +30376,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IRANinKENYA/status/2052488620624187755",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "military-threat"
+      ],
+      "aggression": 5,
+      "source": "socialdata",
+      "sentiment": "positive"
     },
     {
       "id": "2052488248476221443",
@@ -30360,9 +30395,13 @@
       "likes": 9,
       "retweets": 1,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "resistance-axis",
+        "sovereignty"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "positive"
     },
     {
       "id": "2052488019563704352",
@@ -30375,9 +30414,12 @@
       "likes": 27,
       "retweets": 11,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "military-threat"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052487681096012082",
@@ -30390,9 +30432,13 @@
       "likes": 5,
       "retweets": 4,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-Israel",
+        "humanitarian"
+      ],
+      "aggression": 3,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052486923571048588",
@@ -30405,9 +30451,12 @@
       "likes": 19,
       "retweets": 2,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "resistance-axis"
+      ],
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052486380681392541",
@@ -30420,9 +30469,12 @@
       "likes": 26,
       "retweets": 5,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "military-threat"
+      ],
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052486353359712724",
@@ -30435,9 +30487,12 @@
       "likes": 167,
       "retweets": 36,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052486125114069303",
@@ -30450,9 +30505,14 @@
       "likes": 29,
       "retweets": 13,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-Israel",
+        "proxy-support",
+        "ceasefire"
+      ],
+      "aggression": 3,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052486125852209287",
@@ -30466,9 +30526,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052486125852209287",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-Israel",
+        "proxy-support",
+        "resistance-axis"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052485758162792723",
@@ -30481,9 +30546,12 @@
       "likes": 87,
       "retweets": 8,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "sovereignty"
+      ],
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "positive"
     },
     {
       "id": "2052485743138738182",
@@ -30497,9 +30565,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IRANinBULGARIA/status/2052485743138738182",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US",
+        "anti-Israel",
+        "humanitarian"
+      ],
+      "aggression": 4,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052485483133837571",
@@ -30512,9 +30585,14 @@
       "likes": 9,
       "retweets": 3,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-Israel",
+        "proxy-support",
+        "resistance-axis"
+      ],
+      "aggression": 4,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052485407518949782",
@@ -30528,8 +30606,9 @@
       "retweets": 12,
       "replies": 0,
       "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052485362505642019",
@@ -30542,9 +30621,13 @@
       "likes": 7,
       "retweets": 3,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "BRICS",
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052485287763226770",
@@ -30557,9 +30640,13 @@
       "likes": 61,
       "retweets": 8,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "hormuz",
+        "military-threat"
+      ],
+      "aggression": 4,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052484805921480985",
@@ -30572,9 +30659,12 @@
       "likes": 4,
       "retweets": 3,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "sovereignty"
+      ],
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052484561641107528",
