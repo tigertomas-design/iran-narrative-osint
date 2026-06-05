@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-04T09:56:46Z",
+    "last_updated": "2026-06-05T09:50:39Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -4424,7 +4424,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2053241593096749144",
@@ -18636,7 +18636,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052799920352927931",
@@ -25570,7 +25570,7 @@
       "quotes": 0,
       "url": "https://x.com/s_m_marandi/status/2052653635637572010",
       "narratives": [],
-      "aggression": 1,
+      "aggression": 2,
       "source": "socialdata",
       "sentiment": "neutral"
     },
@@ -26250,7 +26250,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052637795592618493",
@@ -26384,7 +26384,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052633362435625410",
@@ -26777,7 +26777,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052610997479694504",
@@ -29524,10 +29524,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IRANinBULGARIA/status/2052497284810568066",
-      "narratives": [],
+      "narratives": [
+        "sovereignty"
+      ],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052497209946419280",
@@ -30677,9 +30679,13 @@
       "likes": 81,
       "retweets": 21,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "sovereignty",
+        "resistance-axis"
+      ],
+      "aggression": 3,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052484175102415304",
@@ -30693,9 +30699,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052484175102415304",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "military-threat",
+        "anti-US"
+      ],
+      "aggression": 4,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052484086967550273",
@@ -30708,9 +30719,13 @@
       "likes": 13,
       "retweets": 3,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-Israel",
+        "conspiracy"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052482955138781545",
@@ -30723,9 +30738,13 @@
       "likes": 25,
       "retweets": 4,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "military-threat",
+        "anti-US"
+      ],
+      "aggression": 5,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052482718970085388",
@@ -30739,8 +30758,9 @@
       "retweets": 2,
       "replies": 0,
       "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052482248419459297",
@@ -30753,9 +30773,14 @@
       "likes": 739,
       "retweets": 184,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "military-threat",
+        "anti-US",
+        "resistance-axis"
+      ],
+      "aggression": 5,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052482228249035002",
@@ -30768,9 +30793,12 @@
       "likes": 46,
       "retweets": 13,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "sovereignty"
+      ],
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052482184468910555",
@@ -30784,9 +30812,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/iribnews_irib/status/2052482184468910555",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "military-threat",
+        "anti-US",
+        "hormuz"
+      ],
+      "aggression": 4,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052481222425678001",
@@ -30800,9 +30833,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IRANinBiH/status/2052481222425678001",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052481091685302335",
@@ -30815,9 +30851,13 @@
       "likes": 58,
       "retweets": 19,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "military-threat",
+        "anti-US"
+      ],
+      "aggression": 4,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052480556185833552",
@@ -30830,9 +30870,13 @@
       "likes": 4,
       "retweets": 4,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "military-threat",
+        "hormuz"
+      ],
+      "aggression": 3,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052480251658219565",
@@ -30845,9 +30889,13 @@
       "likes": 15,
       "retweets": 2,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "proxy-support",
+        "resistance-axis"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "positive"
     },
     {
       "id": "2052479542225248337",
@@ -30861,9 +30909,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052479542225248337",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "military-threat",
+        "anti-US",
+        "hormuz"
+      ],
+      "aggression": 4,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052479229955129545",
@@ -30877,9 +30930,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052479229955129545",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "resistance-axis",
+        "sovereignty"
+      ],
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052478835300450452",
@@ -30893,9 +30950,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/iribnews_irib/status/2052478835300450452",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "sovereignty"
+      ],
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052478708724695552",
@@ -30909,9 +30969,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052478708724695552",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "resistance-axis"
+      ],
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052478580211482920",
@@ -30925,9 +30988,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052478580211482920",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-Israel",
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052478556890857632",
@@ -30942,8 +31009,9 @@
       "quotes": 0,
       "url": "https://x.com/EnglishFars/status/2052478556890857632",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052478433037263163",
@@ -30957,9 +31025,14 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/EnglishFars/status/2052478433037263163",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "military-threat",
+        "anti-US",
+        "anti-Israel"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052478330121695670",
@@ -30973,9 +31046,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/EnglishFars/status/2052478330121695670",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US",
+        "sovereignty"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052478319518462418",
@@ -30990,8 +31067,9 @@
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052478319518462418",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052478316787953900",
@@ -31005,9 +31083,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052478316787953900",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "military-threat"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052478305475911906",
@@ -31021,9 +31102,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/presstvturk/status/2052478305475911906",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "military-threat"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052478232755077260",
@@ -31037,9 +31121,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/EnglishFars/status/2052478232755077260",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052478117495582987",
@@ -31053,9 +31140,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/EnglishFars/status/2052478117495582987",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "sovereignty"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052478017323061651",
