@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-11T10:24:40Z",
+    "last_updated": "2026-06-12T10:13:47Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -13832,7 +13832,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052943092362154422",
@@ -14110,7 +14110,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052917126453731835",
@@ -25084,7 +25084,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052666162006110503",
@@ -26250,7 +26250,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052637795592618493",
@@ -32685,7 +32685,9 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052445569201721396",
-      "narratives": [],
+      "narratives": [
+        "ceasefire"
+      ],
       "aggression": 1,
       "source": "socialdata",
       "sentiment": "neutral"
@@ -32878,8 +32880,9 @@
       "quotes": 0,
       "url": "https://x.com/IrnaEnglish/status/2052435762906267934",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "positive"
     },
     {
       "id": "2052435635634311289",
@@ -32893,9 +32896,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IrnaEnglish/status/2052435635634311289",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "resistance-axis"
+      ],
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "positive"
     },
     {
       "id": "2052435563345572064",
@@ -32909,9 +32915,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052435563345572064",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-Israel"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052435519632503243",
@@ -32925,9 +32934,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IrnaEnglish/status/2052435519632503243",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "resistance-axis"
+      ],
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "positive"
     },
     {
       "id": "2052435291261001747",
@@ -32941,9 +32953,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/Iran_in_UK/status/2052435291261001747",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US",
+        "sovereignty"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052435189599523303",
@@ -32957,9 +32973,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IrnaEnglish/status/2052435189599523303",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "sovereignty",
+        "anti-US"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052435014906773902",
@@ -32973,9 +32993,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IrnaEnglish/status/2052435014906773902",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "sovereignty",
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052434438290645354",
@@ -32989,9 +33013,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IRANinFINLAND/status/2052434438290645354",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US",
+        "humanitarian"
+      ],
+      "aggression": 4,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052433911544701288",
