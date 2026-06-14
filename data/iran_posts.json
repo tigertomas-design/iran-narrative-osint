@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-13T08:59:10Z",
+    "last_updated": "2026-06-14T09:35:14Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -7796,7 +7796,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2053135151673274443",
@@ -10026,7 +10026,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2053064938877489272",
@@ -13832,7 +13832,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052943092362154422",
@@ -14110,7 +14110,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052917126453731835",
@@ -18636,7 +18636,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052799920352927931",
@@ -18712,7 +18712,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052799179924164875",
@@ -26250,7 +26250,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052637795592618493",
@@ -33112,7 +33112,9 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IrnaEnglish/status/2052433329731911922",
-      "narratives": [],
+      "narratives": [
+        "anti-US"
+      ],
       "aggression": 2,
       "source": "socialdata",
       "sentiment": "neutral"
@@ -33187,9 +33189,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/MayadeenEnglish/status/2052431980176818638",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "ceasefire"
+      ],
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052431320484049170",
@@ -33204,8 +33209,9 @@
       "quotes": 0,
       "url": "https://x.com/MayadeenEnglish/status/2052431320484049170",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052431178536292427",
@@ -33219,9 +33225,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/MayadeenEnglish/status/2052431178536292427",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "ceasefire"
+      ],
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052430723034857926",
@@ -33235,9 +33244,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052430723034857926",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-Israel"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052428690928066746",
@@ -33251,9 +33263,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052428690928066746",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US",
+        "conspiracy"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052427816243749172",
@@ -33267,9 +33283,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052427816243749172",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "resistance-axis",
+        "proxy-support"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "positive"
     },
     {
       "id": "2052427551084085405",
@@ -33283,9 +33303,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052427551084085405",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-Israel",
+        "resistance-axis"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "positive"
     },
     {
       "id": "2052426146692616683",
