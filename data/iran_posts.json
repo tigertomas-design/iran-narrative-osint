@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-14T09:35:14Z",
+    "last_updated": "2026-06-15T12:13:40Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -7796,7 +7796,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2053135151673274443",
@@ -31461,7 +31461,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052473193227579797",
@@ -31611,7 +31611,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052471333447962761",
@@ -33324,8 +33324,9 @@
       "quotes": 0,
       "url": "https://x.com/IraninZimbabwe/status/2052426146692616683",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052425729019687240",
@@ -33340,8 +33341,9 @@
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052425729019687240",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052425727337742778",
@@ -33355,9 +33357,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052425727337742778",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "sanctions"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052424059346882865",
@@ -33370,9 +33375,13 @@
       "likes": 2,
       "retweets": 0,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-Israel",
+        "military-threat"
+      ],
+      "aggression": 3,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052423210705027186",
@@ -33386,8 +33395,9 @@
       "retweets": 2,
       "replies": 0,
       "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052423199070081249",
@@ -33400,9 +33410,12 @@
       "likes": 6,
       "retweets": 2,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "ceasefire"
+      ],
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052423128127512675",
@@ -33416,8 +33429,9 @@
       "retweets": 1,
       "replies": 0,
       "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052421835501813957",
