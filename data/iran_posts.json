@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-15T12:13:40Z",
+    "last_updated": "2026-06-16T11:10:47Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -7796,7 +7796,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2053135151673274443",
@@ -26384,7 +26384,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052633362435625410",
@@ -26777,7 +26777,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052610997479694504",
@@ -31461,7 +31461,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052473193227579797",
@@ -31611,7 +31611,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052471333447962761",
@@ -33444,9 +33444,12 @@
       "likes": 6,
       "retweets": 4,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-Israel"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052420502698770654",
@@ -33460,8 +33463,9 @@
       "retweets": 2,
       "replies": 0,
       "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "aggression": 1,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052420486148321710",
@@ -33474,9 +33478,13 @@
       "likes": 8,
       "retweets": 4,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "hormuz",
+        "sovereignty"
+      ],
+      "aggression": 3,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052419847049351416",
