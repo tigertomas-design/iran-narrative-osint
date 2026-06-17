@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-16T11:10:47Z",
+    "last_updated": "2026-06-17T10:56:01Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -13832,7 +13832,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052943092362154422",
@@ -14110,7 +14110,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052917126453731835",
@@ -18636,7 +18636,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052799920352927931",
@@ -18712,7 +18712,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052799179924164875",
@@ -26384,7 +26384,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052633362435625410",
@@ -26777,7 +26777,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052610997479694504",
@@ -31461,7 +31461,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052473193227579797",
@@ -32416,7 +32416,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052451495602266293",
@@ -33497,9 +33497,12 @@
       "likes": 2,
       "retweets": 2,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052419216918069251",
@@ -33514,8 +33517,9 @@
       "quotes": 0,
       "url": "https://x.com/presstvturk/status/2052419216918069251",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052418606638506399",
