@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-20T08:56:38Z",
+    "last_updated": "2026-06-21T09:51:00Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -13832,7 +13832,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052943092362154422",
@@ -14110,7 +14110,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052917126453731835",
@@ -14398,7 +14398,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052901981228810455",
@@ -15423,7 +15423,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052866013331349699",
@@ -33534,7 +33534,9 @@
       "likes": 5,
       "retweets": 3,
       "replies": 0,
-      "narratives": [],
+      "narratives": [
+        "ceasefire"
+      ],
       "aggression": 1,
       "source": "live",
       "sentiment": "neutral"
@@ -33551,9 +33553,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/iraninyerevan/status/2052418297082118515",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052418185450885548",
