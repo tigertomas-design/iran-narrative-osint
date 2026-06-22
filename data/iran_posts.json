@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-21T09:51:00Z",
+    "last_updated": "2026-06-22T11:54:53Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -7796,7 +7796,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2053135151673274443",
@@ -14398,7 +14398,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052901981228810455",
@@ -15423,7 +15423,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052866013331349699",
@@ -25084,7 +25084,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052666162006110503",
@@ -26250,7 +26250,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052637795592618493",
@@ -32533,7 +32533,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052448381679681814",
@@ -33342,10 +33342,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052425729019687240",
-      "narratives": [],
-      "aggression": 1,
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "negative"
     },
     {
       "id": "2052425727337742778",
@@ -33571,9 +33573,13 @@
       "likes": 17,
       "retweets": 8,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "humanitarian",
+        "anti-Israel"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052418185094119614",
@@ -33587,9 +33593,13 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052418185094119614",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "hormuz",
+        "sovereignty"
+      ],
+      "aggression": 3,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052418148729499915",
