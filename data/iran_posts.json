@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-22T11:54:53Z",
+    "last_updated": "2026-06-23T09:39:17Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -4424,7 +4424,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2053241593096749144",
@@ -7796,7 +7796,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2053135151673274443",
@@ -25084,7 +25084,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052666162006110503",
@@ -26250,7 +26250,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052637795592618493",
@@ -32418,7 +32418,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052451495602266293",
@@ -33612,9 +33612,12 @@
       "likes": 8,
       "retweets": 1,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "humanitarian"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "negative"
     },
     {
       "id": "2052418068173766966",
@@ -33627,9 +33630,13 @@
       "likes": 6,
       "retweets": 2,
       "replies": 0,
-      "narratives": [],
-      "aggression": 0,
-      "source": "live"
+      "narratives": [
+        "hormuz",
+        "sovereignty"
+      ],
+      "aggression": 2,
+      "source": "live",
+      "sentiment": "neutral"
     },
     {
       "id": "2052417332727685236",
@@ -33644,8 +33651,9 @@
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052417332727685236",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052416179478692193",
