@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-27T08:36:38Z",
+    "last_updated": "2026-06-28T08:52:02Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -4424,7 +4424,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2053241593096749144",
@@ -7796,7 +7796,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2053135151673274443",
@@ -14398,7 +14398,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052901981228810455",
@@ -15423,7 +15423,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052866013331349699",
@@ -31461,7 +31461,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052473193227579797",
@@ -32537,7 +32537,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052448381679681814",
@@ -33804,8 +33804,9 @@
       "quotes": 0,
       "url": "https://x.com/IraninSpain/status/2052412299441238481",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052411634375610790",
@@ -33820,8 +33821,9 @@
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052411634375610790",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "positive"
     },
     {
       "id": "2052411429505175804",
@@ -33836,8 +33838,9 @@
       "quotes": 0,
       "url": "https://x.com/IraninJapan/status/2052411429505175804",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052411387444388341",
@@ -33852,8 +33855,9 @@
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052411387444388341",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052411259094438278",
