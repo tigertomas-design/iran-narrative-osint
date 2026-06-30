@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-06-29T10:59:24Z",
+    "last_updated": "2026-06-30T09:35:39Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -26250,7 +26250,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052637795592618493",
@@ -26384,7 +26384,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052633362435625410",
@@ -26777,7 +26777,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052610997479694504",
@@ -31461,7 +31461,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052473193227579797",
@@ -32537,7 +32537,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052448381679681814",
@@ -33803,7 +33803,9 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IraninSpain/status/2052412299441238481",
-      "narratives": [],
+      "narratives": [
+        "sovereignty"
+      ],
       "aggression": 1,
       "source": "socialdata",
       "sentiment": "neutral"
@@ -33823,7 +33825,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052411429505175804",
