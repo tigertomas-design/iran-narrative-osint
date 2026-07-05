@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-07-04T08:37:10Z",
+    "last_updated": "2026-07-05T08:52:46Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -7796,7 +7796,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2053135151673274443",
@@ -18636,7 +18636,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052799920352927931",
@@ -18712,7 +18712,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052799179924164875",
@@ -31461,7 +31461,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052473193227579797",
@@ -33993,9 +33993,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IraninIndonesia/status/2052407324309090728",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "conspiracy"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052406853183865040",
@@ -34010,8 +34013,9 @@
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052406853183865040",
       "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "aggression": 1,
+      "source": "socialdata",
+      "sentiment": "neutral"
     },
     {
       "id": "2052405987064328216",
