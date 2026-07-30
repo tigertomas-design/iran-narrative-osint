@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-07-29T08:40:25Z",
+    "last_updated": "2026-07-30T08:26:32Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -4424,7 +4424,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2053241593096749144",
@@ -7796,7 +7796,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2053135151673274443",
@@ -14406,7 +14406,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052901981228810455",
@@ -15431,7 +15431,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052866013331349699",
@@ -26263,7 +26263,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052637795592618493",
@@ -32907,7 +32907,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052435635634311289",
@@ -34296,10 +34296,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/hispantv_brasil/status/2052398968928194828",
-      "narratives": [],
+      "narratives": [
+        "BRICS"
+      ],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052398928708956436",
@@ -34366,7 +34368,9 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/MayadeenEnglish/status/2052396112359624825",
-      "narratives": [],
+      "narratives": [
+        "resistance-axis"
+      ],
       "aggression": 1,
       "source": "socialdata",
       "sentiment": "neutral"
@@ -34441,7 +34445,9 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/AlMayadeenNews/status/2052394456871993440",
-      "narratives": [],
+      "narratives": [
+        "resistance-axis"
+      ],
       "aggression": 1,
       "source": "socialdata",
       "sentiment": "neutral"
@@ -34648,10 +34654,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/PressTV/status/2052387221546705185",
-      "narratives": [],
-      "aggression": 1,
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "negative"
     },
     {
       "id": "2052386801411563613",
