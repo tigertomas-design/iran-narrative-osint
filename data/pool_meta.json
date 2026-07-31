@@ -1,9 +1,9 @@
 {
-  "last_any_update": "2026-07-31T08:13:16Z",
+  "last_any_update": "2026-07-31T08:50:46Z",
   "tracks": {
     "iran": {
       "track": "iran",
-      "last_updated": "2026-07-30T08:26:32Z",
+      "last_updated": "2026-07-31T08:49:26Z",
       "coverage_from": "2026-01-01",
       "total_posts": 11317,
       "new_posts_today": 0,
@@ -12,7 +12,7 @@
     },
     "trump": {
       "track": "trump",
-      "last_updated": "2026-07-30T08:28:00Z",
+      "last_updated": "2026-07-31T08:50:46Z",
       "coverage_from": "2026-01-01",
       "total_posts": 0,
       "new_posts_today": 0,
@@ -21,10 +21,10 @@
     },
     "telegram": {
       "track": "telegram",
-      "last_updated": "2026-07-30T08:27:03Z",
-      "coverage_from": "2026-07-28",
-      "total_posts": 16406,
-      "new_posts": 172,
+      "last_updated": "2026-07-31T08:49:56Z",
+      "coverage_from": "2026-07-29",
+      "total_posts": 16576,
+      "new_posts": 170,
       "channels": 19,
       "errors": []
     }
