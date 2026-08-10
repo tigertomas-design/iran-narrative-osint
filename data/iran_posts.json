@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-08-09T06:56:01Z",
+    "last_updated": "2026-08-10T07:40:29Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -4424,7 +4424,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2053241593096749144",
@@ -12859,7 +12859,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052996079574999504",
@@ -13213,7 +13213,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052976322079809604",
@@ -14406,7 +14406,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052901981228810455",
@@ -23278,7 +23278,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052708339294065097",
@@ -25099,7 +25099,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052666162006110503",
@@ -26399,7 +26399,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052633362435625410",
@@ -34983,7 +34983,9 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IRANinBULGARIA/status/2052379105656446990",
-      "narratives": [],
+      "narratives": [
+        "sovereignty"
+      ],
       "aggression": 2,
       "source": "socialdata",
       "sentiment": "positive"
@@ -35000,7 +35002,9 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/IRANinBULGARIA/status/2052378880267165894",
-      "narratives": [],
+      "narratives": [
+        "sovereignty"
+      ],
       "aggression": 2,
       "source": "socialdata",
       "sentiment": "positive"
