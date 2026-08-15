@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-08-14T07:24:03Z",
+    "last_updated": "2026-08-15T06:37:15Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -7796,7 +7796,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2053135151673274443",
@@ -14406,7 +14406,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052901981228810455",
@@ -18649,7 +18649,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052799920352927931",
@@ -26399,7 +26399,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052633362435625410",
@@ -32441,7 +32441,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052451495602266293",
@@ -32909,7 +32909,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052435635634311289",
