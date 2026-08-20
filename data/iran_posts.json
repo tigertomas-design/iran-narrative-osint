@@ -1,7 +1,7 @@
 {
   "meta": {
     "track": "iran",
-    "last_updated": "2026-08-19T06:42:24Z",
+    "last_updated": "2026-08-20T06:43:50Z",
     "coverage_from": "2026-01-01",
     "total_posts": 11317,
     "new_posts_today": 0,
@@ -4424,7 +4424,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2053241593096749144",
@@ -13844,7 +13844,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052943092362154422",
@@ -14410,7 +14410,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "neutral"
+      "sentiment": "positive"
     },
     {
       "id": "2052901981228810455",
@@ -18653,7 +18653,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052799920352927931",
@@ -26269,7 +26269,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052637795592618493",
@@ -32913,7 +32913,7 @@
       "narratives": [],
       "aggression": 1,
       "source": "socialdata",
-      "sentiment": "positive"
+      "sentiment": "neutral"
     },
     {
       "id": "2052435635634311289",
@@ -35250,9 +35250,12 @@
       "replies": 0,
       "quotes": 0,
       "url": "https://x.com/MayadeenEnglish/status/2052369675107897607",
-      "narratives": [],
-      "aggression": 0,
-      "source": "socialdata"
+      "narratives": [
+        "anti-US"
+      ],
+      "aggression": 2,
+      "source": "socialdata",
+      "sentiment": "negative"
     },
     {
       "id": "2052369570577400254",
