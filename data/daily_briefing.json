@@ -1,13 +1,13 @@
 {
   "latest": {
-    "date": "2026-09-13",
-    "generated": "2026-09-13T11:14:56Z",
+    "date": "2026-09-14",
+    "generated": "2026-09-14T12:00:10Z",
     "escalation": {
       "score": 4.8,
       "trend": "stable",
       "avg_aggression": 0.0,
-      "posts_24h": 312,
-      "posts_7d": 1480,
+      "posts_24h": 364,
+      "posts_7d": 1538,
       "langs_active": [
         "AR",
         "EN",
@@ -15,27 +15,9 @@
       ],
       "top_narratives": []
     },
-    "text": "שגיאה בייצור תדריך: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cf1LnnAwSw7iG6M8VnaQE'}"
+    "text": "שגיאה בייצור תדריך: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cf3J3nTPNedgjVn73iqTo'}"
   },
   "history": [
-    {
-      "date": "2026-08-14",
-      "generated": "2026-08-14T07:26:23Z",
-      "escalation": {
-        "score": 4.8,
-        "trend": "stable",
-        "avg_aggression": 0.0,
-        "posts_24h": 261,
-        "posts_7d": 1376,
-        "langs_active": [
-          "AR",
-          "EN",
-          "FA"
-        ],
-        "top_narratives": []
-      },
-      "text": "# תדריך מודיעין יומי\n## מערך ההשפעה האיראני ברשתות החברתיות\n### 14 באוגוסט 2026\n\n---\n\n## סיכום מנהלים\n\nיום שקט יחסית מבחינת תוכן אגרסיבי גלוי, אך עם פעילות מתמשכה ב-261 פוסטים ב-24 שעות האחרונות. הנתון הבולט: **ציון אגרסיביות אפס** בכל הפוסטים שנדגמו — דבר המעיד על מעבר טקטי לשיח \"ממלכתי\" ודיפלומטי, תוך שימור מסרים אסטרטגיים קשים. זהו דפוס אופייני לתקופות בהן איראן מבקשת לבנות לגיטימציה בינלאומית תוך שימור יכולת הסלמה.\n\n---\n\n## === נרטיבים פעילים ===\n\n### 1. **\"פשעי מלחמה אמריקאיים-ישראליים\" — הפנמת סטטוס קורבן**\nPress TV מוביל נרטיב מובנה: *\"Iran strongly condemns US-Israeli violations of international law, saying war crimes committed by the US against Iranians have crossed the boundaries of brutality and barbarity.\"* \n\nהשימוש במונחים \"brutality and barbarity\" מכוון לבניית מסגור של איראן כקורבן — נרטיב המשרת מטרה כפולה: גיוס סימפתיה בינלאומית וביסוס casus belli לתגובה עתידית.\n\n### 2. **שליטה במיצרי הורמוז — הרתעה כלכלית**\nמפקד חיל הים של משמרות המהפכה מדגיש *\"complete and decisive control over the Strait of Hormuz\"* ומתנה פתיחתו ב*\"termination of US aggression.\"* זהו מסר הרתעתי קלאסי המכוון לשווקים הפיננסיים ולמקבלי החלטות בוושינגטון.\n\n### 3. **זיהום נפט בקשם — ייחוס נזק סביבתי לארה\"ב-ישראל**\nהייחוס של זיהום נפט ל\"תוקפנות אמריקאית-ישראלית\" (*\"direct result of US-Israeli aggression\"*) מרחיב את מסגור הסכסוך לממד הסביבתי — אסטרטגיה להגעה לקהלים ירוקים/פרוגרסיביים במערב.\n\n### 4. **\"חוסר כשירות הגזת\" — ניצול מחלוקות פנים-אמריקאיות**\nהדהוד דברי הסנטור שומר נגד שר ההגנה הגזת (*\"מטלגאי ישלמו את מחיר חוסר הכשירות\"*) — טקטיקה של הגברה (amplification) של ביקורת פנימית אמריקאית לערעור אמון הציבור במנהיגות הצבאית.\n\n---\n\n## === שינויים בטון ומגמות ===\n\n**מגמה בולטת: \"דיפלומטיזציה\" של השיח**\n\n- הפוסטים מאופיינים בטון ממלכתי, ציטוט גורמים רשמיים, והימנעות מלשון אגרסיבית גלויה\n- ריבוי תכנים \"נורמליים\" — מזג אוויר, כבישים, ברכות דיפלומטיות (לפקיסטן)\n- פזשקיאן מופיע עם מסרים על \"האצלת סמכויות\" — בניית דימוי של מנהיג רפורמי\n\n**פרשנות:** איראן מנהלת כרגע \"קמפיין לגיטימציה\" — הורדת הטון הרטורי תוך שימור עמדות אסטרטגיות קשות. זו אינה התמתנות אלא טקטיקה.\n\n---\n\n## === קשרים לאירועים גיאו-פוליטיים ===\n\n### הכרה אמריקאית באיי קוריל כיפניים\nדיווח המידן על הכרזת השגריר האמריקאי בטוקיו — אירוע שנועד לעורר תגובה רוסית ולהעמיק את ציר מוסקבה-טהרן. איראן מגבירה תכנים פרו-רוסיים (התקפות על אוקראינה) כחלק מבניית הברית.\n\n### השלכות כלכליות של הסכסוך\nFinancial Times מצוטט שלוש פעמים בהמידן בנושא עליית ריביות והשפעות אינפלציוניות — מסר מכוון: \"המלחמה פוגעת בכם, לא רק בנו.\"\n\n---\n\n## === אזהרות ונרטיבים עולים ===\n\n⚠️ **אנימציית לגו של USS Abraham Lincoln** — Press TV מפיץ אנימציה המתארת \"מצב קשה\" של חיילים אמריקאים. זהו תוכן פסיכולוגי-לוחמתי המכוון לפגיעה במורל ולהשפעה על משפחות חיילים.\n\n⚠️ **\"בארזאריי אמניתי\"** — מינוי מפקדים חדשים מנותח ברשתות כ\"ארגון מחדש מוחלט של הביטחון באיראן.\" עשוי לסמן הכנה לפעולה.\n\n⚠️ **ריכוז תכנים על דרום לבנון** — שלושה דיווחים על פעילות צה\"ל בגבול. שימור מוקדנות \"ציר ההתנגדות.\"\n\n---\n\n## === הסלמה: ציון ונימוק ===\n\n| מדד | ערך |\n|------|------|\n| **ציון הסלמה** | 4.8/10 |\n| **מגמה** | יציבה |\n| **אגרסיביות ממוצעת** | 0.0 |\n\n**נימוק:** הציון המתון משקף את הטון הממלכתי, אך אינו מעיד על הרגעה אמיתית. המסרים האסטרטגיים (הורמוז, פשעי מלחמה, הרתעה) נשמרים. ההימנעות מאגרסיביות גלויה עשויה להיות הכנה לטיעון \"ניסינו בדרכי"
-    },
     {
       "date": "2026-08-15",
       "generated": "2026-08-15T06:39:30Z",
@@ -565,6 +547,24 @@
         "top_narratives": []
       },
       "text": "שגיאה בייצור תדריך: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cf1LnnAwSw7iG6M8VnaQE'}"
+    },
+    {
+      "date": "2026-09-14",
+      "generated": "2026-09-14T12:00:10Z",
+      "escalation": {
+        "score": 4.8,
+        "trend": "stable",
+        "avg_aggression": 0.0,
+        "posts_24h": 364,
+        "posts_7d": 1538,
+        "langs_active": [
+          "AR",
+          "EN",
+          "FA"
+        ],
+        "top_narratives": []
+      },
+      "text": "שגיאה בייצור תדריך: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cf3J3nTPNedgjVn73iqTo'}"
     }
   ]
 }
