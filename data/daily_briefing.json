@@ -1,41 +1,24 @@
 {
   "latest": {
-    "date": "2026-10-17",
-    "generated": "2026-10-17T10:17:15Z",
+    "date": "2026-10-18",
+    "generated": "2026-10-18T10:33:42Z",
     "escalation": {
-      "score": 4.8,
+      "score": 5.4,
       "trend": "stable",
       "avg_aggression": 0.0,
-      "posts_24h": 342,
-      "posts_7d": 1442,
+      "posts_24h": 339,
+      "posts_7d": 1479,
       "langs_active": [
         "AR",
         "EN",
-        "FA"
+        "FA",
+        "FA/EN"
       ],
       "top_narratives": []
     },
-    "text": "שגיאה בייצור תדריך: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cg7dtr7E9Q2nNawZwZFgE'}"
+    "text": "שגיאה בייצור תדריך: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cg9YxUwY3364bTDf6cgGA'}"
   },
   "history": [
-    {
-      "date": "2026-09-17",
-      "generated": "2026-09-17T11:07:43Z",
-      "escalation": {
-        "score": 4.8,
-        "trend": "stable",
-        "avg_aggression": 0.0,
-        "posts_24h": 342,
-        "posts_7d": 1477,
-        "langs_active": [
-          "AR",
-          "EN",
-          "FA"
-        ],
-        "top_narratives": []
-      },
-      "text": "שגיאה בייצור תדריך: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cf8uUXchiwZPRKTymoFCf'}"
-    },
     {
       "date": "2026-09-18",
       "generated": "2026-09-18T10:43:40Z",
@@ -582,6 +565,25 @@
         "top_narratives": []
       },
       "text": "שגיאה בייצור תדריך: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cg7dtr7E9Q2nNawZwZFgE'}"
+    },
+    {
+      "date": "2026-10-18",
+      "generated": "2026-10-18T10:33:42Z",
+      "escalation": {
+        "score": 5.4,
+        "trend": "stable",
+        "avg_aggression": 0.0,
+        "posts_24h": 339,
+        "posts_7d": 1479,
+        "langs_active": [
+          "AR",
+          "EN",
+          "FA",
+          "FA/EN"
+        ],
+        "top_narratives": []
+      },
+      "text": "שגיאה בייצור תדריך: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cg9YxUwY3364bTDf6cgGA'}"
     }
   ]
 }
